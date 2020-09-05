@@ -1,0 +1,285 @@
+Snort 3 differs from Snort 2 in the following ways:
+
+* command line and conf file syntax made more uniform
+* removed unused and deprecated features
+* remove as many barriers to successful run as possible
+  (e.g.: no upper bounds on memcaps)
+* assume the simplest mode of operation
+  (e.g.: never assume input from or output to some hardcoded filename)
+* all Snort 2 config options are grouped into Snort 3 modules
+
+=== Features New to Snort 3
+
+Some things Snort++ can do today that Snort can not do:
+
+* regex fast patterns, not just literals
+* FlatBuffers and JSON perf monitor logs
+* LuaJIT scriptable rule options and loggers
+* pub/sub inspection events (currently used by sip and http_inspect to appid)
+* JIT buffer stuffers (notably with new http_inspect)
+* C-style comments in rules
+* #begin ... #end comment blocks in rules
+* rule remarks (comment is part of rule, not just in it)
+* process raw files (eg read a PDF and do file processing)
+* process raw payload (eg bridge 2 sockets and do inspection)
+* fast pattern offload to separate thread (experimental)
+* track all memory allocated
+* add or override any config item on command line
+* set CPU affinity
+* pause and resume commands
+
+=== Features Improved over Snort 2
+
+Some things Snort++ can do today that Snort can not do as well:
+
+* Hyperscan search engine plugin
+  (Intel provides patch for Snort 2)
+* fast pattern sensitive data
+  (Snort 2 requires a slow, extra search)
+* multiple packet threads with one config
+  (Snort 2 requires multiple processes)
+* wizard automatically detects service for first flow
+  (Snort 2 appid detects for next flow)
+* nested policy binding
+  (Snort 2 has just one level)
+* decode arbitrary layers
+  (Snort 2 supports only 2 IP layers)
+* process PDU buffers
+  (Snort 2 only processes packets)
+* fully stateful http_inspect with 97 builtin alerts
+  (Snort 2 is only partly stateful with 33 builtin alerts)
+* output all semantic errors before quitting
+  (Snort 2 stops at first one)
+* alert file rules
+  (Snort 2 must use multiple rules)
+* alert service rules, eg alert http
+  (Snort 2 must use metadata:service)
+* automatic fast_pattern only
+  (Snort 2 requires explicit fast_pattern:only)
+* elided rule headers omit nets and/or ports
+  (Snort 2 requires explicit 'any')
+* dump builtin rule stubs
+  (Snort 2 can only dump SO stubs)
+* rule sticky buffers
+  (Snort 2 buffers must be repeated)
+* http_header:name supported to restrict to single field
+  (Snort 2 searches all headers)
+* fully equivalent SO rules
+  (Snort 2 has some limitations with SO processing)
+* text-based SO rule implementation
+  (Snort 2 requires tedious, nested C structs)
+* extensible module-based tracing
+  (Snort 2 has a fixed set of flags)
+* over 200 plugins, no need to change core source code
+  (Snort 2 only supports preprocessors and outputs)
+* use consistent conf syntax
+  (Snort 2 defines lists different ways in different places, etc.)
+* use consistent rule syntax
+  (Snort 2 has semicolon separated suboptions, etc.)
+* arbitrary whitespace and comments in conf and rules
+  (Snort 2 requires newline escapes)
+* properly parse rules
+  (Snort 2 can actually completely ignore stuff)
+* optional, expanded warnings output, can be fatal
+  (Snort 2 warnings limited and are not optional or fatal)
+* define and use arbitrary variables and functions in config with Lua
+  (Snort 2 has variables just for rule headers)
+* text-based command line shell
+  (Snort 2 has binary control socket)
+* generate text and HTML user guide in addition to PDF
+  (Snort 2 just has PDF and Talos provides HTML)
+* generate developer's guide
+  (Snort 2's is manually written)
+* extensive command line help, eg every config item, rule option, and peg count
+  (Snort 2 only has command line args)
+* cmake builds
+  (Snort 2 only does automake)
+* read rules from separate file or stdin
+  (Snort 2 requires rules directly in or included in conf)
+* simple, clean, uniform startup and shutdown output
+  (Snort 2 is heavy and inconsistent)
+* port_scan is fully configurable
+  (Snort 2 hard codes most of the configuration)
+* port_scan can block scans
+  (Snort 2 can only detect scans)
+* sigquit will cause a --dirty-pig style exit
+  (Snort 2 handles sigquit the same as sigterm and sigint)
+* detection trace
+  (Snort 2 has more limited buffer dumping)
+* updated unified2 events with MPLS, VLAN, and IP6
+  (Snort 2 requires configuration and extra data)
+* significantly more unit tests, including --catch and make check
+  (Snort 2 has very few unit tests)
+* better modularity 346K/1534 = 226 lines/file, max=2700
+  (Snort 2 has 440K/1021 = 431 lines/file, max=13K)
+
+=== Build Options
+
+* configure --with-lib{pcap,pcre}-* -> --with-{pcap,pcre}-*
+* control socket, cs_dir, and users were deleted
+* POLICY_BY_ID_ONLY code was deleted
+* hardened --enable-inline-init-failopen / INLINE_FAILOPEN
+
+=== Command Line
+
+* --pause loads config and waits for resume before processing packets
+* --require-rule-sid is hardened
+* --shell enables interactive Lua shell
+* -T is assumed if no input given
+* added --help-config prefix to dump all matching settings
+* added --script-path
+* added -L none|dump|pcap
+* added -z <#> and --max-packet-threads <#>
+* delete --enable-mpls-multicast, --enable-mpls-overlapping-ip, 
+  --max-mpls-labelchain-len, --mpls-payload-type
+* deleted --pid-path and --no-interface-pidfile
+* deleting command line options which will be available with --lua or some such including:
+  -I, -h, -F, -p, --disable-inline-init-failopen
+* hardened -n < 0
+* removed --search-method
+* replaced "unknown args are bpf" with --bpf
+* replaced --dynamic-*-lib[-dir] with --plugin-path (with : separators)
+* removed -b, -N, -Z and, --perfmon-file options
+
+=== Conf File
+
+* Snort 3 has a default unicode.map
+* Snort 3 will not enforce an upper bound on memcaps and the like within 64 bits
+* Snort 3 will supply a default *_global config if not specified
+  (Snort 2 would fatal; e.g. http_inspect_server w/o http_inspect_global)
+* address list syntax changes: [[ and ]] must be [ [ and ] ] to avoid Lua string
+  parsing errors (unless in quoted string)
+* because the Lua conf is live code, we lose file:line locations in app error messages
+  (syntax errors from Lua have file:line)
+* changed search-method names for consistency
+* delete config include_vlan_in_alerts (not used in code)
+* delete config so_rule_memcap (not used in code)
+* deleted --disable-attribute-table-reload-thread
+* deleted config decode_*_{alerts,drops} (use rules only)
+* deleted config dump-dynamic-rules-path
+* deleted config ipv6_frag (not actually used)
+* deleted config threshold and ips rule threshold (-> event_filter)
+* eliminated ac-split; must use ac-full-q split-any-any
+* frag3 -> defrag, arpspoof -> arp_spoof, sfportscan -> port_scan,
+  perfmonitor -> perf_monitor, bo -> back_orifice
+* limits like "1234K" are now "limit = 1234, units = 'K'"
+* lua field names are (lower) case sensitive; snort.conf largely wasn't
+* module filenames are not configurable: always <log-dir>/<module-name><suffix>
+  (suffix is determined by module)
+* no positional parameters; all name = value
+* perf_monitor configuration was simplified
+* portscan.detect_ack_scans deleted (exact same as include_midstream)
+* removed various run modes - now just one
+* frag3 default policy is Linux not bsd
+* lowmem* search methods are now in snort_examples
+* deleted unused http_inspect stateful mode
+* deleted stateless inspection from ftp and telnet
+* deleted http and ftp alert options (now strictly rule based)
+* preprocessor disabled settings deleted since no longer relevant
+* sessions are always created; snort config stateful checks eliminated
+* stream5_tcp: prune_log_max deleted; to be replaced with histogram
+* stream5_tcp: max_active_responses, min_response_seconds moved to 
+  active.max_responses, min_interval
+
+=== Rules
+
+* all rules must have a sid
+* sid == 0 not allowed
+* deleted activate / dynamic rules
+* deleted unused rule_state.action
+* deleted metadata engine shared
+* deleted metadata: rule-flushing (with PDU flushing rule flushing can cause
+  missed attacks, the opposite of its intent)
+* changed metadata:service one[, service two]; to service:one[, two];
+* soid is now a non-metadata option
+* metadata is now truly metadata with no impact on detection
+  (Snort doesn't care about metadata internal structure / syntax)
+* deleted fast_pattern:only; use fast_pattern, nocase
+  (option is not added to detection tree if not required)
+* changed fast_pattern:<offset>,<length> to
+  fast_pattern,fast_pattern_offset <offset>,fast_pattern_length <length>
+* fast pattern sensitive data with sd_pattern using hyperscan
+* hyperscan regex fast patterns with regex:"<regex>", fast_pattern;
+* no ; separated content suboptions
+* offset, depth, distance, and within must use a space separator not colon
+  (e.g. offset:5; becomes offset 5;)
+* content suboptions http_* are now full options
+* added sticky buffers: buffer selector options must precede contents and remain
+  in effect until changed
+* the following pcre options have been deleted: use sticky buffers instead
+    B, U, P, H, M, C, I, D, K, S, Y
+* deleted uricontent option; use sticky buffer
+  uricontent:"foo" -->  http_uri; content:"foo"
+* deleted urilen raw and norm; must use http_raw_uri and http_uri instead
+* deleted unused http_encode option
+* urilen replaced with generic bufferlen which applies to current sticky
+  buffer
+* added optional selector to http_header, e.g. http_header:User-Agent;
+* the all new http_inspect has new buffers and rule options
+* added alert file and alert service rules
+  (service in body not required if there is only one and it is in header;
+  alert service / file rules disable fast pattern searching of raw packets)
+* rule option sequence: <stub> soid <hidden>
+* arbitrary whitespace and multiline rules w/o \n
+* #begin ... #end comments to easily comment out multiple lines
+* add rule remarks option with rem:"arbitrary comment"
+* nets and/or ports may be omitted from rule headers (matches any)
+* parse all rules and output all errors before quitting
+* read rules from conf, separate rules file, or stdin
+* The symbol =< in a byte test is recognized as a syntax error. The correct
+  symbol is \<=.
+
+
+=== Output
+
+* alert_fast includes packet data by default
+* all text mode outputs default to stdout
+* changed default logging mode to -L none
+* deleted layer2resets and flexresp2_*
+* deleted log_ascii
+* general output guideline: don't print zero counts
+* Snort 3 queues decoder and inspector events to the main event queue before ips policy
+  is selected; since some events may not be enabled, the queue needs to be sized larger
+  than with Snort 2 which used an intermediate queue for decoder events.
+* deleted the intermediate http and ftp_telnet event queues
+* alert_unified2 and log_unified2 have been deleted
+
+=== Sensitive Data
+
+The Snort 2.X SDF Preprocessor is gone, replaced by ips option `sd_pattern`.
+The sd_pattern rule option is synonymous with the sd_pattern option used
+for gid:138 rules, but has a different syntax. A major difference in syntax
+is the use of Hyperscan pattern matching library which provides a regex
+language similar to PCRE.
+
+To facilitate continued performance, sd_pattern rule option is implemented
+with Hyperscan pattern matching library. The rule option is now also utilized
+as a "fast pattern" in the Snort engine which provides a significant performance
+improvement over the separate detection step of earlier implementations.
+
+The preprocessor alert SDF_COMBO_ALERT (139:1) has been removed and has no
+replacement in Snort 3.X. This is because the rule offered no additional
+value over gid:138 rules and was difficult to interpret the result of.
+
+For more information, See Features > Sensitive Data Filtering for details.
+
+=== Features Not Yet Supported by Snort 3
+
+* Support in http_inspect for Original Client IP is limited to the
+  X-Forwarded-For and True-Client-IP headers in that order. It is not
+  possible to configure additional custom headers to search for Original
+  Client IP.
+
+* The -n option does not work properly when perf_monitor is configured. The
+  number of packets processed from the pcap is likely to be more than the
+  number specified with the -n option.
+
+* When a file is transferred via SMB2 it may be allowed even though
+  according to file policy it should be blocked. This occurs when the
+  create and read requests are sent together and then the read and create
+  responses are sent together. Blocking is done correctly if the create and
+  read requests are sent separately or if the file is large enough to
+  require two read responses.
+
+* This user manual is incomplete and does not fully cover many Snort 2.X
+  features that are also supported by Snort 3.

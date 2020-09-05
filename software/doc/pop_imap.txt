@@ -1,0 +1,76 @@
+POP inspector is a service inspector for POP3 protocol and IMAP inspector 
+is for IMAP4 protocol.
+
+==== Overview
+
+POP and IMAP inspectors examine data traffic and find POP and IMAP 
+commands and responses. The inspectors also identify the command, header, 
+body sections and extract the MIME attachments and decode it 
+appropriately. The pop and imap also identify and whitelist the pop and 
+imap traffic.
+
+==== Configuration
+
+POP inspector and IMAP inspector offer same set of configuration options 
+for MIME decoding depth. These depths range from 0 to 65535 bytes. Setting
+the value to 0 ("do none") turns the feature off. Alternatively the value
+-1 means an unlimited amount of data should be decoded. If you do not
+specify the default value is 1460 bytes.
+
+The depth limits apply per attachment. They are:
+
+===== b64_decode_depth
+
+Set the base64 decoding depth used to decode the base64-encoded MIME
+attachments.
+
+===== qp_decode_depth
+
+Set the Quoted-Printable (QP) decoding depth used to decode QP-encoded
+MIME attachments.
+
+===== bitenc_decode_depth
+
+Set the non-encoded MIME extraction depth used for non-encoded MIME
+attachments.
+
+===== uu_decode_depth
+
+Set the Unix-to-Unix (UU) decoding depth used to decode UU-encoded
+attachments.
+
+===== Examples
+
+
+    stream = { }
+
+    stream_tcp = { }
+
+    stream_ip = { }
+
+    binder =
+    {
+        {
+            {
+                when = { proto = 'tcp', ports = '110', },
+                use = { type = 'pop', },
+            },
+            {
+                when = { proto = 'tcp', ports = '143', },
+                use =  { type = 'imap', },
+            },
+        },
+    }
+
+    imap =
+    {
+        qp_decode_depth = 500,
+    }
+
+    pop =
+    {
+        qp_decode_depth = -1,
+        b64_decode_depth = 3000,
+    }
+
+

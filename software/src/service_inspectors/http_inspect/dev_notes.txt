@@ -1,0 +1,215 @@
+The new Snort HTTP inspector (HI) is divided into two major parts. The HttpStreamSplitter
+(splitter) accepts TCP payload data from Stream and subdivides it into message sections.
+HttpInspect (inspector) processes individual message sections.
+
+Splitter finish() is called by the framework when the TCP connection closes (including pruning).
+It serves several specialized purposes in cases where the HTTP message is truncated (ends
+unexpectedly).
+
+HttpFlowData is a data class representing all HI information relating to a flow. It serves as
+persistent memory between invocations of HI by the framework. It also glues together the inspector,
+the client-to-server splitter, and the server-to-client splitter which pass information through the
+flow data.
+
+Message section is a core concept of HI. A message section is a piece of an HTTP message that is
+processed together. There are seven types of message section:
+
+1. Request line (client-to-server start line)
+2. Status line (server-to-client start line)
+3. Headers (all headers after the start line as a group)
+4. Content-Length message body (a block of message data usually not much larger than 16K from a
+   body defined by the Content-Length header)
+5. Chunked message body (same but from a chunked body)
+6. Old message body (same but from a body with no Content-Length header that runs to connection
+   close)
+7. Trailers (all header lines following a chunked body as a group)
+
+Message sections are represented by message section objects that contain and process them. There
+are eleven message section classes that inherit as follows. An asterisk denotes a virtual class.
+
+1. HttpMsgSection* - top level with all common elements
+2. HttpMsgStart* : HttpMsgSection - common elements of request and status
+3. HttpMsgRequest : HttpMsgStart
+4. HttpMsgStatus : HttpMsgStart
+5. HttpMsgHeadShared* : HttpMsgSection - common elements of header and trailer
+6. HttpMsgHeader : HttpMsgHeadShared
+7. HttpMsgTrailer : HttpMsgHeadShared
+8. HttpMsgBody* : HttpMsgSection - common elements of message body processing
+9. HttpMsgBodyCl : HttpMsgBody
+10. HttpMsgBodyChunk : HttpMsgBody
+11. HttpMsgBodyOld : HttpMsgBody
+
+An HttpTransaction is a container that keeps all the sections of a message together and associates
+the request message with the response message. Transactions may be organized into pipelines when an
+HTTP pipeline is present. The current transaction and any pipeline live in the flow data. A
+transaction may have only a request because the response is not (yet) received or only a response
+because the corresponding request is unknown or unavailable.
+
+The attach_my_transaction() factory method contains all the logic that makes this work. There are
+many corner cases. Don't mess with it until you fully understand it.
+
+Message sections implement the Just-In-Time (JIT) principle for work products. A mimimum of
+essential processing is done under process(). Other work products are derived and stored the first
+time detection or some other customer asks for them.
+
+The Field class is an important tool for managing JIT. It consists of a pointer to a raw message
+field or derived work product with a length field. Various negative length values specify the
+status of the field. For instance STAT_NOTCOMPUTE means the item has not been computed yet,
+STAT_NOTPRESENT means the item does not exist, and STAT_PROBLEMATIC means an attempt to compute the
+item failed. Never dereference the pointer without first checking the length value.
+
+All of these values and more are in http_enums.h which is a general repository for enumerated
+values in HI.
+
+A Field is intended to represent an immutable object. It is either part of the original message
+section or it is a work product that has been derived from the original message section. In the
+former case the original message is constant and there is no reason for a Field value to change. In
+the latter case, once the value has been derived from the original message there is no reason to
+derive it again.
+
+Once Field is set to a non-null value it should never change. The set() functions will assert if
+this rule is disregarded.
+
+A Field may own the buffer containing the message or it may point to a buffer that belongs to
+someone else. When a Field owning a buffer is deleted the buffer is deleted as well. Ownership is
+determined with the Field is initially set. In general any dynamically allocated buffer should be
+owned by a Field. If you follow this rule you won't need to keep track of allocated buffers or have
+delete[]s all over the place.
+
+HI implements flow depth using the request_depth and response_depth parameters. HI seeks to provide
+a consistent experience to detection by making flow depth independent of factors that a sender
+could easily manipulate, such as header length, chunking, compression, and encodings. The maximum
+depth is computed against normalized message body data.
+
+HttpUri is the class that represents a URI. HttpMsgRequest objects have an HttpUri that is created
+during analyze().
+
+URI normalization is performed during HttpUri construction in four steps.
+
+Step 1: Identify the type of URI.
+
+NHI recognizes four types of URI:
+
+1. Asterisk: a lone ‘*’ character signifying that the request does not refer to any resource in
+particular. Often used with the OPTIONS method. This is not normalized.
+
+2. Authority: any URI used with the CONNECT method. The entire URI is treated as an authority.
+
+3. Absolute Path: a URI that begins with a slash. Consists of only an absolute path with no scheme
+or authority present.
+
+4. Absolute URI: a URI which includes a scheme and a host as well as an absolute path. E.g.
+http://example.com/path/to/resource.
+
+Step 2: Decompose the URI into its up to six constituent pieces: scheme, host, port, path, query,
+and fragment.
+
+Based on the URI type the overall URI is divided into scheme, authority, and absolute path. The
+authority is subdivided into host and port. The absolute path is subdivided into path, query, and
+fragment.
+
+The raw URI pieces can be accessed via rules. For example: http_raw_uri: query; content: “foo”
+will only match the query portion of the URI.
+
+Step 3: Normalize the individual pieces.
+
+The scheme and port are not normalized. The other four pieces are normalized in a fashion similar
+to 2.X with an important exception. Path-related normalizations such as eliminating directory
+traversals and squeezing out extra slashes are only done for the path.
+
+The normalized URI pieces can be accessed via rules. For example: http_uri: path; content:
+“foo/bar”.
+
+Step 4: Stitch the normalized pieces back together into a complete normalized URI.
+
+This allows rules to be written against a normalized whole URI as is done in 2.X.
+
+The procedures for normalizing the individual pieces are mostly identical to 2.X. Some points
+warrant mention:
+
+1. NHI considers it to be normal for reserved characters to be percent encoded and does not
+generate an alert. The 119/1 alert is used only for unreserved characters that are found to be
+percent encoded. The ignore_unreserved configuration option allows the user to specify a list of
+unreserved characters that are exempt from this alert.
+
+2. Plus to space substitution is a configuration option. It is not currently limited to the query
+but that would not be a difficult feature to add.
+
+3. The 2.X multi_slash and directory options are combined into a single option called
+simplify_path.
+
+Test tool usage instructions:
+
+The HI internal test tool is the HttpTestInput class. It allows the developer to write tests that
+simulate HTTP messages split into TCP segments at specified points. The tests cover all of splitter
+and inspector and the impact on downstream customers such as detection and file processing.
+
+The test input comes from the file http_test_msgs.txt in the current directory. Enter HTTP test
+message text as you want it to be presented to the StreamSplitter.
+
+The easiest way to format is to put a blank line between message sections so that each message
+section is its own "paragraph". Within a paragraph the placement of single new lines does not have
+any effect. Format a paragraph any way you are comfortable. Extra blank lines between paragraphs
+also do not have any effect.
+
+Each paragraph represents a TCP segment. The splitter can be tested by putting multiple sections in
+the same paragraph (splitter must split) or continuing a section in the next paragraph (splitter
+must search and reassemble).
+
+Lines beginning with # are comments. Lines beginning with @ are commands. This does not apply to
+lines in the middle of a paragraph.
+
+Commands:
+  @break resets HTTP Inspect data structures and begins a new test. Use it liberally to prevent
+     unrelated tests from interfering with each other.
+  @tcpclose simulates a half-duplex TCP close following the next paragraph of data.
+  @request and @response set the message direction. Applies to subsequent paragraphs until changed.
+     The initial direction is always request and the break command resets the direction to request.
+  @fill <decimal number> create a paragraph consisting of <number> octets of auto-fill data
+     ABCDEFGHIJABC ... Primarily useful for chunk testing.
+  @fileset <pathname> specifies a file from which the tool will read data into the message buffer.
+     This may be used to include a zipped or other binary file into a message body. Data is read
+     beginning at the start of the file.
+  @fileread <decimal number> read the specified number of bytes from the included file into the
+     message buffer. Each read corresponds to one TCP section.
+  @fileskip <decimal number> skips over the specified number of bytes in the included file. This
+     must be a positive number. To move backward do a new fileset and skip forward from the
+     beginning.
+  @fileclose resets the current file to none. Closing is done automatically whenever a new file is
+     set or there is a break command. An explicit close is only necessary when you want to revert
+     to generated fill data (see below).
+  @<decimal number> sets the test number and hence the test output file name. Applies to subsequent
+     sections until changed. Don't reuse numbers.
+
+Escape sequences begin with '\'. They may be used within a paragraph or to begin a paragraph.
+  \r - carriage return
+  \n - linefeed
+  \t - tab
+  \\ - backslash
+  \# - #
+  \@ - @
+  \xnn or \Xnn - where nn is a two-digit hexadecimal number. Insert an arbitrary 8-bit number as
+     the next character. a-f and A-F are both acceptable.
+
+Data is separated into segments for presentation to the splitter whenever a paragraph ends (blank
+line).
+
+Whenever a segment contains insufficient data to make up a body, fill data will be provided to
+make up the difference based on the Content-Length field. Specifically, flushing more data than in
+the current segment will trigger filling. The user should include at least one character of body
+data either as part of the previous header segment or at the beginning of a new segment following
+the headers. Fill data will be read from the currently included file. If no included file is
+currently set the fill data will be generated in the pattern ABC...XYZABC...
+
+The current chunk reassembly algorithm does not flush data beyond the current segment. The fill
+feature does not work with chunked bodies but the fill command can be used.
+
+Fill data will not be provided for a paragraph that is preceded by tcpclose. The body will
+terminate at the end of the paragraph.
+
+This test tool does not implement the feature of being hardened against bad input. If you write a
+badly formatted or improper test case the program may assert or crash. The responsibility is on the
+developer to get it right. Currently that is the best use of resources.
+
+Test input is currently designed for single-threaded operation only.
+

@@ -1,0 +1,308 @@
+The section will walk you through building and running Snort.  It is not
+exhaustive but, once you master this material, you should be able to figure
+out more advanced usage.
+
+
+=== Dependencies
+
+Required:
+
+* autotools or cmake to build from source
+
+* daq from http://www.snort.org for packet IO
+
+* g\++ >= 4.8 or other recent C++11 compiler
+
+* dnet from https://github.com/dugsong/libdnet.git for network utility
+  functions
+
+* hwloc from https://www.open-mpi.org/projects/hwloc/ for CPU affinity management
+
+* LuaJIT from http://luajit.org for configuration and scripting
+
+* OpenSSL from https://www.openssl.org/source/ for SHA and MD5 file signatures,
+  the protected_content rule option, and SSL service detection
+
+* pcap from http://www.tcpdump.org for tcpdump style logging
+
+* pcre from http://www.pcre.org for regular expression pattern matching
+
+* pkgconfig from https://www.freedesktop.org/wiki/Software/pkg-config/ to locate build dependencies
+
+* zlib from http://www.zlib.net for decompression (>= 1.2.8 recommended)
+
+Optional:
+
+* asciidoc from http://www.methods.co.nz/asciidoc/ to build the HTML
+  manual
+
+* cpputest from http://cpputest.github.io to run additional unit tests with
+  make check
+
+* dblatex from http://dblatex.sourceforge.net to build the pdf manual (in
+  addition to asciidoc)
+
+* flatbuffers from https://google.github.io/flatbuffers/ for enabling the
+  flatbuffers serialization format
+
+* hyperscan >= 4.4.0 from https://github.com/01org/hyperscan to build new
+  the regex and sd_pattern rule options and hyperscan search engine.
+  Hyperscan is large so it recommended to follow their instructions for
+  building it as a shared library.
+
+* iconv from https://ftp.gnu.org/pub/gnu/libiconv/ for converting
+  UTF16-LE filenames to UTF8 (usually included in glibc)
+
+* lzma >= 5.1.2 from http://tukaani.org/xz/ for decompression of SWF and
+  PDF files
+
+* safec from https://sourceforge.net/projects/safeclib/ for runtime bounds
+  checks on certain legacy C-library calls
+
+* source-highlight from http://www.gnu.org/software/src-highlite/ to
+  generate the dev guide
+
+* w3m from http://sourceforge.net/projects/w3m/ to build the plain text
+  manual
+
+* uuid from uuid-dev package for unique identifiers
+
+=== Building
+
+* Optionally built features are listed in the reference section.
+
+* Create an install path:
+
+    export my_path=/path/to/snorty
+    mkdir -p $my_path
+
+* If you are using a github clone with autotools, do this:
+
+    autoreconf -isvf
+
+* Now do one of the following:
+
+a. To build with cmake and make, run configure_cmake.sh.  It will
+   automatically create and populate a new subdirectory named 'build'.
+
+    ./configure_cmake.sh --prefix=$my_path
+    cd build
+    make -j 8
+    make install
+    ln -s $my_path/conf $my_path/etc
+
+b. You can also specify a cmake project generator:
+
+    ./configure_cmake.sh --generator=Xcode --prefix=$my_path
+
+c. Or use ccmake directly to configure and generate from an arbitrary build
+   directory like one of these:
+
+    ccmake -G Xcode /path/to/Snort++/tree
+    open snort.xcodeproj
+
+    ccmake -G "Eclipse CDT4 - Unix Makefiles" /path/to/Snort++/tree
+    run eclipse and do File > Import > Existing Eclipse Project
+
+* To build with g++ on OS X where clang is installed, do this first:
+
+    export CXX=g++
+
+
+=== Running
+
+First set up the environment:
+
+    export LUA_PATH=$my_path/include/snort/lua/\?.lua\;\;
+    export SNORT_LUA_PATH=$my_path/etc/snort/
+
+Then give it a go:
+
+* Get some help:
+
+    $my_path/bin/snort --help
+    $my_path/bin/snort --help-module suppress
+    $my_path/bin/snort --help-config | grep thread
+
+* Examine and dump a pcap:
+
+    $my_path/bin/snort -r <pcap>
+    $my_path/bin/snort -L dump -d -e -q -r <pcap>
+
+* Verify config, with or w/o rules:
+
+    $my_path/bin/snort -c $my_path/etc/snort/snort.lua
+    $my_path/bin/snort -c $my_path/etc/snort/snort.lua -R $my_path/etc/snort/sample.rules
+
+* Run IDS mode.  To keep it brief, look at the first n packets in each file:
+
+    $my_path/bin/snort -c $my_path/etc/snort/snort.lua -R $my_path/etc/snort/sample.rules \
+        -r <pcap> -A alert_test -n 100000
+
+* Let's suppress 1:2123.  We could edit the conf or just do this:
+
+    $my_path/bin/snort -c $my_path/etc/snort/snort.lua -R $my_path/etc/snort/sample.rules \
+        -r <pcap> -A alert_test -n 100000 --lua "suppress = { { gid = 1, sid = 2123 } }"
+
+* Go whole hog on a directory with multiple packet threads:
+
+    $my_path/bin/snort -c $my_path/etc/snort/snort.lua -R $my_path/etc/snort/sample.rules \
+        --pcap-filter \*.pcap --pcap-dir <dir> -A alert_fast -n 1000 --max-packet-threads 8
+
+For more examples, see the usage section.
+
+
+=== Tips
+
+One of the goals of Snort 3 is to make it easier to configure your sensor.
+Here is a summary of tips and tricks you may find useful.
+
+General Use
+
+* Snort tries hard not to error out too quickly.  It will report multiple
+  semantic errors.
+
+* Snort always assumes the simplest mode of operation.  Eg, you can omit the -T
+  option to validate the conf if you don't provide a packet source.
+
+* Warnings are not emitted unless --warn-* is specified.  --warn-all enables all
+  warnings, and --pedantic makes such warnings fatal.
+
+* You can process multiple sources at one time by using the -z or --max-threads
+  option.
+
+* To make it easy to find the important data, zero counts are not output at
+  shutdown.
+
+* Load plugins from the command line with --plugin-path /path/to/install/lib.
+
+* You can process multiple sources at one time by using the -z or
+  --max-threads option.
+
+* Unit tests are configured with --enable-unit-tests.  They can then be run
+  with snort --catch-test [tags]|all.
+
+Lua Configuration
+
+* Configure the wizard and default bindings will be created based on configured
+  inspectors.  No need to explicitly bind ports in this case.
+
+* You can override or add to your Lua conf with the --lua command line option.
+
+* The Lua conf is a live script that is executed when loaded.  You can add
+  functions, grab environment variables, compute values, etc.
+
+* You can also rename symbols that you want to disable.  For example,
+  changing normalizer to  Xnormalizer (an unknown symbol) will disable the
+  normalizer.  This can be easier than commenting in some cases.
+
+* By default, symbols unknown to Snort are silently ignored.  You can
+  generate warnings for them  with --warn-unknown.  To ignore such symbols,
+  export them in the environment variable SNORT_IGNORE.
+
+Writing and Loading Rules
+
+Snort rules allow arbitrary whitespace.  Multi-line rules make it easier to
+structure your rule  for clarity.  There are multiple ways to add comments to
+your rules:
+
+* The # character starts a comment to end of line.  In addition, all lines
+  between #begin and #end are comments.
+
+* The rem option allows you to write a comment that is conveyed with the rule.
+
+* C style multi-line comments are allowed, which means you can comment out
+  portions of a rule while  testing it out by putting the options between /* and
+  */.
+
+There are multiple ways to load rules too:
+
+* Set ips.rules or ips.include.
+
+* include statements can be used in rules files.
+
+* Use -R to load a rules file.
+
+* Use --stdin-rules with command line redirection.
+
+* Use --lua to specify one or more rules as a command line argument.
+
+Output Files
+
+To make it simple to configure outputs when you run with multiple packet
+threads, output files are not explicitly configured.  Instead, you can use the
+options below to format the paths:
+
+    <logdir>/[<run_prefix>][<id#>][<X>]<name>
+
+* logdir is set with -l and defaults to ./
+
+* run_prefix is set with --run-prefix else not used
+
+* id# is the packet thread number that writes the file; with one packet thread,
+  id# (zero) is omitted without --id-zero
+
+* X is / if you use --id-subdir, else _ if id# is used
+
+* name is based on module name that writes the file
+
+* all text mode outputs default to stdout
+
+
+=== Help
+
+----
+include::help.txt[]
+----
+
+
+=== Common Errors
+
+include::errors.txt[]
+
+
+=== Gotchas
+
+* A nil key in a table will not be caught.  Neither will a nil value in a
+  table.  Neither of the following will cause errors, nor will they 
+  actually set http_inspect.request_depth:
+
+    http_inspect = { request_depth }
+    http_inspect = { request_depth = undefined_symbol }
+
+* It is not an error to set a value multiple times.  The actual value
+  applied may not be the last in the table either.  It is best to avoid
+  such cases.
+
+    http_inspect =
+    {
+        request_depth = 1234,
+        request_depth = 4321
+    }
+
+* Snort can't tell you the exact filename or line number of a semantic
+  error but it will tell you the fully qualified name.
+
+
+=== Known Issues
+
+* The dump DAQ will not work with multiple threads unless you use --daq-var
+  output=none.  This will be fixed at some point to use the Snort log
+  directory, etc.
+
+* If you build with hyperscan on OS X and see:
+
+    dyld: Library not loaded: @rpath/libhs.4.0.dylib
+
+  when you try to run src/snort, export DYLD_LIBRARY_PATH with the path to
+  libhs.  You can also do:
+
+    install_name_tool -change @rpath/libhs.4.0.dylib \
+        /path-to/libhs.4.0.dylib src/snort
+
+* Snort built with tcmalloc support (--enable-tcmalloc) on Ubuntu 17.04/18.04
+  crashes immediately.
+
+  Workaround:
+  Uninstall gperftools 2.5 provided by the distribution and install gperftools
+  2.7 before building Snort.

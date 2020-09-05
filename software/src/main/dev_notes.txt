@@ -1,0 +1,64 @@
+This directory provides the top-level application objects and services.
+SnortConfig is used heavily throughout the code and should be updated so
+that builtin modules can attach state in a generic but readily accessible
+fashion.
+
+
+On Analyzer states and commands:
+
+The Analyzer life cycle is managed as a finite state machine.  It will start
+in the NEW state and will transition to the INITIALIZED state once the object
+is called as part of spinning off a packet thread.  Further transitions will
+be prompted by commands from the main thread.  From INITIALIZED, it will go to
+STARTED via the START command.  Similarly, it will go from STARTED to RUNNING
+via the RUN command.  Finally, it will end up in the STOPPED state when the
+Analyzer object has finished executing.  This can be prompted by the STOP
+command, but may also happen if the Analyzer finishes its operation for other
+reasons (such as encountering an error condition).  The one other state an
+Analyzer may be in is PAUSED, which will occur when it receives the PAUSE
+command while in the RUNNING state.  A subsequent RESUME command will switch
+it back from PAUSED to RUNNING.  One of the primary drivers of this state
+machine pattern is to allow the main thread to have synchronization points
+with the packet threads such that it can drop privileges at the correct time
+(based on the limitations of the selected DAQ module) prior to starting packet
+processing.
+
+Two other commands are currently available: SWAP and ROTATE.  The SWAP command
+will swap in a new configuration at the earliest convenience, and the ROTATE
+command will cause open per-thread output files to be closed, rotated, and
+reopened anew.
+
+On Control connections and management:
+
+Remote control connections can be created using tcp sockets or unix sockets.
+Each control connection (local and/or remote) has a request and shell
+associated with it. The asynchronous control commands within the control
+connection are blocking and control connections are not returned the shell prompt
+until the control commands are completed.
+
+
+Re THREAD_LOCAL defined in thread.h:
+
+In clang, this code compiles (std::array has, for all intents and purposes,
+a constexpr constructor). gcc, on the other hand has stricter requirements
+for constexpr expressions (tested on gcc 4.8, 4.9, and 5) and the code will
+not compile.  This article implies that at the very least, the clang
+treatment is more up-to-date:
+
+http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3597.html
+
+In any case, it does not matter right now, because we are only defining
+THREAD_LOCAL -> thread_local on compilers that do not support extern
+declarations of variables with the GNU __thread attribute (AKA clang).  In
+the future, we may want to consider making the code compatible with either
+TLS attribute, independent of the compiler (and of course
+__declspec(thread) for windows, whenever we cross that bridge).
+
+
+Re Use of libhwloc in thread_config.cc:
+
+The Portable Hardware Locality (hwloc) library provides a nice,
+platform-independent abstraction layer for CPU and memory architecture
+information and management.  Currently it is being used as a cross-platform
+mechanism for managing CPU affinity of threads, but it will be used in the
+future for NUMA (non-uniform memory access) awareness among other things.

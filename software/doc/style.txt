@@ -1,0 +1,347 @@
+All new code should try to follow these style guidelines.  These are not
+yet firm so feedback is welcome to get something we can live with.
+
+=== General
+
+* Generally try to follow
+  http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml, 
+  but there are some differences documented here.
+
+* Each source directory should have a dev_notes.txt file summarizing the
+  key points and design decisions for the code in that directory.  These
+  are built into the developers guide.
+
+* Makefile.am and CMakeLists.txt should have the same files listed in alpha
+  order.  This makes it easier to maintain both build systems.
+
+* All new code must come with unit tests providing 95% coverage or better.
+
+* Generally, Catch is preferred for tests in the source file and CppUTest
+  is preferred for test executables in a test subdirectory.
+
+=== C++ Specific
+
+* Do not use exceptions.  Exception-safe code is non-trivial and we have
+  ported legacy code that makes use of exceptions unwise.  There are a few
+  exceptions to this rule for the memory manager, shell, etc.  Other code
+  should handle errors as errors.
+
+* Do not use dynamic_cast or RTTI.  Although compilers are getting better
+  all the time, there is a time and space cost to this that is easily
+  avoided.
+
+* Use smart pointers judiciously as they aren't free.  If you would have to
+  roll your own, then use a smart pointer.  If you just need a dtor to
+  delete something, write the dtor.
+
+* Prefer 'and' over && and 'or' over || for new source files.
+
+* Use nullptr instead of NULL.
+
+* Use new, delete, and their [] counterparts instead of malloc and free
+  except where realloc must be used.  But try not to use realloc.  New and
+  delete can't return nullptr so no need to check.  And Snort's memory
+  manager will ensure that we live within our memory budget.
+
+* Use references in lieu of pointers wherever possible.
+
+* Use the order public, protected, private top to bottom in a class
+  declaration.
+
+* Keep inline functions in a class declaration very brief, preferably just
+  one line.  If you need a more complex inline function, move the
+  definition below the class declaration.
+
+* The goal is to have highly readable class declarations.  The user
+  shouldn't have to sift through implementation details to see what is
+  available to the client.
+
+* Any using statements in source files should be added only after all
+  includes have been declared.
+
+=== Naming
+
+* Use camel case for namespaces, classes, and types like WhizBangPdfChecker.
+
+* Use lower case identifiers with underscore separators, e.g. some_function()
+  and my_var.
+
+* Do not start or end variable names with an underscore.  This has a good
+  chance of conflicting with macro and/or system definitions.
+
+* Use lower case filenames with underscores.
+
+=== Comments
+
+* Write comments sparingly with a mind towards future proofing.  Often the
+  comments can be obviated with better code.  Clear code is better than a
+  comment.
+
+* Heed Tim Ottinger's Rules on Comments (https://disqus.com/by/tim_ottinger/):
+
+    1. Comments should only say what the code is incapable of saying.
+    2. Comments that repeat (or pre-state) what the code is doing must be
+       removed.
+    3. If the code CAN say what the comment is saying, it must be changed at
+       least until rule #2 is in force.
+
+* Function comment blocks are generally just noise that quickly becomes
+  obsolete.  If you absolutely must comment on parameters, put each on a
+  separate line along with the comment.  That way changing the signature
+  may prompt a change to the comments too.
+
+* Use FIXIT (not FIXTHIS or TODO or whatever) to mark things left for a
+  day or even just a minute.  That way we can find them easily and won't
+  lose track of them.
+
+* Presently using FIXIT-X where X = A | W | P | H | M | L, indicating analysis,
+  warning, perf, high, med, or low priority.  Place A and W comments on the
+  exact warning line so we can match up comments and build output.  Supporting
+  comments can be added above.
+
+* Put the copyright(s) and license in a comment block at the top of each
+  source file (.h and .cc).  Don't bother with trivial scripts and make
+  foo.  Some interesting Lua code should get a comment block too.  Copy and
+  paste exactly from src/main.h (don't reformat).
+
+* Put author, description, etc. in separate comment(s) following the
+  license.  Do not put such comments in the middle of the license foo.
+  Be sure to put the author line ahead of the header guard to exclude them
+  from the developers guide.  Use the following format, and include a
+  mention to the original author if this is derived work:
+
+    // ips_dnp3_obj.cc author Maya Dagon <mdagon@cisco.com>
+    // based on work by Ryan Jordan
+
+* Each header should have a comment immediately after the header guard to
+  give an overview of the file so the reader knows what's going on.
+
+* Use the following comment on switch cases that intentionally fall through
+  to the next case to suppress compiler warning on known valid cases:
+
+    // fallthrough
+
+=== Logging
+
+* Messages intended for the user should not look like debug messages. Eg,
+  the function name should not be included.  It is generally unhelpful to
+  include pointers.
+
+* Most debug messages should just be deleted.
+
+* Don't bang your error messages (no !).  The user feels bad enough about the
+  problem already w/o you shouting at him.
+
+=== Types
+
+* Use logical types to make the code clearer and to help the compiler catch
+  problems.  typedef uint16_t Port; bool foo(Port) is way better than
+  int foo(int port).
+
+* Use forward declarations (e.g. struct SnortConfig;) instead of void*.
+
+* Try not to use extern data unless absolutely necessary and then put the
+  extern in an appropriate header.  Exceptions for things used in exactly
+  one place like BaseApi pointers.
+
+* Use const liberally.  In most cases, const char* s = "foo" should be
+  const char* const s = "foo".  The former goes in the initialized data
+  section and the latter in read only data section.
+
+* But use const char s[] = "foo" instead of const char* s = "foo" when
+  possible.  The latter form allocates a pointer variable and the data
+  while the former allocates only the data.
+
+* Use static wherever possible to minimize public symbols and eliminate
+  unneeded relocations.
+
+* Declare functions virtual only in the parent class introducing the
+  function (not in a derived class that is overriding the function).
+  This makes it clear which class introduces the function.
+
+* Declare functions as override if they are intended to override a
+  function.  This makes it possible to find derived implementations that
+  didn't get updated and therefore won't get called due a change in the
+  parent signature.
+
+* Use bool functions instead of int unless there is truly a need for
+  multiple error returns.  The C-style use of zero for success and -1 for
+  error is less readable and often leads to messy code that either ignores
+  the various errors anyway or needlessly and ineffectively tries to do
+  something about them.  Generally that code is not updated if new errors
+  are added.
+
+=== Macros (aka defines)
+
+* In many cases, even in C++, use #define name "value" instead of a
+  const char* const name = "value" because it will eliminate a symbol from
+  the binary.
+  
+* Use inline functions instead of macros where possible (pretty much all
+  cases except where stringification is necessary).  Functions offer better
+  typing, avoid re-expansions, and a debugger can break there.
+
+* All macros except simple const values should be wrapped in () and all
+  args should be wrapped in () too to avoid surprises upon expansion.
+  Example:
+
+    #define SEQ_LT(a,b)  ((int)((a) - (b)) <  0)
+
+* Multiline macros should be blocked (i.e. inside { }) to avoid if-else type
+  surprises.
+
+=== Formatting
+
+* Try to keep all source files under 2500 lines.  3000 is the max allowed.
+  If you need more lines, chances are that the code needs to be refactored.
+
+* Indent 4 space chars ... no tabs!
+
+* If you need to indent many times, something could be rewritten or
+  restructured to make it clearer.  Fewer indents is generally easier to
+  write, easier to read, and overall better code.
+
+* Braces go on the line immediately following a new scope (function
+  signature, if, else, loop, switch, etc.
+
+* Use consistent spacing and line breaks.  Always indent 4 spaces from the
+  breaking line.  Keep lines less than 100 chars; it greatly helps
+  readability.
+
+    No:
+        calling_a_func_with_a_long_name(arg1,
+                                        arg2,
+                                        arg3);
+
+    Yes:
+        calling_a_func_with_a_long_name(
+            arg1, arg2, arg3);
+
+* Put function signature on one line, except when breaking for the arg
+  list:
+
+    No:
+        inline
+        bool foo()
+        { // ...
+
+    Yes:
+        inline bool foo()
+        { // ...
+
+* Put conditional code on the line following the if so it is easy to break
+  on the conditional block:
+
+  No:
+      if ( test ) foo();
+
+  Yes:
+      if ( test )
+          foo();
+
+=== Headers
+
+* Don't hesitate to create a new header if it is needed.  Don't lump
+  unrelated stuff into an header because it is convenient.
+
+* Write header guards like this (leading underscores are reserved for
+  system stuff).  In my_header.h:
+
+    #ifndef MY_HEADER_H
+    #define MY_HEADER_H
+    // ...
+    #endif
+
+* Includes from a different directory should specify parent directory.
+  This makes it clear exactly what is included and avoids the primordial
+  soup that results from using -I this -I that -I the_other_thing ... .
+
+    // given:
+    src/foo/foo.cc
+    src/bar/bar.cc
+    src/bar/baz.cc
+
+    // in baz.cc
+    #include "bar.h"
+
+    // in foo.cc
+    #include "bar/bar.h"
+
+* Includes within installed headers should specify parent directory.
+
+* Just because it is a #define doesn't mean it goes in a header.
+  Everything should be scoped as tightly as possible.  Shared
+  implementation declarations should go in a separate header from the
+  interface.  And so on.
+
+* All .cc files should include config.h with the standard block shown below
+  immediately following the initial comment blocks and before anything else.
+  This presents a consistent view of all included header files as well as
+  access to any other configure-time definitions. No .h files should include
+  config.h unless they are guaranteed to be local header files (never
+  installed).
+
+    #ifdef HAVE_CONFIG_H
+    #include "config.h"
+    #endif
+
+* A .cc should include its own .h before any others aside from the
+  aforementioned config.h (including system headers).  This ensures that the
+  header stands on its own and can be used by clients without include
+  prerequisites and the developer will be the first to find a dependency issue.
+
+* Split headers included from the local directory into a final block of
+  headers.  For a .cc file, the final order of sets of header includes should
+  look like this:
+
+    1. config.h
+    2. its own .h file
+    3. system headers (.h/.hpp/.hxx)
+    4. C++ standard library headers (no file extension)
+    5. Snort headers external to the local directory (path-prefixed)
+    6. Snort headers in the local directory
+
+* Include required headers, all required headers, and nothing but required
+  headers.  Don't just clone a bunch of headers because it is convenient.
+
+* Keep includes in alphabetical order.  This makes it easier to maintain, avoid
+  duplicates, etc.
+
+* Do not put using statements in headers unless they are tightly scoped.
+
+=== Warnings
+
+* With g++, use at least these compiler flags:
+
+    -Wall -Wextra -pedantic -Wformat -Wformat-security
+    -Wunused-but-set-variable -Wno-deprecated-declarations
+    -fsanitize=address -fno-omit-frame-pointer
+
+* With clang, use at least these compiler flags:
+
+    -Wall -Wextra -pedantic -Wformat -Wformat-security
+    -Wno-deprecated-declarations
+    -fsanitize=address -fno-omit-frame-pointer
+
+* Two macros (PADDING_GUARD_BEGIN and PADDING_GUARD_END) are provided by
+  utils/cpp_macros.h.  These should be used to surround any structure used as
+  a hash key with a raw comparator or that would otherwise suffer from
+  unintentional padding.  A compiler warning will be generated if any structure
+  definition is automatically padded between the macro invocations.
+
+* Then Fix All Warnings and Aborts.  None Allowed.
+
+=== Uncrustify
+
+Currently using uncrustify from at https://github.com/bengardner/uncrustify
+to reformat legacy code and anything that happens to need a makeover at
+some point.
+
+The working config is crusty.cfg in the top level directory.  It does well
+but will munge some things.  Specially formatted INDENT-OFF comments were
+added in 2 places to avoid a real mess.
+
+You can use uncrustify something like this:
+
+    uncrustify -c crusty.cfg --replace file.cc
+

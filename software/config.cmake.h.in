@@ -1,0 +1,171 @@
+#ifndef __CONFIG_H__
+#define __CONFIG_H__
+
+
+/*****************************************************************************/
+/**                                                                         **/
+/** If you want to change any of these options, go to your build directory, **/
+/** and type `ccmake ${PATH_TO_SOURCE}`".  Change your options in the GUI.  **/
+/** Make sure to compile and regenerate the Makefiles when you are done by  **/
+/** either exiting the GUI by typing `c` following by `g`, or by typing     **/
+/** `cmake ${PATH_TO_SOURCE}` from your build directory.                    **/  
+/**                                                                         **/
+/*****************************************************************************/
+
+/* General Snort++ Information */
+
+/* Name of package */
+#define PACKAGE @PROJECT_NAME@
+
+/* Version number of package */
+#define VERSION "@VERSION@"
+
+/* see configure.ac for the purpose of API_OPTIONS */
+/* there is no cmake magic yet to configure this */
+/* but luckily it is not yet needed */
+#define API_OPTIONS ""
+
+
+/*  User-configured options */
+
+/* enable debug messages */
+#cmakedefine DEBUG_MSGS 1
+
+/* enable profiling */
+#cmakedefine PROFILE 1
+
+/* do not generate a core file on segfault etc */
+#cmakedefine NOCOREFILE 1
+
+/* enable piglet */
+#cmakedefine PIGLET 1
+
+/* enable pigasus */
+#cmakedefine PIGASUS 1
+
+/* enable command shell */
+#cmakedefine SHELL 1
+
+/* include internal decoders in binary */
+#cmakedefine STATIC_CODECS 1
+
+/* include internal inspectors in binary */
+#cmakedefine STATIC_INSPECTORS 1
+
+/* include internal ips actions in binary */
+#cmakedefine STATIC_IPS_ACTIONS 1
+
+/* include internal ips options in binary */
+#cmakedefine STATIC_IPS_OPTIONS 1
+
+/* include internal loggers in binary */
+#cmakedefine STATIC_LOGGERS 1
+
+/* include internal inspectors in binary */
+#cmakedefine STATIC_SEARCH_ENGINES 1
+
+/* enable third party appid */
+#cmakedefine ENABLE_APPID_THIRD_PARTY 1
+
+/* enable unit tests */
+#cmakedefine UNIT_TEST 1
+
+/* enable stdlog */
+#cmakedefine USE_STDLOG 1
+
+/* enable tsc clock */
+#cmakedefine USE_TSC_CLOCK 1
+
+/* disable snort profiler */
+#cmakedefine NO_PROFILER 1
+
+/* disable snort memory manager */
+#cmakedefine NO_MEM_MGR 1
+
+/* enable deep profiling */
+#cmakedefine DEEP_PROFILING 1
+
+/* signal to dump stats  */
+#cmakedefine SIGNAL_SNORT_DUMP_STATS @SIGNAL_SNORT_DUMP_STATS@
+
+/* signal to reload attribute table */
+#cmakedefine SIGNAL_SNORT_READ_ATTR_TBL @SIGNAL_SNORT_READ_ATTR_TBL@
+
+/* signal to reload configuration */
+#cmakedefine SIGNAL_SNORT_RELOAD @SIGNAL_SNORT_RELOAD@
+
+/* signal to reload stats */
+#cmakedefine SIGNAL_SNORT_ROTATE_STATS @SIGNAL_SNORT_ROTATE_STATS@
+
+/* large pcap options */
+#cmakedefine _LARGEFILE_SOURCE 1
+#cmakedefine _FILE_OFFSET_BITS @_FILE_OFFSET_BITS@
+
+
+/*  System types and their sizes */
+
+/* The size of `long int', as computed by sizeof. */
+#cmakedefine SIZEOF_LONG_INT @SIZEOF_LONG_INT@
+
+/* The size of `unsigned long int', as computed by sizeof. */
+#cmakedefine SIZEOF_UNSIGNED_LONG_INT @SIZEOF_UNSIGNED_LONG_INT@
+
+/* Define if words are big endian */
+#cmakedefine WORDS_BIGENDIAN 1
+
+
+/*  Header file definitions */
+
+/* Define to 1 if you have the <dumbnet.h> header file. */
+#cmakedefine HAVE_DUMBNET_H 1
+
+
+/*  Available libraries */
+
+/* hyperscan available */
+#cmakedefine HAVE_HYPERSCAN 1
+
+/* lzma available */
+#cmakedefine HAVE_LZMA 1
+
+/* safec available */
+#cmakedefine HAVE_SAFEC 1
+#cmakedefine ENABLE_SAFEC 1
+
+#cmakedefine HAVE_FLATBUFFERS 1
+
+#cmakedefine HAVE_ICONV 1
+
+#cmakedefine HAVE_UUID 1
+
+#cmakedefine USE_TIRPC 1
+
+
+/*  Availability of specific library functions */
+
+/* Define to 1 if you have the `mallinfo' function. */
+#cmakedefine HAVE_MALLINFO 1
+
+/* Define to 1 if you have the `malloc_trim' function. */
+#cmakedefine HAVE_MALLOC_TRIM 1
+
+/* Define to 1 if you have the `memrchr' function. */
+#cmakedefine HAVE_MEMRCHR 1
+
+/* Define to 1 if you have the `sigaction' function. */
+#cmakedefine HAVE_SIGACTION 1
+
+/* Define to 1 if you have the GNU form of the `strerror_r' function. */
+#cmakedefine HAVE_GNU_STRERROR_R 1
+
+
+/*  Available compiler options */
+
+/* Define if the compiler supports visibility declarations. */
+#cmakedefine HAVE_VISIBILITY 1
+
+/* Define if `thread_local` keyword should be used */
+#cmakedefine USE_THREAD_LOCAL 1
+
+#endif
+

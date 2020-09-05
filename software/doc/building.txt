@@ -1,0 +1,37 @@
+The options listed below must be explicitly enabled so they are built
+into the Snort binary.  For a full list of build options, run ./configure
+--help.
+
+*  *--enable-shell*: enable building local and remote command line shell
+   support.
+
+* *--enable-tsc-clock*: use the TSC register on x86 systems for improved
+  performance of latency and profiler features.
+
+These options are built only if the required libraries and headers are
+present.  There is no need to explicitly enable.
+
+* *flatbuffers*: for an alternative perf_monitor logging format.
+
+* *hyperscan* >= 4.4.0: for the regex and sd_pattern rule options and the hyperscan
+  search engine.
+
+* *iconv*: for converting UTF16-LE filenames to UTF8 (usually included in glibc)
+
+* *lzma*: for decompression of SWF and PDF files.
+
+* *safec*: for additional runtime error checking of some memory copy operations.
+
+If you need to use headers and/or libraries in non-standard locations, you
+can use these options:
+
+* *--with-pkg-includes*: specify the directory containing the package
+  headers.
+
+* *--with-pkg-libraries*: specify the directory containing the package
+  libraries.
+
+These can be used for pcap, luajit, pcre, dnet, daq, lzma, openssl,
+flatbuffers, iconv, and hyperscan packages.  For more information on
+these libraries see the Getting Started section of the manual.
+

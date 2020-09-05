@@ -1,0 +1,8 @@
+*.o
+.intel_fpga_pcie*.cmd
+*.ko
+*.ur-safe
+Module.symvers
+modules.order
+.cache.mk
+.tmp_versions

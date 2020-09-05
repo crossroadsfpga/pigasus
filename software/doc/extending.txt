@@ -1,0 +1,607 @@
+=== Plugins
+
+Plugins have an associated API defined for each type, all of which share a
+common 'header', called the BaseApi.  A dynamic library makes its plugins
+available by exporting the snort_plugins symbol, which is a null terminated
+array of BaseApi pointers.
+
+The BaseApi includes type, name, API version, plugin version, and function
+pointers for constructing and destructing a Module.  The specific API add
+various other data and functions for their given roles.
+
+
+=== Modules
+
+If we are defining a new Inspector called, say, gadget, it might be
+configured in snort.lua like this:
+
+    gadget =
+    {
+        brain = true,
+        claw = 3
+    }
+
+When the gadget table is processed, Snort will look for a module called
+gadget.  If that Module has an associated API, it will be used to configure
+a new instance of the plugin.  In this case, a GadgetModule would be
+instantiated, brain and claw would be set, and the Module instance would be
+passed to the GadgetInspector constructor.
+
+Module has three key virtual methods:
+
+* *begin()* - called when Snort starts processing the associated Lua
+  table.  This is a good place to allocate any required data and set
+  defaults.
+* *set()* - called to set each parameter after validation.
+* *end()* - called when Snort finishes processing the associated Lua
+  table.  This is where additional integrity checks of related parameters
+  should be done.
+
+The configured Module is passed to the plugin constructor which pulls the
+configuration data from the Module.  For non-trivial configurations, the
+working paradigm is that Module hands a pointer to the configured data to
+the plugin instance which takes ownership.
+
+Note that there is at most one instance of a given Module, even if multiple
+plugin instances are created which use that Module.  (Multiple instances
+require Snort binding configuration.)
+
+
+=== Inspectors
+
+There are several types of inspector, which determines which inspectors are
+executed when:
+
+* IT_BINDER - determines which inspectors apply to given flows
+
+* IT_WIZARD - determines which service inspector to use if none explicitly
+  bound
+
+* IT_PACKET - used to process all packets before session and service processing
+  (e.g. normalize)
+
+* IT_NETWORK - processes packets w/o service (e.g. arp_spoof, back_orifice)
+
+* IT_STREAM - for flow tracking, ip defrag, and tcp reassembly
+
+* IT_SERVICE - for http, ftp, telnet, etc.
+
+* IT_PROBE - process all packets after all the above (e.g. perf_monitor,
+  port_scan)
+
+
+=== Codecs
+
+The Snort Codecs decipher raw packets. These Codecs are now completely
+pluggable; almost every Snort Codec can be built dynamically and replaced
+with an alternative, customized Codec. The pluggable nature has also made
+it easier to build new Codecs for protocols without having to touch the
+Snort code base. 
+
+The first step in creating a Codec is defining its class and protocol.
+Every Codec must inherit from the Snort Codec class defined in
+"framework/codec.h". The following is an example Codec named "example" and
+has an associated struct that is 14 bytes long.
+
+    #include <cstdint>
+    #include <arpa/inet.h>
+    #include “framework/codec.h”
+    #include "main/snort_types.h"
+
+    #define EX_NAME “example”
+    #define EX_HELP “example codec help string”
+
+    struct Example
+    {
+        uint8_t dst[6];
+        uint8_t src[6];
+        uint16_t ethertype;
+
+        static inline uint8_t size()
+        { return 14; }
+    }
+
+    class ExCodec : public Codec
+    {
+    public:
+        ExCodec() : Codec(EX_NAME) { }
+        ~ExCodec() { }
+
+        bool decode(const RawData&, CodecData&, DecodeData&) override;
+        void get_protocol_ids(std::vector<uint16_t>&) override;
+    };
+
+After defining ExCodec, the next step is adding the Codec's decode
+functionality. The function below does this by implementing a valid decode
+function. The first parameter, which is the RawData struct, provides both a
+pointer to the raw data that has come from a wire and the length of that raw
+data. The function takes this information and validates that there are enough
+bytes for this protocol. If the raw data's length is less than 14 bytes, the
+function returns false and Snort discards the packet; the packet is neither
+inspected nor processed. If the length is greater than 14 bytes, the function
+populates two fields in the CodecData struct, next_prot_id and lyr_len. The
+lyr_len field tells Snort the number of bytes that this layer contains. The
+next_prot_id field provides Snort the value of the next EtherType or IP
+protocol number.
+
+    bool ExCodec::decode(const RawData& raw, CodecData& codec, DecodeData&)
+    {
+       if ( raw.len < Example::size() )
+           return false;
+
+        const Example* const ex = reinterpret_cast<const Example*>(raw.data);
+        codec.next_prot_id = ntohs(ex->ethertype);
+        codec.lyr_len = ex->size();
+        return true;
+    }
+
+For instance, assume this decode function receives the following raw data with
+a validated length of 32 bytes:
+
+    00 11 22 33 44 55 66 77    88 99 aa bb 08 00 45 00
+    00 38 00 01 00 00 40 06    5c ac 0a 01 02 03 0a 09
+
+The Example struct's EtherType field is the 13 and 14 bytes. Therefore, this
+function tells Snort that the next protocol has an EtherType of 0x0800.
+Additionally, since the lyr_len is set to 14, Snort knows that the next
+protocol begins 14 bytes after the beginning of this protocol. The Codec with
+EtherType 0x0800, which happens to be the IPv4 Codec, will receive the
+following data with a validated length of 18 ( == 32 – 14):
+
+    45 00 00 38 00 01 00 00    40 06 5c ac 0a 01 02 03
+    0a 09
+
+How does Snort know that the IPv4 Codec has an EtherType of 0x0800? The
+Codec class has a second virtual function named get_protocol_ids(). When
+implementing the function, a Codec can register for any number of values
+between 0x0000 - 0xFFFF. Then, if the next_proto_id is set to a value for which
+this Codec has registered, this Codec's decode function will be called. As a
+general note, the protocol ids between [0, 0x00FF] are IP protocol numbers,
+[0x0100, 0x05FF] are custom types, and [0x0600, 0xFFFF] are EtherTypes.
+
+For example, in the get_protocol_ids function below, the ExCodec registers for
+the protocols numbers 17, 787, and 2054. 17 happens to be the protocol number
+for UDP while 2054 is ARP's EtherType. Therefore, this Codec will now attempt
+to decode UDP and ARP data. Additionally, if any Codec sets the
+next_protocol_id to 787, ExCodec's decode function will be called. Some custom
+protocols are already defined in the file "protocols/protocol_ids.h" 
+
+    void ExCodec::get_protocol_ids(std::vector<uint16_t>&v)
+    {
+        v.push_back(0x0011); // == 17  == UDP
+        v.push_back(0x1313); // == 787  == custom
+        v.push_back(0x0806); // == 2054  == ARP
+    }
+
+To register a Codec for Data Link Type's rather than protocols, the function
+get_data_link_type() can be similarly implemented.
+
+The final step to creating a pluggable Codec is the snort_plugins array. This
+array is important because when Snort loads a dynamic library, the program
+only find plugins that are inside the snort_plugins array. In other words, if a
+plugin has not been added to the snort_plugins array, that plugin will not be
+loaded into Snort.
+
+Although the details will not be covered in this post, the following code
+snippet is a basic CodecApi that Snort can load. This snippet can be copied
+and used with only three minor changes. First, in the function ctor, ExCodec
+should be replaced with the name of the Codec that is being built. Second,
+EX_NAME must match the Codec's name or Snort will be unable to load this Codec.
+Third, EX_HELP should be replaced with the general description of this Codec.
+Once this code snippet has been added, ExCodec is ready to be compiled and
+plugged into Snort.
+
+    static Codec* ctor(Module*)
+    { return new ExCodec; }
+
+    static void dtor(Codec *cd)
+    { delete cd; }
+
+    static const CodecApi ex_api =
+    {
+        {
+            PT_CODEC,
+            EX_NAME,
+            EX_HELP,
+            CDAPI_PLUGIN_V0,
+            0,
+            nullptr,
+            nullptr,
+        },
+        nullptr, // pointer to a function called during Snort's startup.
+        nullptr, // pointer to a function called during Snort's exit.
+        nullptr, // pointer to a function called during thread's startup.
+        nullptr, // pointer to a function called during thread's destruction.
+        ctor, // pointer to the codec constructor.
+        dtor, // pointer to the codec destructor.
+    };
+
+    SO_PUBLIC const BaseApi* snort_plugins[] =
+    {
+        &ex_api.base,
+        nullptr
+    };
+
+Two example Codecs are available in the extra directory on git and the extra
+tarball on the Snort page. One of those examples is the Token Ring Codec
+while the other example is the PIM Codec.
+
+As a final note, there are four more virtual functions that a Codec should
+implement: encode, format, update, and log. If the functions are not
+implemented Snort will not throw any errors. However, Snort may also be unable
+to accomplish some of its basic functionality.
+
+* encode is called whenever Snort actively responds and needs to builds a
+  packet, i.e. whenever a rule using an IPS ACTION like react, reject, or rewrite
+  is triggered. This function is used to build the response packet protocol by
+  protocol.
+
+* format is called when Snort is rebuilding a packet. For instance, every time
+  Snort reassembles a TCP stream or IP fragment, format is called. Generally,
+  this function either swaps any source and destination fields in the protocol or
+  does nothing.
+
+* update is similar to format in that it is called when Snort is reassembling a
+  packet. Unlike format, this function only sets length fields.
+
+* log is called when either the log_codecs logger or a custom logger that calls
+  PacketManager::log_protocols is used when running Snort.
+
+
+=== IPS Actions
+
+Action plugins specify a builtin action in the API which is used to
+determine verdict.  (Conversely, builtin actions don't have an associated
+plugin function.)
+
+=== Piglet Test Harness
+
+In order to assist with plugin development, an experimental mode called "piglet" mode
+is provided. With piglet mode, you can call individual methods for a specific plugin.
+The piglet tests are specified as Lua scripts. Each piglet test script defines a test
+for a specific plugin.
+
+Here is a minimal example of a piglet test script for the IPv4 Codec plugin:
+
+    plugin =
+    {
+        type = "piglet",
+        name = "codec::ipv4",
+        use_defaults = true,
+        test = function()
+            local daq_header = DAQHeader.new()
+            local raw_buffer = RawBuffer.new("some data")
+            local codec_data = CodecData.new()
+            local decode_data = DecodeData.new()
+
+            return Codec.decode(
+                daq_header,
+                raw_buffer,
+                codec_data,
+                decode_data
+            )
+        end
+    }
+
+To run snort in piglet mode, first build snort with the ENABLE_PIGLET option turned on
+(pass the flag -DENABLE_PIGLET:BOOL=ON in cmake).
+
+Then, run the following command:
+
+    snort --script-path $test_scripts --piglet
+
+(where $test_scripts is the directory containing your piglet tests).
+
+The test runner will generate a check-like output, indicating the
+the results of each test script.
+
+=== Piglet Lua API
+
+This section documents the API that piglet exposes to Lua.
+Refer to the piglet directory in the source tree for examples of usage.
+
+Note: Because of the differences between the Lua and C\++ data model and type
+system, not all parameters map directly to the parameters of the underlying
+C\++ member functions. Every effort has been made to keep the mappings consist,
+but there are still some differences. They are documented below.
+
+==== Plugin Instances
+
+For each test, piglet instantiates plugin specified in the ++name++ field of the
+++plugin++ table. The virtual methods of the instance are exposed in a table
+unique to each plugin type. The name of the table is the CamelCase name of the
+plugin type.
+
+For example, codec plugins have a virtual method called ++decode++. This method
+is called like this:
+
+    Codec.decode(...)
+
+*Codec*
+
+* ++Codec.get_data_link_type() -> { int, int, ... }++
+* ++Codec.get_protocol_ids() -> { int, int, ... }++
+* ++Codec.decode(DAQHeader, RawBuffer, CodecData, DecodeData) -> bool++
+* ++Codec.log(RawBuffer, uint[lyr_len])++
+* ++Codec.encode(RawBuffer, EncState, Buffer) -> bool++
+* ++Codec.update(uint[flags_hi], uint[flags_lo], RawBuffer, uint[lyr_len] -> int++
+* ++Codec.format(bool[reverse], RawBuffer, DecodeData)++
+
+Differences:
+
+* In ++Codec.update()++, the ++(uint64_t) flags++ parameter has been split into
+++flags_hi++ and ++flags_lo++
+
+*Inspector*
+
+* ++Inspector.configure()++
+* ++Inspector.tinit()++
+* ++Inspector.tterm()++
+* ++Inspector.likes(Packet)++
+* ++Inspector.eval(Packet)++
+* ++Inspector.clear(Packet)++
+* ++Inspector.get_buf_from_key(string[key], Packet, RawBuffer) -> bool++
+* ++Inspector.get_buf_from_id(uint[id], Packet, RawBuffer) -> bool++
+* ++Inspector.get_buf_from_type(uint[type], Packet, RawBuffer) -> bool++
+* ++Inspector.get_splitter(bool[to_server]) -> StreamSplitter++
+
+Differences:
+* In ++Inspector.configure()++, the ++SnortConfig*++ parameter is passed implicitly.
+* the overloaded ++get_buf()++ member function has been split into three separate methods.
+
+*IpsOption*
+
+* ++IpsOption.hash() -> int++
+* ++IpsOption.is_relative() -> bool++
+* ++IpsOption.fp_research() -> bool++
+* ++IpsOption.get_cursor_type() -> int++
+* ++IpsOption.eval(Cursor, Packet) -> int++
+* ++IpsOption.action(Packet)++
+
+*IpsAction*
+
+* ++IpsAction.exec(Packet)++
+
+*Logger*
+
+* ++Logger.open()++
+* ++Logger.close()++
+* ++Logger.reset()++
+* ++Logger.alert(Packet, string[message], Event)++
+* ++Logger.log(Packet, string[message], Event)++
+
+*SearchEngine*
+
+Currently, SearchEngine does not expose any methods.
+
+*SoRule*
+
+Currently, SoRule does not expose any methods.
+
+===== Interface Objects
+
+Many of the plugins take C\++ classes and structs as arguments. These objects
+are exposed to the Lua API as Lua userdata. Exposed objects are instantiated
+by calling the ++new++ method from each object's method table.
+
+For example, the DecodeData object can be instantiated and exposed to Lua
+like this:
+
+    local decode_data = DecodeData.new(...)
+
+Each object also exposes useful methods for getting and setting member variables,
+and calling the C\++ methods contained in the the object. These methods can
+be accessed using the ++:++ accessor syntax:
+
+    decode_data:set({ sp = 80, dp = 3500 })
+
+Since this is just syntactic sugar for passing the object as the first parameter
+of the function ++DecodeData.set++, an equivalent form is:
+
+    decode_data.set(decode_data, { sp = 80, dp = 3500 })
+
+or even:
+
+    DecodeData.set(decode_data, { sp = 80, dp = 3500 })
+
+*Buffer*
+
+* ++Buffer.new(string[data]) -> Buffer++
+* ++Buffer.new(uint[length]) -> Buffer++
+* ++Buffer.new(RawBuffer) -> Buffer++
+* ++Buffer:allocate(uint[length]) -> bool++
+* ++Buffer:clear()++
+
+*CodecData*
+
+* ++CodecData.new() -> CodecData++
+* ++CodecData.new(uint[next_prot_id]) -> CodecData++
+* ++CodecData.new(fields) -> CodecData++
+
+* ++CodecData:get() -> fields++
+* ++CodecData:set(fields)++
+
+++fields++ is a table with the following contents:
+
+* ++next_prot_id++
+* ++lyr_len++
+* ++invalid_bytes++
+* ++proto_bits++
+* ++codec_flags++
+* ++ip_layer_cnt++
+* ++ip6_extension_count++
+* ++curr_ip6_extension++
+* ++ip6_csum_proto++
+
+*Cursor*
+
+* ++Cursor.new() -> Cursor++
+* ++Cursor.new(Packet) -> Cursor++
+* ++Cursor.new(string[data]) -> Cursor++
+* ++Cursor.new(RawBuffer) -> Cursor++
+* ++Cursor:reset()++
+* ++Cursor:reset(Packet)++
+* ++Cursor:reset(string[data])++
+* ++Cursor:reset(RawBuffer)++
+
+*DAQHeader*
+
+* ++DAQHeader.new() -> DAQHeader++
+* ++DAQHeader.new(fields) -> DAQHeader++
+* ++DAQHeader:get() -> fields++
+* ++DAQHeader:set(fields)++
+
+++fields++ is a table with the following contents:
+
+* ++caplen++
+* ++pktlen++
+* ++ingress_index++
+* ++egress_index++
+* ++ingress_group++
+* ++egress_group++
+* ++flags++
+* ++opaque++
+
+*DecodeData*
+
+* ++DecodeData.new() -> DecodeData++
+* ++DecodeData.new(fields) -> DecodeData++
+* ++DecodeData:reset()++
+* ++DecodeData:get() -> fields++
+* ++DecodeData:set(fields)++
+* ++DecodeData:set_ipv4_hdr(RawBuffer, uint[offset])++
+
+++fields++ is a table with the following contents:
+
+* ++sp++
+* ++dp++
+* ++decode_flags++
+* ++type++
+
+*EncState*
+
+* ++EncState.new() -> EncState++
+* ++EncState.new(uint[flags_lo]) -> EncState++
+* ++EncState.new(uint[flags_lo], uint[flags_hi]) -> EncState++
+* ++EncState.new(uint[flags_lo], uint[flags_hi], uint[next_proto]) -> EncState++
+* ++EncState.new(uint[flags_lo], uint[flags_hi], uint[next_proto], uint[ttl]) -> EncState++
+* ++EncState.new(uint[flags_lo], uint[flags_hi], uint[next_proto], uint[ttl], uint[dsize]) -> EncState++
+
+*Event*
+
+* ++Event.new() -> Event++
+* ++Event.new(fields) -> Event++
+* ++Event:get() -> fields++
+* ++Event:set(fields)++
+
+++fields++ is a table with the following contents:
+
+* ++event_id++
+* ++event_reference++
+* ++sig_info++
+** ++generator++
+** ++id++
+** ++rev++
+** ++class_id++
+** ++priority++
+** ++text_rule++
+** ++num_services++
+
+*Flow*
+
+* ++Flow.new() -> Flow++
+* ++Flow:reset()++
+
+*Packet*
+
+* ++Packet.new() -> Packet++
+* ++Packet.new(string[data]) -> Packet++
+* ++Packet.new(uint[size]) -> Packet++
+* ++Packet.new(fields) -> Packet++
+* ++Packet.new(RawBuffer) -> Packet++
+* ++Packet.new(DAQHeader) -> Packet++
+* ++Packet:set_decode_data(DecodeData)++
+* ++Packet:set_data(uint[offset], uint[length])++
+* ++Packet:set_flow(Flow)++
+* ++Packet:get() -> fields++
+* ++Packet:set() ++
+* ++Packet:set(string[data]) ++
+* ++Packet:set(uint[size]) ++
+* ++Packet:set(fields) ++
+* ++Packet:set(RawBuffer) ++
+* ++Packet:set(DAQHeader) ++
+
+++fields++ is a table with the following contents:
+
+* ++packet_flags++
+* ++xtradata_mask++
+* ++proto_bits++
+* ++application_protocol_ordinal++
+* ++alt_dsize++
+* ++num_layers++
+* ++iplist_id++
+* ++user_policy_id++
+* ++ps_proto++
+
+Note: ++Packet.new()++ and ++Packet:set()++ accept multiple arguments of the
+types described above in any order
+
+*RawBuffer*
+
+* ++RawBuffer.new() -> RawBuffer++
+* ++RawBuffer.new(uint[size]) -> RawBuffer++
+* ++RawBuffer.new(string[data]) -> RawBuffer++
+* ++RawBuffer:size() -> int++
+* ++RawBuffer:resize(uint[size])++
+* ++RawBuffer:write(string[data])++
+* ++RawBuffer:write(string[data], uint[size])++
+* ++RawBuffer:read() -> string++
+* ++RawBuffer:read(uint[end]) -> string++
+* ++RawBuffer:read(uint[start], uint[end]) -> string++
+
+Note: calling ++RawBuffer.new()++ with no arguments returns a RawBuffer of size 0
+
+*StreamSplitter*
+
+* ++StreamSplitter:scan(Flow, RawBuffer) -> int, int++
+* ++StreamSplitter:scan(Flow, RawBuffer, uint[len]) -> int, int++
+* ++StreamSplitter:scan(Flow, RawBuffer, uint[len], uint[flags]) -> int, int++
+* ++StreamSplitter:reassemble(Flow, uint[total], uint[offset], RawBuffer) -> int, RawBuffer++
+* ++StreamSplitter:reassemble(Flow, uint[total], uint[offset], RawBuffer, uint[len]) -> int, RawBuffer++
+* ++StreamSplitter:reassemble(Flow, uint[total], uint[offset], RawBuffer, uint[len], uint[flags]) -> int, RawBuffer++
+* ++StreamSplitter:finish(Flow) -> bool++
+
+Note: StreamSplitter does not have a ++new()++ method, it must be created by an inspector via
+++Inspector.get_splitter()++
+
+=== Developers Guide
+
+Run doc/dev_guide.sh to generate /tmp/dev_guide.html, an annotated guide to
+the source tree.
+
+=== Performance Considerations for Developers
+
+* Since C compilers evaluate compound conditional expression from left to
+  right, put the costly condition last. Put the often-false condition first
+  in && expression. Put the often-true condition first in || expression.
+
+* Use emplace_back/emplace instead of push_back/insert on STL containers.
+
+* In general, unordered_map is faster than map for frequent lookups using
+  integer key on relatively static collection of unsorted elements. Whereas,
+  map is faster for frequent insertions/deletions/iterations and for
+  non-integer key such as string or custom objects. Consider the same factors
+  when deciding ordered vs. unordered multimap and set.
+
+* Iterate using range-based for loop with reference (i.e., auto&).
+
+* Be mindful of construction and destruction of temporary objects which can
+  be wasteful. Consider using std::move, std::swap, lvalue reference (&),
+  and rvalue reference (&&).
+
+* Avoid thread-local storage. When unavoidable, minimize frequent TLS access
+  by caching it to a local variable.
+
+* When writing inter-library APIs, consider interfaces depending on use cases
+  to minimize context switching. For example, if two APIs foo() and bar() are
+  needed to call, combine these into a single API to minimize jumps.

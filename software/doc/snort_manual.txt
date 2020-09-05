@@ -1,0 +1,122 @@
+= Snort 3 User Manual
+:author: The Snort Team
+:toc:
+:toc-placement: manual
+:toc-title: Contents
+
+image::snorty.png["Snorty",width="480"]
+include::version.txt[]
+toc::[]
+
+== Overview
+
+include::overview.txt[]
+
+== Concepts
+
+This section provides background on essential aspects of Snort's operation.
+
+include::concepts.txt[]
+
+== Tutorial
+
+include::tutorial.txt[]
+
+== Usage
+
+include::usage.txt[]
+
+== Features
+
+This section explains how to use key features of Snort.
+
+include::features.txt[]
+
+== Basic Modules
+
+Internal modules which are not plugins are termed "basic".  These include
+configuration for core processing.
+
+include::basic.txt[]
+
+== Codec Modules
+
+Codec is short for coder / decoder.  These modules are used for basic
+protocol decoding, anomaly detection, and construction of active responses.
+
+include::codec.txt[]
+
+== Connector Modules
+
+Connectors support High Availability communication links.
+
+include::connector.txt[]
+
+== Inspector Modules
+
+These modules perform a variety of functions, including analysis of
+protocols beyond basic decoding.
+
+include::inspector.txt[]
+
+== IPS Action Modules
+
+IPS actions allow you to perform custom actions when events are generated.
+Unlike loggers, these are invoked before thresholding and can be used to
+control external agents.
+
+Externally defined actions must be configured to become available to the
+parser.  For the reject rule, you can set reject = { } to get the rule to
+parse.
+
+include::ips_action.txt[]
+
+== IPS Option Modules
+
+IPS options are the building blocks of IPS rules.
+
+include::ips_option.txt[]
+
+== Search Engine Modules
+
+Search engines perform multipattern searching of packets and payload to find
+rules that should be evaluated.  There are currently no specific modules,
+although there are several search engine plugins.  Related configuration
+is done with the basic detection module.
+
+== SO Rule Modules
+
+SO rules are dynamic rules that require custom coding to perform detection
+not possible with the existing rule options.  These rules typically do not
+have associated modules.
+
+== Logger Modules
+
+All output of events and packets is done by Loggers.
+
+include::logger.txt[]
+
+== DAQ Configuration and Modules
+
+include::daq.txt[]
+
+== Snort 3 vs Snort 2
+
+include::differences.txt[]
+
+== Snort2Lua
+
+include::snort2lua.txt[]
+
+== Extending Snort
+
+include::extending.txt[]
+
+== Coding Style
+
+include::style.txt[]
+
+== Reference
+
+include::reference.txt[]
+
