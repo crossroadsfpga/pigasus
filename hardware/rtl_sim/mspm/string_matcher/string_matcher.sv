@@ -1,5 +1,5 @@
 `include "./struct_s.sv"
-`define DUMMY
+//`define DUMMY
 module string_matcher (
     front_clk,
     front_rst,

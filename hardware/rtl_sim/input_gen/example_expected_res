@@ -1,0 +1,15 @@
+# IN_PKT:	0x00000064
+# OUT_PKT:	0x0000005a
+# DMA_PKT:	0x0000000a
+# NO_CHECK_PKT_CNT:	0x0000005a
+
+You should expect the above counter values when running the m10_100.pcap.
+m10_100.pcap contains 100 packets, 10 of them would trigger MSPM match. 
+
+IN_PKT is number of the input packets of the system.
+OUT_PKT is the number of the output packets of the system.
+DMA_PKT is the number of packets that matches MSPM.
+NO_CHECK_PKT_CNT is the number of packets that are evaluated by MSPM but do not generate matches.
+
+In simulation, the PCIe are bypassed. Any packets that have MSPM matches (i.e. trigger full match) will be dropped. 
+Thus, in above example, the OUT_PKT is 90, DMA_PKT is 10, and NO_CHECK_PKT_CNT is 90. 
