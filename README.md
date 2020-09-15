@@ -15,7 +15,7 @@ To start, clone this repository:
 git clone https://github.com/cmu-snap/pigasus.git
 ```
 
-Then, follow the next instructions to configure the software and hardware components.
+If you just want to do RTL simulation, please jump to [Developing Pigasus](#developing-pigasus). The [Software Configuration](#software-configuration) is only necessary for running Pigasus in real system. 
 
 ### Software Configuration
 
@@ -213,21 +213,24 @@ New developers may find a description of each hardware component [here](hardware
 
 To change the hardware component of Pigasus you will need Quartus as well as an RTL simulation tool. Here we use Modelsim-SE (requires license) as our simulation tool. We do not recommend using the Modelsim-Altera_Start_Edition (Modelsim-ASE) -- the free version that comes with Quartus -- to simulate Pigasus, as Pigasus exceeds the line limit of Modelsim-ASE, which leads to extremely slow simulation. We have not tested other simulation tools like VCS.
 
-If you have not yet installed Quartus, download and install [Quartus 19.3](https://fpgasoftware.intel.com/19.3/?edition=pro) and the Stratix 10 device support (same link). Then follow the next steps to prepare the RTL code for synthesis and simulation:
+If you have not yet installed Quartus, download and install [Quartus 19.3](https://fpgasoftware.intel.com/19.3/?edition=pro) and the Stratix 10 device support (same link). Then follow the next steps to prepare the RTL code for simulation and synthesis.
 
+Simulation Setup:
+1. Compile Quartus 19.3 IP library for RTL simulation. Open Quartus 19.3. Select "Launch Simulation Library Compiler" under the "Tools" Tab. Select "ModelSim" as the "Tool name" and specify the path for "Executable location." Then select "Stratix 10" as Library families. Specify the output directory and click "Start Compilation".
+2. Add compiled library path as enviroment variable, by `export SIM_LIB_PATH=your_install_path/sim_lib/verilog_libs`
+3. Generate IP cores used in RTL simulation from Quartus, including 1-PORT RAM, 2-PORT RAM, 2-PORT ROM, Avalon-ST Adapter, Avalon-ST Multiplexer, Avalon-ST Dual Clock FIFO, Avalon-ST Single Clock FIFO, Native Fixed Point DSP. Copy the generated files to `pigasus/hardware/rtl_sim/common/`.
+
+Synthesis Setup:
 1. Generate the IP blocks used in Pigasus. Generate the design example of [H-tile Hard IP for Ethernet Intel Stratix 10 FPGA IP](https://www.intel.com/content/www/us/en/programmable/documentation/vqu1511218103429.html). Generate the design example of [Avalon memory mapped Intel Stratix 10 Hard IP+](https://www.intel.com/content/www/us/en/programmable/documentation/sox1520633403002.html). Generate IOPLL, eSRAM IP, and External Memory Interfaces (DRAM) IP. The eSRAM is only available on particular Intel FPGA devices. It is optional for Pigasus as it can be replaced by BRAM. 
-2. Compile Quartus 19.3 IP library for RTL simulation. Open Quartus 19.3. Select "Launch Simulation Library Compiler" under the "Tools" Tab. Select "ModelSim" as the "Tool name" and specify the path for "Executable location." Then select "Stratix 10" as Library families. Specify the output directory and click "Start Compilation".
-3. Change the "sim_lib_path" in `pigasus/hardware/rtl_sim/run_vsim.sh` to be the compiled library path.
-4. Generate IP cores used in RTL simulation from Quartus, including 1-PORT RAM, 2-PORT RAM, 2-PORT ROM, Avalon-ST Adapter, Avalon-ST Multiplexer, Avalon-ST Dual Clock FIFO, Avalon-ST Single Clock FIFO, Native Fixed Point DSP. Copy the generated files to `pigasus/hardware/rtl_sim/common/`.
-5. Add Pigasus source code into the Ethernet Hard IP design example. The remaining IPs should be inserted inside Pigasus. Refer to the [component descriptions](hardware/README.md) to better understand where to place each IP.
-6. Change the pin assignment based on the hardware platform. We use [Stratix 10 MX Development Kit](https://www.intel.com/content/www/us/en/programmable/documentation/cbc1517362051825.html).
-7. Compile the design by clicking "Compile Design" in Quartus. 
+2. Add Pigasus source code (entire `rtl_sim` folder including the `rtl_sim/common`) into the Ethernet Hard IP design example.
+3. Change the pin assignment based on the hardware platform. We use [Stratix 10 MX Development Kit](https://www.intel.com/content/www/us/en/programmable/documentation/cbc1517362051825.html).
+4. Compile the design by clicking "Compile Design" in Quartus. 
 
 > **Notes:**
 >
-> - We will create a script to fully automate steps 2-5.
-> - When using other Quartus versions, step 1-5 should be redone.
-> - When mapping to other Intel FPGA devices, the specific device support should be downloaded and 2-5 should be redone as the IPs for difference devices might be different.
+> - We will create a script to fully automate Simulation step 3 and Synthesis step 1-4. 
+> - When using other Quartus versions, all the Simulation and Synthesis steps should be redone.
+> - When mapping to other Intel FPGA devices, the specific device support should be downloaded and all the Simulation and Synthesis steps should be redone as the IPs for difference devices might be different.
 > - When mapping to FPGAs from other vendors, users are responsible to include all the missing IPs and perhaps a shim layer between those IPs and the Pigasus code. 
 
 ### RTL Simulation
@@ -249,9 +252,12 @@ Now run the simulation using Modelsim and your newly generated input:
 
 After the simulation, you should expect the key counter values match up with the `input_gen/example_expected_res`
 
+We also provide an example script `run_vsim.bat` for Windows users. Please set up the `SIM_LIB_PATH` and the RTL simulator environment variables before running this script in cmd or powershell. 
+
 Tips:
 To enable GUI mode in Modelsim, comment the last line of `run_vsim.sh` and uncomment the line under "GUI full debug."
-To speedup the simulation, you can disable MSPM in your first few runs by uncommenting the second line of `mspm/string_matcher/string_matcher.sv`. The MSPM will be a dummy module which just pass the packets. 
+To speedup the simulation, you can disable MSPM in your first few runs by uncommenting the second line of `mspm/string_matcher/string_matcher.sv`. The MSPM will be a dummy module which just passes the packets. 
+
 
 
 ### Hardware Synthesis
