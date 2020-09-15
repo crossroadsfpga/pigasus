@@ -232,22 +232,26 @@ If you have not yet installed Quartus, download and install [Quartus 19.3](https
 
 ### RTL Simulation
 
-Before you synthesize your changes an run them on the FPGA, you should verify your design using RTL simulation. The following instructions assume that you have ModelSim installed.
+Before you synthesize your changes an run them on the FPGA, you should verify your design using RTL simulation. The simulation testbed does not include the Ethernet IP core, PCIe IP core, and full matcher on CPU. The `testbench.sv` drives the FPGA datapth, including parser, TCP Reassembly and MSPM by dumping converted pcap file. Once the simulation finishes, the testbench will report statistics of FPGA datapth to help developers verify functionality and diagnose performance bottleneck. The following instructions assume that you have Modelsim installed. 
 
 Go to the input generator and convert the example pcap into a pkt format, that can be used as input for the simulation:
 
 ```bash
 cd $pigasus_rep_dir/hardware/rtl_sim/input_gen/
-./run.sh ./example.pcap
+./run.sh ./m10_100.pcap
 cd ..
 ```
 
-Now run the simulation using ModelSim and your newly generated input:
+Now run the simulation using Modelsim and your newly generated input:
 ```bash
 ./run_vsim.sh ./input_gen/output.pkt
 ```
 
+After the simulation, you should expect the key counter values match up with the `input_gen/example_expected_res`
+
+Tips:
 To enable GUI mode in Modelsim, comment the last line of `run_vsim.sh` and uncomment the line under "GUI full debug."
+To speedup the simulation, you can disable MSPM in your first few runs by uncommenting the second line of `mspm/string_matcher/string_matcher.sv`. The MSPM will be a dummy module which just pass the packets. 
 
 
 ### Hardware Synthesis
