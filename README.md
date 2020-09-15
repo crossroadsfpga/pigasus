@@ -8,7 +8,7 @@ If you have already configured your system and wants to run Pigasus, you can ski
 
 ## Getting Started
 
-Pigasus has a hardware component, that runs on an FPGA, and a software component which is adapted from [Snort3](https://github.com/snort3/snort3). The current version requires a host with a multi-core CPU and an [Intel Stratix 10 FPGA](https://www.intel.com/content/www/us/en/products/programmable/soc/stratix-10.html) (with 100Gb Ethernet). The instructions that follow assume the system runs Ubuntu 18.04. They may be slightly different for other distributions.
+Pigasus has a hardware component, that runs on an FPGA, and a software component which is adapted from [Snort3](https://github.com/snort3/snort3). The current version requires a host with a multi-core CPU and an [Intel Stratix 10 MX FPGA](https://www.intel.com/content/www/us/en/programmable/products/boards_and_kits/dev-kits/altera/kit-s10-mx.html) (with 100Gb Ethernet). The instructions that follow assume the system runs Ubuntu 16.04. They may be slightly different for other distributions.
 
 To start, clone this repository:
 ```bash
