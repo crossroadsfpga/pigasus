@@ -2,14 +2,16 @@
 # OUT_PKT:	0x0000005a
 # DMA_PKT:	0x0000000a
 # NO_CHECK_PKT_CNT:	0x0000005a
+# NO_MATCH_PKT_CNT:	0x0000000a
+# MATCH_PKT_CNT:	0x00000000
 
 You should expect the above counter values when running the m10_100.pcap.
-m10_100.pcap contains 100 packets, 10 of them would trigger MSPM match. 
+m10_100.pcap contains 100 packets, 10 of them would be check_pkt (pkt matches fast patterns in MSPM).
+None of the 10 check_pkt would be match_pkt (pkt matches the rest of rule filed in Full matcher), as the Full Matcher is not included in this simulation. 
 
 IN_PKT is number of the input packets of the system.
 OUT_PKT is the number of the output packets of the system.
-DMA_PKT is the number of packets that matches MSPM.
-NO_CHECK_PKT_CNT is the number of packets that are evaluated by MSPM but do not generate matches.
-
-In simulation, the PCIe are bypassed. Any packets that have MSPM matches (i.e. trigger full match) will be dropped. 
-Thus, in above example, the OUT_PKT is 90, DMA_PKT is 10, and NO_CHECK_PKT_CNT is 90. 
+DMA_PKT is the number of packets that matches fast patterns in MSPM.
+NO_CHECK_PKT_CNT is the number of packets that are evaluated by MSPM but do not match fast patterns.
+NO_MATCH_PKT_CNT is the number of packets that match the fast patterns in MSPM but do not match the rest of the rule field in Full Matcher.
+MATCH_PKT_CNT is the number of packets that match both the fast patterns in MSPM and the rest of the rule field in Full Matcher. This counter is meaningless in simulation as Full Matcher is not included. 

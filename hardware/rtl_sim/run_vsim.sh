@@ -2,14 +2,13 @@
 rm -r work
 rm vsim.wlf
 
-sim_lib_path="/home/zzhao1/sim_lib/verilog_libs/"
-altera_ver="$sim_lib_path/altera_ver"
-lpm_ver="$sim_lib_path/lpm_ver"
-sgate_ver="$sim_lib_path/sgate_ver"
-altera_mf_ver="$sim_lib_path/altera_mf_ver"
-altera_lnsim_ver="$sim_lib_path/altera_lnsim_ver"
-fourteennm_ver="$sim_lib_path/fourteennm_ver"
-fourteennm_ct1_ver="$sim_lib_path/fourteennm_ct1_ver"
+altera_ver="$SIM_LIB_PATH/altera_ver"
+lpm_ver="$SIM_LIB_PATH/lpm_ver"
+sgate_ver="$SIM_LIB_PATH/sgate_ver"
+altera_mf_ver="$SIM_LIB_PATH/altera_mf_ver"
+altera_lnsim_ver="$SIM_LIB_PATH/altera_lnsim_ver"
+fourteennm_ver="$SIM_LIB_PATH/fourteennm_ver"
+fourteennm_ct1_ver="$SIM_LIB_PATH/fourteennm_ct1_ver"
 
 vlib work
 PKT_FILE=${1:-"./input_gen/output.pkt"}
