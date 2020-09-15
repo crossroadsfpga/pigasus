@@ -3,8 +3,8 @@
 module tb;
 
 `ifndef PKT_FILE
-`define PKT_FILE "./input_gen/test_ooo.pkt"
-`define PKT_FILE_NB_LINES 2400
+`define PKT_FILE "./input_gen/output.pkt"
+`define PKT_FILE_NB_LINES 2200
 `endif
 
 // duration for each bit = 20 * timescale = 20 * 1 ns  = 20ns
