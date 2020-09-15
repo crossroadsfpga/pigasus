@@ -41421,7 +41421,7 @@ rom_2port #(
 	.DWIDTH(RID_WIDTH),
 	.AWIDTH(15),
 	.MEM_SIZE(32768),
-	.INIT_FILE("./my/string_matcher/hashtable0.mif")
+	.INIT_FILE("./mspm/string_matcher/hashtable0.mif")
 )
 hashtable_inst_0(
 	.q_a       (ht_q_0),    
@@ -41434,7 +41434,7 @@ rom_2port #(
 	.DWIDTH(RID_WIDTH),
 	.AWIDTH(15),
 	.MEM_SIZE(32768),
-	.INIT_FILE("./my/string_matcher/hashtable1.mif")
+	.INIT_FILE("./mspm/string_matcher/hashtable1.mif")
 )
 hashtable_inst_1(
 	.q_a       (ht_q_1),    
@@ -41447,7 +41447,7 @@ rom_2port #(
 	.DWIDTH(RID_WIDTH),
 	.AWIDTH(12),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/hashtable2.mif")
+	.INIT_FILE("./mspm/string_matcher/hashtable2.mif")
 )
 hashtable_inst_2(
 	.q_a       (ht_q_2),    
@@ -41460,7 +41460,7 @@ rom_2port #(
 	.DWIDTH(RID_WIDTH),
 	.AWIDTH(12),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/hashtable3.mif")
+	.INIT_FILE("./mspm/string_matcher/hashtable3.mif")
 )
 hashtable_inst_3(
 	.q_a       (ht_q_3),    
@@ -41473,7 +41473,7 @@ rom_2port #(
 	.DWIDTH(RID_WIDTH),
 	.AWIDTH(11),
 	.MEM_SIZE(2048),
-	.INIT_FILE("./my/string_matcher/hashtable4.mif")
+	.INIT_FILE("./mspm/string_matcher/hashtable4.mif")
 )
 hashtable_inst_4(
 	.q_a       (ht_q_4),    
@@ -41486,7 +41486,7 @@ rom_2port #(
 	.DWIDTH(RID_WIDTH),
 	.AWIDTH(12),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/hashtable5.mif")
+	.INIT_FILE("./mspm/string_matcher/hashtable5.mif")
 )
 hashtable_inst_5(
 	.q_a       (ht_q_5),    
@@ -41499,7 +41499,7 @@ rom_2port #(
 	.DWIDTH(RID_WIDTH),
 	.AWIDTH(10),
 	.MEM_SIZE(1024),
-	.INIT_FILE("./my/string_matcher/hashtable6.mif")
+	.INIT_FILE("./mspm/string_matcher/hashtable6.mif")
 )
 hashtable_inst_6(
 	.q_a       (ht_q_6),    
@@ -41512,7 +41512,7 @@ rom_2port #(
 	.DWIDTH(RID_WIDTH),
 	.AWIDTH(8),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/hashtable7.mif")
+	.INIT_FILE("./mspm/string_matcher/hashtable7.mif")
 )
 hashtable_inst_7(
 	.q_a       (ht_q_7),    

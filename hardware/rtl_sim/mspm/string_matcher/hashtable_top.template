@@ -105,7 +105,7 @@ hashtable #(
 	.NBITS({{context['nbits'][i]}}),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE({{context['bm_size'][i]}}),
-	.INIT_FILE("./my/string_matcher/bitmap{{i}}.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap{{i}}.mif")
 )
 hashtable_{{i}}_{{j}} (
 	.clk (clk),

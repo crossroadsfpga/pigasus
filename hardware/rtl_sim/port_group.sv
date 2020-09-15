@@ -420,7 +420,7 @@ rom_2port #(
     .DWIDTH(RULE_PG_WIDTH),
     .AWIDTH(RULE_AWIDTH),
     .MEM_SIZE(RULE_DEPTH),
-    .INIT_FILE("./my/rule_2_pg.mif")
+    .INIT_FILE("./mspm/rule_2_pg.mif")
 )
 rule2pg_table_0_1 (
     .q_a       (rule_pg_data_0),
@@ -434,7 +434,7 @@ rom_2port #(
     .DWIDTH(RULE_PG_WIDTH),
     .AWIDTH(RULE_AWIDTH),
     .MEM_SIZE(RULE_DEPTH),
-    .INIT_FILE("./my/rule_2_pg.mif")
+    .INIT_FILE("./mspm/rule_2_pg.mif")
 )
 rule2pg_table_2_3 (
     .q_a       (rule_pg_data_2),
@@ -448,7 +448,7 @@ rom_2port #(
     .DWIDTH(RULE_PG_WIDTH),
     .AWIDTH(RULE_AWIDTH),
     .MEM_SIZE(RULE_DEPTH),
-    .INIT_FILE("./my/rule_2_pg.mif")
+    .INIT_FILE("./mspm/rule_2_pg.mif")
 )
 rule2pg_table_4_5 (
     .q_a       (rule_pg_data_4),
@@ -462,7 +462,7 @@ rom_2port #(
     .DWIDTH(RULE_PG_WIDTH),
     .AWIDTH(RULE_AWIDTH),
     .MEM_SIZE(RULE_DEPTH),
-    .INIT_FILE("./my/rule_2_pg.mif")
+    .INIT_FILE("./mspm/rule_2_pg.mif")
 )
 rule2pg_table_6_7 (
     .q_a       (rule_pg_data_6),

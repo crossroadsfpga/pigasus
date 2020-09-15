@@ -129,7 +129,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_{{i}} (
 	.q_a       (q{{2*i}}),    

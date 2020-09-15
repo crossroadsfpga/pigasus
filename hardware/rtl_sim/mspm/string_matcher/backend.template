@@ -706,7 +706,7 @@ rom_2port #(
 	.DWIDTH(RID_WIDTH),
 	.AWIDTH({{context['nbits'][i]}}),
 	.MEM_SIZE({{context['mem_size'][i]}}),
-	.INIT_FILE("./my/string_matcher/hashtable{{i}}.mif")
+	.INIT_FILE("./mspm/string_matcher/hashtable{{i}}.mif")
 )
 hashtable_inst_{{i}}(
 	.q_a       (ht_q_{{i}}),    

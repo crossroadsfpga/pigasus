@@ -1833,7 +1833,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_0 (
 	.clk (clk),
@@ -1852,7 +1852,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_1 (
 	.clk (clk),
@@ -1871,7 +1871,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_2 (
 	.clk (clk),
@@ -1890,7 +1890,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_3 (
 	.clk (clk),
@@ -1909,7 +1909,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_4 (
 	.clk (clk),
@@ -1928,7 +1928,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_5 (
 	.clk (clk),
@@ -1947,7 +1947,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_6 (
 	.clk (clk),
@@ -1966,7 +1966,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_7 (
 	.clk (clk),
@@ -1985,7 +1985,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_8 (
 	.clk (clk),
@@ -2004,7 +2004,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_9 (
 	.clk (clk),
@@ -2023,7 +2023,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_10 (
 	.clk (clk),
@@ -2042,7 +2042,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_11 (
 	.clk (clk),
@@ -2061,7 +2061,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_12 (
 	.clk (clk),
@@ -2080,7 +2080,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_13 (
 	.clk (clk),
@@ -2099,7 +2099,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_14 (
 	.clk (clk),
@@ -2118,7 +2118,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap0.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap0.mif")
 )
 hashtable_0_15 (
 	.clk (clk),
@@ -2137,7 +2137,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_0 (
 	.clk (clk),
@@ -2156,7 +2156,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_1 (
 	.clk (clk),
@@ -2175,7 +2175,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_2 (
 	.clk (clk),
@@ -2194,7 +2194,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_3 (
 	.clk (clk),
@@ -2213,7 +2213,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_4 (
 	.clk (clk),
@@ -2232,7 +2232,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_5 (
 	.clk (clk),
@@ -2251,7 +2251,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_6 (
 	.clk (clk),
@@ -2270,7 +2270,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_7 (
 	.clk (clk),
@@ -2289,7 +2289,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_8 (
 	.clk (clk),
@@ -2308,7 +2308,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_9 (
 	.clk (clk),
@@ -2327,7 +2327,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_10 (
 	.clk (clk),
@@ -2346,7 +2346,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_11 (
 	.clk (clk),
@@ -2365,7 +2365,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_12 (
 	.clk (clk),
@@ -2384,7 +2384,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_13 (
 	.clk (clk),
@@ -2403,7 +2403,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_14 (
 	.clk (clk),
@@ -2422,7 +2422,7 @@ hashtable #(
 	.NBITS(15),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(4096),
-	.INIT_FILE("./my/string_matcher/bitmap1.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap1.mif")
 )
 hashtable_1_15 (
 	.clk (clk),
@@ -2441,7 +2441,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_0 (
 	.clk (clk),
@@ -2460,7 +2460,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_1 (
 	.clk (clk),
@@ -2479,7 +2479,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_2 (
 	.clk (clk),
@@ -2498,7 +2498,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_3 (
 	.clk (clk),
@@ -2517,7 +2517,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_4 (
 	.clk (clk),
@@ -2536,7 +2536,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_5 (
 	.clk (clk),
@@ -2555,7 +2555,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_6 (
 	.clk (clk),
@@ -2574,7 +2574,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_7 (
 	.clk (clk),
@@ -2593,7 +2593,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_8 (
 	.clk (clk),
@@ -2612,7 +2612,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_9 (
 	.clk (clk),
@@ -2631,7 +2631,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_10 (
 	.clk (clk),
@@ -2650,7 +2650,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_11 (
 	.clk (clk),
@@ -2669,7 +2669,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_12 (
 	.clk (clk),
@@ -2688,7 +2688,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_13 (
 	.clk (clk),
@@ -2707,7 +2707,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_14 (
 	.clk (clk),
@@ -2726,7 +2726,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap2.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap2.mif")
 )
 hashtable_2_15 (
 	.clk (clk),
@@ -2745,7 +2745,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_0 (
 	.clk (clk),
@@ -2764,7 +2764,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_1 (
 	.clk (clk),
@@ -2783,7 +2783,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_2 (
 	.clk (clk),
@@ -2802,7 +2802,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_3 (
 	.clk (clk),
@@ -2821,7 +2821,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_4 (
 	.clk (clk),
@@ -2840,7 +2840,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_5 (
 	.clk (clk),
@@ -2859,7 +2859,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_6 (
 	.clk (clk),
@@ -2878,7 +2878,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_7 (
 	.clk (clk),
@@ -2897,7 +2897,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_8 (
 	.clk (clk),
@@ -2916,7 +2916,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_9 (
 	.clk (clk),
@@ -2935,7 +2935,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_10 (
 	.clk (clk),
@@ -2954,7 +2954,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_11 (
 	.clk (clk),
@@ -2973,7 +2973,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_12 (
 	.clk (clk),
@@ -2992,7 +2992,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_13 (
 	.clk (clk),
@@ -3011,7 +3011,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_14 (
 	.clk (clk),
@@ -3030,7 +3030,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap3.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap3.mif")
 )
 hashtable_3_15 (
 	.clk (clk),
@@ -3049,7 +3049,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_0 (
 	.clk (clk),
@@ -3068,7 +3068,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_1 (
 	.clk (clk),
@@ -3087,7 +3087,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_2 (
 	.clk (clk),
@@ -3106,7 +3106,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_3 (
 	.clk (clk),
@@ -3125,7 +3125,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_4 (
 	.clk (clk),
@@ -3144,7 +3144,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_5 (
 	.clk (clk),
@@ -3163,7 +3163,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_6 (
 	.clk (clk),
@@ -3182,7 +3182,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_7 (
 	.clk (clk),
@@ -3201,7 +3201,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_8 (
 	.clk (clk),
@@ -3220,7 +3220,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_9 (
 	.clk (clk),
@@ -3239,7 +3239,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_10 (
 	.clk (clk),
@@ -3258,7 +3258,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_11 (
 	.clk (clk),
@@ -3277,7 +3277,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_12 (
 	.clk (clk),
@@ -3296,7 +3296,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_13 (
 	.clk (clk),
@@ -3315,7 +3315,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_14 (
 	.clk (clk),
@@ -3334,7 +3334,7 @@ hashtable #(
 	.NBITS(11),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(256),
-	.INIT_FILE("./my/string_matcher/bitmap4.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap4.mif")
 )
 hashtable_4_15 (
 	.clk (clk),
@@ -3353,7 +3353,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_0 (
 	.clk (clk),
@@ -3372,7 +3372,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_1 (
 	.clk (clk),
@@ -3391,7 +3391,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_2 (
 	.clk (clk),
@@ -3410,7 +3410,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_3 (
 	.clk (clk),
@@ -3429,7 +3429,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_4 (
 	.clk (clk),
@@ -3448,7 +3448,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_5 (
 	.clk (clk),
@@ -3467,7 +3467,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_6 (
 	.clk (clk),
@@ -3486,7 +3486,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_7 (
 	.clk (clk),
@@ -3505,7 +3505,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_8 (
 	.clk (clk),
@@ -3524,7 +3524,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_9 (
 	.clk (clk),
@@ -3543,7 +3543,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_10 (
 	.clk (clk),
@@ -3562,7 +3562,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_11 (
 	.clk (clk),
@@ -3581,7 +3581,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_12 (
 	.clk (clk),
@@ -3600,7 +3600,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_13 (
 	.clk (clk),
@@ -3619,7 +3619,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_14 (
 	.clk (clk),
@@ -3638,7 +3638,7 @@ hashtable #(
 	.NBITS(12),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(512),
-	.INIT_FILE("./my/string_matcher/bitmap5.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap5.mif")
 )
 hashtable_5_15 (
 	.clk (clk),
@@ -3657,7 +3657,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_0 (
 	.clk (clk),
@@ -3676,7 +3676,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_1 (
 	.clk (clk),
@@ -3695,7 +3695,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_2 (
 	.clk (clk),
@@ -3714,7 +3714,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_3 (
 	.clk (clk),
@@ -3733,7 +3733,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_4 (
 	.clk (clk),
@@ -3752,7 +3752,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_5 (
 	.clk (clk),
@@ -3771,7 +3771,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_6 (
 	.clk (clk),
@@ -3790,7 +3790,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_7 (
 	.clk (clk),
@@ -3809,7 +3809,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_8 (
 	.clk (clk),
@@ -3828,7 +3828,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_9 (
 	.clk (clk),
@@ -3847,7 +3847,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_10 (
 	.clk (clk),
@@ -3866,7 +3866,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_11 (
 	.clk (clk),
@@ -3885,7 +3885,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_12 (
 	.clk (clk),
@@ -3904,7 +3904,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_13 (
 	.clk (clk),
@@ -3923,7 +3923,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_14 (
 	.clk (clk),
@@ -3942,7 +3942,7 @@ hashtable #(
 	.NBITS(10),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(128),
-	.INIT_FILE("./my/string_matcher/bitmap6.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap6.mif")
 )
 hashtable_6_15 (
 	.clk (clk),
@@ -3961,7 +3961,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_0 (
 	.clk (clk),
@@ -3980,7 +3980,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_1 (
 	.clk (clk),
@@ -3999,7 +3999,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_2 (
 	.clk (clk),
@@ -4018,7 +4018,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_3 (
 	.clk (clk),
@@ -4037,7 +4037,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_4 (
 	.clk (clk),
@@ -4056,7 +4056,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_5 (
 	.clk (clk),
@@ -4075,7 +4075,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_6 (
 	.clk (clk),
@@ -4094,7 +4094,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_7 (
 	.clk (clk),
@@ -4113,7 +4113,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_8 (
 	.clk (clk),
@@ -4132,7 +4132,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_9 (
 	.clk (clk),
@@ -4151,7 +4151,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_10 (
 	.clk (clk),
@@ -4170,7 +4170,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_11 (
 	.clk (clk),
@@ -4189,7 +4189,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_12 (
 	.clk (clk),
@@ -4208,7 +4208,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_13 (
 	.clk (clk),
@@ -4227,7 +4227,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_14 (
 	.clk (clk),
@@ -4246,7 +4246,7 @@ hashtable #(
 	.NBITS(8),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE(32),
-	.INIT_FILE("./my/string_matcher/bitmap7.mif")
+	.INIT_FILE("./mspm/string_matcher/bitmap7.mif")
 )
 hashtable_7_15 (
 	.clk (clk),

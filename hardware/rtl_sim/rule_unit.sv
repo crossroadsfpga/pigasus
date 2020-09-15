@@ -280,7 +280,7 @@ rom_2port #(
     .DWIDTH(PG_ENTRY_WIDTH),
     .AWIDTH(PG_AWIDTH),
     .MEM_SIZE(PG_DEPTH),
-    .INIT_FILE("./my/pg_meta.mif")
+    .INIT_FILE("./mspm/pg_meta.mif")
 )
 pg_entry_table_0_1 (
     .q_a       (pg_entry_data_0),
@@ -293,7 +293,7 @@ rom_2port #(
     .DWIDTH(PG_ENTRY_WIDTH),
     .AWIDTH(PG_AWIDTH),
     .MEM_SIZE(PG_DEPTH),
-    .INIT_FILE("./my/pg_meta.mif")
+    .INIT_FILE("./mspm/pg_meta.mif")
 )
 pg_entry_table_2_3 (
     .q_a       (pg_entry_data_2),
@@ -307,7 +307,7 @@ rom_2port #(
     .DWIDTH(16),
     .AWIDTH(PG_AWIDTH),
     .MEM_SIZE(PG_DEPTH),
-    .INIT_FILE("./my/pg_single_value.mif")
+    .INIT_FILE("./mspm/pg_single_value.mif")
 )
 single_table_0_1 (
     .q_a       (single_data_0),
@@ -320,7 +320,7 @@ rom_2port #(
     .DWIDTH(16),
     .AWIDTH(PG_AWIDTH),
     .MEM_SIZE(PG_DEPTH),
-    .INIT_FILE("./my/pg_single_value.mif")
+    .INIT_FILE("./mspm/pg_single_value.mif")
 )
 single_table_2_3 (
     .q_a       (single_data_2),
@@ -334,7 +334,7 @@ rom_1port_mlab #(
     .DWIDTH(PG_RANGE_DWIDTH),
     .AWIDTH(PG_RANGE_AWIDTH),
     .MEM_SIZE(PG_RANGE_DEPTH),
-    .INIT_FILE("./my/pg_range.mif")
+    .INIT_FILE("./mspm/pg_range.mif")
 )
 range_table_0 (
     .address   (range_addr_0),
@@ -346,7 +346,7 @@ rom_1port_mlab #(
     .DWIDTH(PG_RANGE_DWIDTH),
     .AWIDTH(PG_RANGE_AWIDTH),
     .MEM_SIZE(PG_RANGE_DEPTH),
-    .INIT_FILE("./my/pg_range.mif")
+    .INIT_FILE("./mspm/pg_range.mif")
 )
 range_table_1 (
     .address   (range_addr_1),
@@ -358,7 +358,7 @@ rom_1port_mlab #(
     .DWIDTH(PG_RANGE_DWIDTH),
     .AWIDTH(PG_RANGE_AWIDTH),
     .MEM_SIZE(PG_RANGE_DEPTH),
-    .INIT_FILE("./my/pg_range.mif")
+    .INIT_FILE("./mspm/pg_range.mif")
 )
 range_table_2 (
     .address   (range_addr_2),
@@ -371,7 +371,7 @@ rom_1port_mlab #(
     .DWIDTH(PG_RANGE_DWIDTH),
     .AWIDTH(PG_RANGE_AWIDTH),
     .MEM_SIZE(PG_RANGE_DEPTH),
-    .INIT_FILE("./my/pg_range.mif")
+    .INIT_FILE("./mspm/pg_range.mif")
 )
 range_table_3 (
     .address   (range_addr_3),
@@ -383,7 +383,7 @@ rom_1port_mlab #(
     .DWIDTH  (PG_LIST_DWIDTH),
     .AWIDTH  (PG_LIST_AWIDTH),
     .MEM_SIZE(PG_LIST_DEPTH),
-    .INIT_FILE("./my/pg_list.mif")
+    .INIT_FILE("./mspm/pg_list.mif")
 )
 list_table_0 (
     .address   (list_addr_0),
@@ -395,7 +395,7 @@ rom_1port_mlab #(
     .DWIDTH  (PG_LIST_DWIDTH),
     .AWIDTH  (PG_LIST_AWIDTH),
     .MEM_SIZE(PG_LIST_DEPTH),
-    .INIT_FILE("./my/pg_list.mif")
+    .INIT_FILE("./mspm/pg_list.mif")
 )
 list_table_1 (
     .address   (list_addr_1),
@@ -407,7 +407,7 @@ rom_1port_mlab #(
     .DWIDTH  (PG_LIST_DWIDTH),
     .AWIDTH  (PG_LIST_AWIDTH),
     .MEM_SIZE(PG_LIST_DEPTH),
-    .INIT_FILE("./my/pg_list.mif")
+    .INIT_FILE("./mspm/pg_list.mif")
 )
 list_table_2 (
     .address   (list_addr_2),
@@ -419,7 +419,7 @@ rom_1port_mlab #(
     .DWIDTH  (PG_LIST_DWIDTH),
     .AWIDTH  (PG_LIST_AWIDTH),
     .MEM_SIZE(PG_LIST_DEPTH),
-    .INIT_FILE("./my/pg_list.mif")
+    .INIT_FILE("./mspm/pg_list.mif")
 )
 list_table_3 (
     .address   (list_addr_3),
@@ -431,7 +431,7 @@ rom_2port #(
     .DWIDTH  (PG_HTTP_DWIDTH),
     .AWIDTH  (PG_HTTP_AWIDTH),
     .MEM_SIZE(PG_HTTP_DEPTH),
-    .INIT_FILE("./my/pg_http_src.mif")
+    .INIT_FILE("./mspm/pg_http_src.mif")
 )
 http_src_table_0_1 (
     .q_a       (http_src_data_0),
@@ -444,7 +444,7 @@ rom_2port #(
     .DWIDTH  (PG_HTTP_DWIDTH),
     .AWIDTH  (PG_HTTP_AWIDTH),
     .MEM_SIZE(PG_HTTP_DEPTH),
-    .INIT_FILE("./my/pg_http_src.mif")
+    .INIT_FILE("./mspm/pg_http_src.mif")
 )
 http_src_table_2_3 (
     .q_a       (http_src_data_2),
@@ -458,7 +458,7 @@ rom_2port #(
     .DWIDTH  (PG_HTTP_DWIDTH),
     .AWIDTH  (PG_HTTP_AWIDTH),
     .MEM_SIZE(PG_HTTP_DEPTH),
-    .INIT_FILE("./my/pg_http_dst.mif")
+    .INIT_FILE("./mspm/pg_http_dst.mif")
 )
 http_dst_table_0_1 (
     .q_a       (http_dst_data_0),
@@ -471,7 +471,7 @@ rom_2port #(
     .DWIDTH  (PG_HTTP_DWIDTH),
     .AWIDTH  (PG_HTTP_AWIDTH),
     .MEM_SIZE(PG_HTTP_DEPTH),
-    .INIT_FILE("./my/pg_http_dst.mif")
+    .INIT_FILE("./mspm/pg_http_dst.mif")
 )
 http_dst_table_2_3 (
     .q_a       (http_dst_data_2),

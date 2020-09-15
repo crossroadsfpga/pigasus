@@ -265,7 +265,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_0 (
 	.q_a       (q0),    
@@ -278,7 +278,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_1 (
 	.q_a       (q2),    
@@ -291,7 +291,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_2 (
 	.q_a       (q4),    
@@ -304,7 +304,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_3 (
 	.q_a       (q6),    
@@ -317,7 +317,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_4 (
 	.q_a       (q8),    
@@ -330,7 +330,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_5 (
 	.q_a       (q10),    
@@ -343,7 +343,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_6 (
 	.q_a       (q12),    
@@ -356,7 +356,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_7 (
 	.q_a       (q14),    
@@ -369,7 +369,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_8 (
 	.q_a       (q16),    
@@ -382,7 +382,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_9 (
 	.q_a       (q18),    
@@ -395,7 +395,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_10 (
 	.q_a       (q20),    
@@ -408,7 +408,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_11 (
 	.q_a       (q22),    
@@ -421,7 +421,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_12 (
 	.q_a       (q24),    
@@ -434,7 +434,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_13 (
 	.q_a       (q26),    
@@ -447,7 +447,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_14 (
 	.q_a       (q28),    
@@ -460,7 +460,7 @@ rom_2port_noreg #(
 	.DWIDTH(64),
 	.AWIDTH(13),
 	.MEM_SIZE(8192),
-	.INIT_FILE("./my/string_matcher/match_table.mif")
+	.INIT_FILE("./mspm/string_matcher/match_table.mif")
 )
 match_table_15 (
 	.q_a       (q30),    
