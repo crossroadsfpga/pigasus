@@ -69,8 +69,6 @@ And install `libdnet`:
 ```bash
 git clone https://github.com/dugsong/libdnet.git
 cd libdnet
-# the following assumes that pigasus and libdnet are located on the same directory
-git apply ../pigasus/installation/libdnet.patch
 ./configure
 make
 sudo make install
