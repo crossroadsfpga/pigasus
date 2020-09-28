@@ -50,6 +50,7 @@ source ~/.bashrc
 
 Install the dependencies available through packages:
 ```bash
+sudo apt update
 sudo apt install build-essential cmake libhwloc-dev luajit libluajit-5.1-dev \
     openssl libpcap0.8-dev libpcre3-dev pkg-config zlib1g libtool libhyperscan-dev
 ```
@@ -58,6 +59,7 @@ Then install `libdaq`:
 ```bash
 git clone https://github.com/snort3/libdaq.git
 cd libdaq
+git checkout 2.x
 ./bootstrap
 ./configure
 make
@@ -78,6 +80,7 @@ cd ..
 ### Building Software
 
 ```bash
+sudo ldconfig -v
 cd pigasus/software
 ./configure_cmake.sh --prefix=$installation_path_pigasus --enable-pigasus --enable-tsc-clock --builddir=build_pigasus
 cd build_pigasus
