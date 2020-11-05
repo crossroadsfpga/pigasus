@@ -2,7 +2,7 @@
 
 <img align="right" width="200" src="./pigasus_logo.png">
 
-Pigasus is an Intrusion Detection and Prevention System (ID/PS) that achieves 100Gbps using a single FPGA-equipped server. Pigasus's FPGA-first design ensures that most packets are processed entirely using the FPGA, while some packets are sent to the CPU for full evaluation. Refer to the OSDI '20 paper for details about the design.
+Pigasus is an Intrusion Detection and Prevention System (IDS/IPS) that achieves 100Gbps using a single FPGA-equipped server. Pigasus's FPGA-first design ensures that most packets are processed entirely using the FPGA, while some packets are sent to the CPU for full evaluation. Refer to the OSDI '20 paper for details about the design.
 
 If you have already configured your system and wants to run Pigasus, you can skip directly to [Running Pigasus](#running-pigasus).
 
@@ -117,14 +117,14 @@ source ~/.bashrc
 
 Once both the software and hardware components are configured, you can run Pigasus by building Pigasus, loading the bitstream and then running the software.
 
-Generate the Quartus IP cores used by Pigasus and create a Quartus project. This step could take about 10 mins.
+Generate the Quartus IP cores used by Pigasus and create a Quartus project. This step could take about 10 minutes.
 ```bash
 cd $pigasus_rep_dir/hardware/scripts/
 ./run_ipgen.sh
 ./run_quartus_create.sh
 ```
 
-Generate the bitstream. This step could take a few hours. We suggest running this step using a multi-core CPU with large size memory configuration. 
+Generate the bitstream. This step could take a few hours. We suggest running this step using a multi-core CPU with large memory (>= 32GB). 
 ```bash
 cd $pigasus_rep_dir/hardware/scripts/
 ./run_quartus_syn.sh
@@ -227,7 +227,7 @@ To change the hardware component of Pigasus you will need Quartus as well as an 
 
 If you have not yet installed Quartus, download and install [Quartus 19.3](https://fpgasoftware.intel.com/19.3/?edition=pro) and the Stratix 10 device support (same link). Then follow the next steps to prepare the RTL code for simulation and synthesis.
 
-Before setting up simulation and synthesis, if you have not yet generate IP cores/
+If you have not yet generated IP cores, please do that before setting up simulation and synthesis.
 ```bash
 cd $pigasus_rep_dir/hardware/scripts/
 ./run_ipgen.sh

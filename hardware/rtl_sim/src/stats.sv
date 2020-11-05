@@ -54,10 +54,6 @@ module stats (
     logic rst_sync_2;
 
     //RX
-    //logic rx_rst_sync_0;
-    //logic rx_rst_sync_1;
-    //logic rx_rst_sync_2;
-
     logic [31:0] rx_reg_ctrl_0;
     logic [31:0] rx_reg_ctrl_1;
     logic [31:0] rx_reg_ctrl_rx;
@@ -119,10 +115,6 @@ module stats (
     logic [31:0] rx_nf_pkt_cnt_status;
 
     //TX
-    //logic tx_rst_sync_0;
-    //logic tx_rst_sync_1;
-    //logic tx_rst_sync_2;
-
     logic [31:0] tx_reg_ctrl_0;
     logic [31:0] tx_reg_ctrl_1;
     logic [31:0] tx_reg_ctrl_tx;
@@ -278,18 +270,8 @@ module stats (
     assign clear = reg_ctrl[0];
     assign rx_clear = rx_reg_ctrl_rx[0];
 
-    //always @(posedge clk_status)begin
-    //    rst_sync_0 <= arst;
-    //    rst_sync_1 <= rst_sync_0;
-    //    rst_sync_2 <= rst_sync_1;
-    //end
-
     //RX sync
     always @(posedge clk_rx)begin
-        //rx_rst_sync_0 <= arst;
-        //rx_rst_sync_1 <= rx_rst_sync_0;
-        //rx_rst_sync_2 <= rx_rst_sync_1;
-
         rx_reg_ctrl_0  <= reg_ctrl;
         rx_reg_ctrl_1  <= rx_reg_ctrl_0;
         rx_reg_ctrl_rx <= rx_reg_ctrl_1;
@@ -345,10 +327,6 @@ module stats (
 
     //TX sync
     always @(posedge clk_tx)begin
-        //tx_rst_sync_0 <= arst;
-        //tx_rst_sync_1 <= tx_rst_sync_0;
-        //tx_rst_sync_2 <= tx_rst_sync_1;
-
         tx_reg_ctrl_0  <= reg_ctrl;
         tx_reg_ctrl_1  <= tx_reg_ctrl_0;
         tx_reg_ctrl_tx <= tx_reg_ctrl_1;
@@ -508,7 +486,6 @@ module stats (
             if ((rx_pkt_cnt > rx_warmup_pkt_rx) & (rx_pkt_cnt <= rx_max_pkt_rx))begin
                 rx_busy <= 1'b1;
                 if(rx_valid_r)begin
-                    //rx_byte_rx <= rx_byte_rx + 8'd64 - rx_empty;
                     rx_flit_rx <= rx_flit_rx + 1'b1;
                     if(rx_eop_r)begin
                         rx_pkt_rx <= rx_pkt_rx + 1'b1;
@@ -564,9 +541,6 @@ module stats (
         end 
 
         if(rx_sop_r)begin
-            //o_rx_data <= {rx_data[511:480],timestamp,rx_data[447:0]};
-            //o_rx_data <= {32'b0,timestamp,rx_data[447:0]};
-            //rx_data_r1 <= {rx_pkt_cnt,timestamp,rx_data_r[447:0]};
             //keep the original rx_data
             rx_data_r1 <= rx_data_r;
         end else begin
@@ -621,12 +595,8 @@ module stats (
     always @(posedge clk_rx)begin
         if(arst)begin
             timestamp <= 0;
-            //pktID <= 0;
         end else begin
             timestamp <= timestamp + 1;
-            //if(rx_valid & rx_sop) begin
-            //    pktID <= pktID + 1;
-            //end
         end
     end
 
@@ -656,7 +626,6 @@ module stats (
             if ((tx_pkt_cnt > tx_warmup_pkt_tx) & (tx_pkt_cnt <= tx_max_pkt_tx))begin
                 tx_busy <= 1'b1;
                 if(tx_valid_r & tx_ready_r)begin
-                    //tx_byte_tx <= tx_byte_tx + 8'd64 - tx_empty;
                     tx_flit_tx <= tx_flit_tx + 1'b1;
                     if(tx_eop_r)begin
                         tx_pkt_tx <= tx_pkt_tx + 1'b1;
@@ -681,204 +650,5 @@ module stats (
     end
 
     assign tx_tracker_rd_valid = 0;
-/*
-    ///////////////////////////
-    //tx tracker
-    //////////////////////////
-    //tracker first 512 tx pkts. 
-    always @(posedge clk_tx)begin
-        if(tx_clear | arst)begin
-            tx_tracker_wren <= 1'b0;
-            tx_tracker_wraddr <= 0;
-        end else begin
-            tx_tracker_wren <= 1'b0;
-            if (tx_tracker_wraddr != {TRACKER_AWIDTH{1'b1}})begin
-                if(tx_valid_r & tx_sop_r & tx_ready_r)begin
-                    tx_tracker_wren <= 1'b1;
-                end
-                if(tx_tracker_wren)begin
-                    tx_tracker_wraddr <= tx_tracker_wraddr + 1'b1;
-                end
-            end
-        end
-
-        tx_tracker_wdata <= tx_data_r[511:512-TRACKER_DWIDTH];
-    end
-
-    always @(posedge clk_status)begin
-        tx_tracker_rden_r <= tx_tracker_rden;
-        tx_tracker_rd_valid <= tx_tracker_rden_r;
-    end
-
-    ///////////////////////////
-    //Latency
-    //////////////////////////
-    always @(posedge clk_tx)begin
-        fetch_rd_1 <= fetch_rd;   
-        fetch_rd_2 <= fetch_rd_1;   
-        tx_fetch_rd <= fetch_rd_2;   
-        fetch_rd_addr_1 <= fetch_rd_addr;   
-        fetch_rd_addr_2 <= fetch_rd_addr_1;   
-        tx_fetch_rd_addr <= fetch_rd_addr_2;   
-    end
-
-    always @(posedge clk_status)begin
-        fetch_rd_data_1 <= tx_fetch_rd_data;   
-        fetch_rd_data_2 <= fetch_rd_data_1;   
-        fetch_rd_data <= fetch_rd_data_2;   
-        fetch_rd_valid_1 <= tx_fetch_rd_valid;   
-        fetch_rd_valid_2 <= fetch_rd_valid_1;   
-        fetch_rd_valid <= fetch_rd_valid_2;   
-    end
-
-
-
-
-    assign curr_time = tx_data_r[479:448];
-    always @(posedge clk_tx)begin
-        latency_valid <= 0;
-        latency <= 0;
-        if(tx_busy & tx_ready_r & tx_valid_r & tx_sop_r)begin
-            latency <= timestamp_tx + 3 - curr_time;
-            latency_valid <= 1;
-        end
-
-        if((latency >> tx_scale)>32'h3ff)begin
-            latency_r <= 32'h3ff;
-        end else begin
-            latency_r <= latency >> tx_scale;
-        end
-        latency_valid_r <= latency_valid;
-    end
-
-    //manage hist
-    always @(posedge clk_tx)begin
-        case(state)
-            WRITE:begin
-                //if ((tx_pkt_tx < tx_max_pkt_tx) & (tx_pkt_cnt>=tx_warmup_pkt_tx))begin
-                wr <= 0;
-                rd_addr <= latency_r;
-                rd <= latency_valid_r;
-
-                rd_1 <= rd;
-                rd_2 <= rd_1;
-                rd_3 <= rd_2;
-                rd_4 <= rd_3;
-                rd_5 <= rd_4;
-
-                //two cycle delay
-                rd_valid <= rd;
-                rd_valid_1 <= rd_valid;
-
-                rd_addr_1 <= rd_addr;
-                rd_addr_2 <= rd_addr_1;
-                rd_addr_3 <= rd_addr_2;
-                rd_addr_4 <= rd_addr_3;
-                rd_addr_5 <= rd_addr_4;
-
-                wr_addr <= rd_addr_2;
-
-                wr_data_1 <= wr_data;
-                wr_data_2 <= wr_data_1;
-                wr_data_3 <= wr_data_2;
-                if (rd_valid_1)begin
-                    if(rd_data != 32'hffffffff) begin
-                        if (rd_addr_3 == rd_addr_2) begin
-                            wr_data <= wr_data + 1;
-                        end else if (rd_addr_4 == rd_addr_2) begin
-                            wr_data <= wr_data_1 + 1;
-                        end else if (rd_addr_5 == rd_addr_2) begin
-                            wr_data <= wr_data_2 + 1;
-                        end else begin 
-                            wr_data <= rd_data + 1;
-                        end
-                    end
-                    wr <= 1;
-                end
-                if (tx_clear) begin
-                    state <= CLEAR;
-                    wr_addr <= 0;
-                end else if (tx_fetch)begin
-                    state <= FETCH;
-                end
-            end
-            CLEAR:begin
-                wr <= 1;
-                wr_data <= 0;
-                wr_addr <= wr_addr + 1;
-                if (!tx_clear)begin
-                    state <= WRITE;
-                end
-            end
-            FETCH:begin
-                rd <= tx_fetch_rd;
-                rd_valid_2 <= rd;
-                rd_valid_3 <= rd_valid_2;
-                tx_fetch_rd_valid <= rd_valid_3;
-                rd_addr <= tx_fetch_rd_addr;
-                tx_fetch_rd_data <= rd_data;
-                if (!tx_fetch)begin
-                    state <= WRITE;
-                end
-            end
-            default: state <= WRITE;
-        endcase
-
-    end
-
-    bram_core #(
-        .BEWIDTH(4),
-        .AWIDTH(10),
-        .DWIDTH(32),
-        .DEPTH(1024)
-    )
-    latency_hist (
-        .address     (rd_addr),    
-        .clken       (1'b1),      
-        .chipselect  (rd), 
-        .write       (1'b0),      
-        .readdata    (rd_data),   
-        .writedata   (0),  
-        .byteenable  ({4{1'b1}}), 
-        .address2    (wr_addr), 
-        .chipselect2 (wr),  
-        .clken2      (1'b1),                                                 
-        .write2      (wr),                                                 
-        .readdata2   (),     
-        .writedata2  (wr_data),                                                 
-        .byteenable2 ({4{1'b1}}),                                                 
-        .clk         (clk_tx),                             
-        .reset       (tx_rst_sync_2),                   
-        .reset_req   (tx_rst_sync_2)                
-    );
-
-    dc_fifo_reg_core  timestamp_sync (
-        .wrclock               (clk_rx),               //   input,   width = 1,    clk_in.clk
-        .wrreset_n             (!arst),             //   input,   width = 1,  reset_in.reset_n
-        .rdclock               (clk_tx),               //   input,   width = 1,   clk_out.clk
-        .rdreset_n             (!arst),             //   input,   width = 1, reset_out.reset_n
-        .avalonst_sink_valid   (1'b1),   //   input,   width = 1,        in.valid
-        .avalonst_sink_data    (timestamp),    //   input,  width = 32,          .data
-        .avalonst_source_valid (), //  output,   width = 1,       out.valid
-        .avalonst_source_data  (timestamp_tx)   //  output,  width = 32,          .data
-    );
-
-    bram_dc_simple2port #(
-        .AWIDTH(TRACKER_AWIDTH),
-        .DWIDTH(TRACKER_DWIDTH),
-        .DEPTH(TRACKER_DEPTH)
-    )
-
-    tx_pkt_tracker (
-        .data       (tx_tracker_wdata),    
-        .rdaddress  (tx_tracker_rdaddr),      
-        .rdclock    (clk_status), 
-        .rden       (tx_tracker_rden),      
-        .wraddress  (tx_tracker_wraddr),   
-        .wrclock    (clk_tx),  
-        .wren       (tx_tracker_wren), 
-        .q          (tx_tracker_rdata)
-    );
-*/
 
 endmodule

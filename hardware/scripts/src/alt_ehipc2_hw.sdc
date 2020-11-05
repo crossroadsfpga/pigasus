@@ -26,12 +26,6 @@ set RX_CLK0         [get_clocks av_top|alt_ehipc2_0|alt_ehipc2_hard_inst|altera_
 set RX_CLK1         [get_clocks av_top|alt_ehipc2_0|alt_ehipc2_hard_inst|altera_xcvr_native_inst|g_native_phy_inst[1].s10_xcvr_native_inst|*rx_pcs_x2_clk|ch0]
 set TX_CLK0         [get_clocks av_top|alt_ehipc2_0|alt_ehipc2_hard_inst|altera_xcvr_native_inst|g_native_phy_inst[0].s10_xcvr_native_inst|*tx_pcs_x2_clk|ch0]
 set TX_CLK1         [get_clocks av_top|alt_ehipc2_0|alt_ehipc2_hard_inst|altera_xcvr_native_inst|g_native_phy_inst[1].s10_xcvr_native_inst|*tx_pcs_x2_clk|ch0]
-
-
-
-
-
-
 set RX_CLK2         [get_clocks av_top|alt_ehipc2_0|alt_ehipc2_hard_inst|altera_xcvr_native_inst|g_native_phy_inst[2].s10_xcvr_native_inst|*rx_pcs_x2_clk|ch0]
 set RX_CLK3         [get_clocks av_top|alt_ehipc2_0|alt_ehipc2_hard_inst|altera_xcvr_native_inst|g_native_phy_inst[3].s10_xcvr_native_inst|*rx_pcs_x2_clk|ch0]
 set TX_CLK2         [get_clocks av_top|alt_ehipc2_0|alt_ehipc2_hard_inst|altera_xcvr_native_inst|g_native_phy_inst[2].s10_xcvr_native_inst|*tx_pcs_x2_clk|ch0]
@@ -41,14 +35,11 @@ set CLK100          [get_clocks u0|altera_iopll_0_outclk0]
 
 set IOPLL_REF       [get_clocks u0|altera_iopll_0_refclk]
 
-
-
-set USERCLK [get_clocks user_pll_inst|iopll_0_outclk0]
-set USERCLK_HIGH [get_clocks user_pll_inst|iopll_0_outclk1]
+set USERCLK [get_clocks user_pll_inst|user_pll_outclk0]
+set USERCLK_HIGH [get_clocks user_pll_inst|user_pll_outclk1]
 set PCIE_CLK [get_clocks pcie|pcie|dut|dut|hip|altera_avst512_iopll|altera_ep_g3x16_avst512_io_pll_s10_outclk0]
 set ESRAM_CLK [get_clocks esram_pkt_buffer|esram_0|esram_0_clk0]
 set DRAM_CLK [get_clocks dram_inst|ddr4|emif_s10_0|emif_s10_0_core_usr_clk]
-
 
 
 if {! [is_post_route]} {
@@ -61,33 +52,32 @@ if {! [is_post_route]} {
 
 
 
-set_clock_groups -exclusive  -group  $CORECLK  -group $CORECLKRX -group $OSC_CLK  -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll|iopll_0_refclk}]
+set_clock_groups -exclusive  -group  $CORECLK  -group $CORECLKRX -group $OSC_CLK  -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll_inst|user_pll_refclk}]
 
 
-set_clock_groups -exclusive   -group  $RX_CLK0 -group $OSC_CLK   -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll|iopll_0_refclk}]
+set_clock_groups -exclusive   -group  $RX_CLK0 -group $OSC_CLK   -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll_inst|user_pll_refclk}]
 
 
-set_clock_groups -exclusive   -group  $RX_CLK1 -group $OSC_CLK   -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll|iopll_0_refclk}]
-
- 
-set_clock_groups -exclusive   -group  $TX_CLK0 -group $OSC_CLK   -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll|iopll_0_refclk}]
+set_clock_groups -exclusive   -group  $RX_CLK1 -group $OSC_CLK   -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll_inst|user_pll_refclk}]
 
  
-set_clock_groups -exclusive   -group  $TX_CLK1 -group $OSC_CLK   -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll|iopll_0_refclk}]
+set_clock_groups -exclusive   -group  $TX_CLK0 -group $OSC_CLK   -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll_inst|user_pll_refclk}]
+
+ 
+set_clock_groups -exclusive   -group  $TX_CLK1 -group $OSC_CLK   -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll_inst|user_pll_refclk}]
 
  
 
-set_clock_groups -exclusive   -group  $RX_CLK2 -group $OSC_CLK  -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll|iopll_0_refclk}]
+set_clock_groups -exclusive   -group  $RX_CLK2 -group $OSC_CLK  -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll_inst|user_pll_refclk}]
 
 
-set_clock_groups -exclusive   -group  $RX_CLK3 -group $OSC_CLK  -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll|iopll_0_refclk}]
+set_clock_groups -exclusive   -group  $RX_CLK3 -group $OSC_CLK  -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll_inst|user_pll_refclk}]
 
 
-set_clock_groups -exclusive  -group  $TX_CLK2 -group $OSC_CLK  -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll|iopll_0_refclk}]
+set_clock_groups -exclusive  -group  $TX_CLK2 -group $OSC_CLK  -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll_inst|user_pll_refclk}]
 
 
-set_clock_groups -exclusive  -group  $TX_CLK3 -group $OSC_CLK  -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll|iopll_0_refclk}]
-
+set_clock_groups -exclusive  -group  $TX_CLK3 -group $OSC_CLK  -group $REF_CLK -group $CLK100 -group $IOPLL_REF -group $USERCLK -group $USERCLK_HIGH -group $ESRAM_CLK -group $DRAM_CLK -group $PCIE_CLK -group [get_clocks {user_pll_inst|user_pll_refclk}]
 
 # From Timequest cookbook
 set_clock_groups -exclusive -group [get_clocks altera_reserved_tck]
