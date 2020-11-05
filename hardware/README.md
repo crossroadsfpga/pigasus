@@ -1,6 +1,7 @@
-# Pigasus Hardware
+# Pigasus Hardware Files Description
 
-## File descriptions:
+## rtl_sim:
+
 - `input_gen`: Converts `.pcap` files to `.pkt`, which can be used as input for the RTL simulation. Each line represents a "flit" -- the minimum data unit that can be processed in one cycle on the FPGA. Each flit has 512 bits and one packet consists of a variable number of flits, e.g., a 128-byte packet has 2 flits, while a 256-byte packet has 4 flits. For more information, please refer to [Intel Avalon Streaming Interfaces](https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/manual/mnl_avalon_spec.pdf). It also contains the example pcap and expected simulation results of that pcap. 
 - `run_vsim.sh`: Script for running simulation in Modelsim.
 
@@ -53,3 +54,17 @@
       - `ring_buffer.sv`: FPGA side ring buffer to allow batch transfer from FPGA to CPU. 
     - `cpu2fpga_pcie.sv`: Handles the CPU to FPGA PCIe transfer. Similar to the FPGA to CPU path, except that the CPU to FPGA path only needs to pass a short message (512-bit) per block. The actual packets are buffered in the FPGA-side DRAM. 
   - `dram_wrapper.sv`: The top-level module of DRAM logic. In RTL simulation, the DRAM core is also bypassed.
+
+
+## hw_test
+Contains scripts for loading the bitstream and invoking System-console. 
+  - `load_bitstream.sh`: Copy the latest `alt_ehipc2_hw.sof` from quartus_project to current dir and then load it to Intel MX Dev Kit.
+  - `run_console.sh`: Invoke System-console to read FPGA internal counters or pass parameters (e.g. number of cores used for CPU) to FPGA through JTAG.
+  - `hwtest`: The tcl script used to communicate with FPGA throught JTAG. After quartus_project is created, the `hwtest` folder from generated example will be copied here. 
+
+## scripts
+  - `scr`: The source files needed for quartus_project, including the configuration file `alt_ehipc2_hw.qsf`, timing constraint file `alt_ehipc2_hw.sdc`, and system top-level verilog `alt_ehipc2_hw.sv`. They are both adapted from the generated 100G ethernet example. 
+  - `run_ipgen.sh`: Automatically generate the IPs needed by Pigasus. It will create three folders, `generated_files`, `ethernet`, and `pcie`. The `generated_files` will be used in RTL simulation. And all of these three folders will be used for synthesis. 
+  - `run_quartus_create.sh`: Automatically create a Quartus project, which will locate at `pigasus/hardware/quartus_project`. You can open the project in Quartus by opening the `pigasus/hardware/quartus_project/hardware_test_system/alt_ehipc2_hw.qpf`. 
+  - `run_quartus_synth.sh`: If you want to directly generate the bitstream, just run this script in commond line. Alternatively, you can open the project in Quartus and then manually generate the bitstream. 
+
