@@ -81,7 +81,7 @@ cd ..
 
 ```bash
 sudo ldconfig -v
-cd pigasus/software
+cd $pigasus_rep_dir/software
 ./configure_cmake.sh --prefix=$installation_path_pigasus --enable-pigasus --enable-tsc-clock --builddir=build_pigasus
 cd build_pigasus
 make -j $(nproc) install
@@ -89,7 +89,6 @@ make -j $(nproc) install
 
 ### Hardware Configuration
 
-*This assumes that you already have a bitstream to load on the FPGA. For instructions on how to synthesize the design and generate the bitstream refer to the [development guide](#developing-pigasus).*
 
 Download and install [Quartus 19.3](https://fpgasoftware.intel.com/19.3/?edition=pro) and the Stratix 10 device support (same link). You need Quartus in order to load the bitstream into the FPGA.
 
@@ -113,13 +112,25 @@ Make sure these changes are applied:
 source ~/.bashrc
 ```
 
+
 ## Running Pigasus
 
-Once both the software and hardware components are configured, you can run Pigasus by loading the bitstream and then running the software.
+Once both the software and hardware components are configured, you can run Pigasus by building Pigasus, loading the bitstream and then running the software.
 
-To load the bitstream, ensure that you have a `.sof` file (bitstream file), that was handled to you or that you compiled [using the Quartus project](#hardware-synthesis). 
+Generate the Quartus IP cores used by Pigasus and create a Quartus project. This step could take about 10 mins.
+```bash
+cd $pigasus_rep_dir/hardware/scripts/
+./run_ipgen.sh
+./run_quartus_create.sh
+```
 
-Then, copy the `.sof` file to `pigasus/hardware/hw_test/` and load the bitstream with:
+Generate the bitstream. This step could take a few hours. We suggest running this step using a multi-core CPU with large size memory configuration. 
+```bash
+cd $pigasus_rep_dir/hardware/scripts/
+./run_quartus_syn.sh
+```
+
+Load the bitstream to Intel MX development kit.
 ```bash
 cd $pigasus_rep_dir/hardware/hw_test
 ./load_bitstream.sh
@@ -147,7 +158,7 @@ source path.tcl
 
 > It may return some error the first time. Exit it using Ctrl-C. Then relaunch the console (`./run_console`) and rerun `source path.tcl`.
 
-In the tcl console, you will need to type some tcl commands. We built our tcl infrastructure on top of the Ethernet design example "hwtest." In this repo, we only provide our `stats.tcl` file. The files in "hwtest" of the design example are not provided due to copyright.
+In the tcl console, you will need to type some tcl commands.
 
 In the tcl console, set the buffer size:
 ```
@@ -200,7 +211,7 @@ str
 After the packet generator finishes sending the number of packets that you specified, recheck the counters on the FPGA using the tcl console:
 ```
 ## recheck the top counters, you can see the recv pkts, processed pkts and dma pkts.
-get_top_stats 
+get_results
 ```
 
 Now exit the software application, with Ctrl-C. You should expect to see the number of `rx_pkt` should match up the dma pkts. 
@@ -216,23 +227,23 @@ To change the hardware component of Pigasus you will need Quartus as well as an 
 
 If you have not yet installed Quartus, download and install [Quartus 19.3](https://fpgasoftware.intel.com/19.3/?edition=pro) and the Stratix 10 device support (same link). Then follow the next steps to prepare the RTL code for simulation and synthesis.
 
+Before setting up simulation and synthesis, if you have not yet generate IP cores/
+```bash
+cd $pigasus_rep_dir/hardware/scripts/
+./run_ipgen.sh
+```
+
 Simulation Setup:
 1. Compile Quartus 19.3 IP library for RTL simulation. Open Quartus 19.3. Select "Launch Simulation Library Compiler" under the "Tools" Tab. Select "ModelSim" as the "Tool name" and specify the path for "Executable location." Then select "Stratix 10" as Library families. Specify the output directory and click "Start Compilation".
 2. Add compiled library path as enviroment variable, by `export SIM_LIB_PATH=your_install_path/sim_lib/verilog_libs`
-3. Generate IP cores used in RTL simulation from Quartus, including 1-PORT RAM, 2-PORT RAM, 2-PORT ROM, Avalon-ST Adapter, Avalon-ST Multiplexer, Avalon-ST Dual Clock FIFO, Avalon-ST Single Clock FIFO, Native Fixed Point DSP. Copy the generated files to `pigasus/hardware/rtl_sim/common/`.
+
 
 Synthesis Setup:
-1. Generate the IP blocks used in Pigasus. Generate the design example of [H-tile Hard IP for Ethernet Intel Stratix 10 FPGA IP](https://www.intel.com/content/www/us/en/programmable/documentation/vqu1511218103429.html). Generate the design example of [Avalon memory mapped Intel Stratix 10 Hard IP+](https://www.intel.com/content/www/us/en/programmable/documentation/sox1520633403002.html). Generate IOPLL, eSRAM IP, and External Memory Interfaces (DRAM) IP. The eSRAM is only available on particular Intel FPGA devices. It is optional for Pigasus as it can be replaced by BRAM. 
-2. Add Pigasus source code (entire `rtl_sim` folder including the `rtl_sim/common`) into the Ethernet Hard IP design example.
-3. Change the pin assignment based on the hardware platform. We use [Stratix 10 MX Development Kit](https://www.intel.com/content/www/us/en/programmable/documentation/cbc1517362051825.html).
-4. Compile the design by clicking "Compile Design" in Quartus. 
-
-> **Notes:**
->
-> - We will create a script to fully automate Simulation step 3 and Synthesis step 1-4. 
-> - When using other Quartus versions, all the Simulation and Synthesis steps should be redone.
-> - When mapping to other Intel FPGA devices, the specific device support should be downloaded and all the Simulation and Synthesis steps should be redone as the IPs for difference devices might be different.
-> - When mapping to FPGAs from other vendors, users are responsible to include all the missing IPs and perhaps a shim layer between those IPs and the Pigasus code. 
+1. Create a Quartus project.
+```bash
+cd $pigasus_rep_dir/hardware/scripts/
+./run_quartus_create.sh
+```
 
 ### RTL Simulation
 
@@ -262,10 +273,11 @@ To speedup the simulation, you can disable MSPM in your first few runs by uncomm
 
 
 ### Hardware Synthesis
+```bash
+cd $pigasus_rep_dir/hardware/scripts
+./run_quartus_syn.sh
+```
 
-Once you verify that your design runs in simulation, you can synthesize it and run it on the FPGA. To do so you will need Quartus.
-
-If you completed the steps in [Hardware Development Requirements](#hardware-development-requirements), all you need to do is to open the project in Quartus and click in "Compile Design" (it will take a few hours). After that, refer to [Running Pigasus](#running-pigasus) for instructions on how to load the bitstream on the FPGA and run Pigasus.
 
 ## License
 

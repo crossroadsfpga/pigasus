@@ -1,0 +1,9 @@
+ethernet
+pcie
+qdb
+ip
+ip_gen
+ip_gen.qpf
+ip_gen.qsf
+ip_gen.qsys
+generated_files

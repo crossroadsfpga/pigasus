@@ -15,6 +15,8 @@ Setlocal EnableDelayedExpansion
   )
 )
 
+xcopy ..\scripts\generated_files  src\common /E
+
 %QUESTASIM%\vlog.exe +define+PKT_FILE=\"%PKT_FILE%\" +define+PKT_FILE_NB_LINES=%PKT_FILE_NB_LINES% *.sv -sv 
 %QUESTASIM%\vlog.exe ./common/*.sv -sv
 %QUESTASIM%\vlog.exe ./common/*.v

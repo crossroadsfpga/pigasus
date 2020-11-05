@@ -1,0 +1,143 @@
+module first_filter(clk,rst,
+	in_data,in_valid,in_sop,in_eop,in_empty,
+    out_data,out_valid
+);
+
+input clk;
+input rst;
+input [255:0] in_data;
+input in_valid;
+input in_sop;
+input in_eop;
+input [4:0] in_empty;
+output wire [255:0] out_data;
+output reg out_valid;
+
+{% for i in range(0,context['byte_size'])%}
+wire [12:0] addr{{i}};
+wire [63:0] q{{i}};
+wire [127:0] temp_st{{i}};
+{% endfor %}
+
+reg [255:0] in_reg;
+reg in_valid_reg;
+wire [127:0] temp_low;
+wire [127:0] temp_high;
+wire [127:0] temp_high1;
+wire [127:0] temp_high2;
+reg [63:0] state;
+wire [63:0] next_state;
+wire [127:0] state_low;
+wire [127:0] state_high;
+wire [127:0] state_high1;
+wire [127:0] state_high2;
+wire new_pkt;
+reg new_pkt_reg;
+reg state_valid;
+reg last;
+reg last_r;
+reg [255:0] mask;
+reg [8:0] shift;
+
+{% for i in range(0,context['byte_size']-1)%}
+assign addr{{i}} = in_reg[{{i}}*8+12:{{i}}*8];
+{% endfor %}
+{% for i in range(context['byte_size']-1,context['byte_size'])%}
+assign addr{{i}} = last ? {5'b0,in_reg[({{i}}+1)*8-1:{{i}}*8]} : {in_data[4:0],in_reg[({{i}}+1)*8-1:{{i}}*8]};
+{% endfor %}
+
+{% for i in range(0,8)%}
+assign temp_st{{i}} = q{{i}} << {{i}}*8;
+{% endfor %}
+{% for i in range(0,8)%}
+assign temp_st{{i+8}} = q{{i+8}} << {{i}}*8;
+{% endfor %}
+{% for i in range(0,8)%}
+assign temp_st{{i+16}} = q{{i+16}} << {{i}}*8;
+{% endfor %}
+{% for i in range(0,8)%}
+assign temp_st{{i+24}} = q{{i+24}} << {{i}}*8;
+{% endfor %}
+
+
+
+assign temp_low = temp_st0|temp_st1|temp_st2|temp_st3|temp_st4|temp_st5|temp_st6|temp_st7;     
+assign temp_high = temp_st8|temp_st9|temp_st10|temp_st11|temp_st12|temp_st13|temp_st14|temp_st15;     
+assign temp_high1 = temp_st16|temp_st17|temp_st18|temp_st19|temp_st20|temp_st21|temp_st22|temp_st23;     
+assign temp_high2 = temp_st24|temp_st25|temp_st26|temp_st27|temp_st28|temp_st29|temp_st30|temp_st31;     
+assign state_low = temp_low | state;
+assign state_high = temp_high | temp_low[127:64];
+assign state_high1 = temp_high1 | temp_high[127:64];
+assign state_high2 = temp_high2 | temp_high1[127:64];
+
+//assign out_data = {state_high[63:0],state_low[63:0]};
+assign out_data = {state_high2[63:0],state_high1[63:0],state_high[63:0],state_low[63:0]} | mask;
+
+assign next_state = state_high2[127:64];
+
+
+always @ (posedge clk) begin
+    //if(rst)begin
+    //    last <= 0;
+    //    shift <= 0;
+    //end else begin
+    shift <= (32-in_empty)*8;
+    last <= in_valid & in_eop;
+
+    //end
+
+    if(last)begin
+        mask <= {256{1'b1}} << shift;
+    end else begin
+        mask <= 0;
+    end
+end
+
+always @ (posedge clk) begin
+	//if(rst) begin
+	//	in_valid_reg <= 0;
+    //    out_valid <= 0;
+    //    //state <= 64'h0003070f1f3f7fff;
+    //    //state <= {64{1'b1}};
+    //    new_pkt_reg <= 0;
+    //    state_valid <= 0;
+    //    //in_reg <= 0;
+    //    last_r <= 0;
+	//end else begin
+	//end
+    last_r <= last;
+    in_valid_reg <= in_valid;
+    out_valid <= in_valid_reg;
+
+    //state update
+    if(in_valid & in_sop)begin
+        state <= 64'h0003070f1f3f7fff;
+        //The boudary bytes should not generate matches
+        //by themselves
+        //state <= {64{1'b1}};
+    end else begin
+        if(out_valid)begin
+            state <= next_state;
+        end
+    end
+
+    in_reg <= in_data;
+end
+
+{% for i in range(0,context['half_byte_size'])%}
+rom_2port_noreg #(
+	.DWIDTH(64),
+	.AWIDTH(13),
+	.MEM_SIZE(8192),
+	.INIT_FILE("./src/memory_init/match_table.mif")
+)
+match_table_{{i}} (
+	.q_a       (q{{2*i}}),    
+	.q_b       (q{{2*i+1}}),    
+	.address_a (addr{{2*i}}),
+	.address_b (addr{{2*i+1}}),
+	.clock     (clk)   
+);
+{% endfor %}
+
+endmodule

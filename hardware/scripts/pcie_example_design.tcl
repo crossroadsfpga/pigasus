@@ -1,0 +1,1717 @@
+package require -exact qsys 18.0
+
+# create the system "pcie_example_design"
+proc do_create_pcie_example_design {} {
+	# create the system
+	create_system pcie_example_design
+	set_project_property DEVICE {1SM21BHU2F53E2VGS1}
+	set_project_property DEVICE_FAMILY {Stratix 10}
+	set_project_property HIDE_FROM_IP_CATALOG {false}
+	set_use_testbench_naming_pattern 0 {}
+
+	# add the components
+	add_component BAR_INTERPRETER ip/pcie_example_design/pcie_example_design_BAR_INTERPRETER.ip intel_pcie_bri BAR_INTERPRETER 19.1
+	load_component BAR_INTERPRETER
+	set_component_parameter_value BAM_ADDR_WIDTH {19}
+	set_component_parameter_value BRI_DATA_WIDTH {512}
+	set_component_parameter_value PFNUM_WIDTH {2}
+	set_component_project_property HIDE_FROM_IP_CATALOG {false}
+	save_component
+	load_instantiation BAR_INTERPRETER
+	remove_instantiation_interfaces_and_ports
+	add_instantiation_interface clk clock INPUT
+	set_instantiation_interface_parameter_value clk clockRate {0}
+	set_instantiation_interface_parameter_value clk externallyDriven {false}
+	set_instantiation_interface_parameter_value clk ptfSchematicName {}
+	add_instantiation_interface_port clk Clk_i clk 1 STD_LOGIC Input
+	add_instantiation_interface reset reset INPUT
+	set_instantiation_interface_parameter_value reset associatedClock {clk}
+	set_instantiation_interface_parameter_value reset synchronousEdges {DEASSERT}
+	add_instantiation_interface_port reset Rstn_i reset_n 1 STD_LOGIC Input
+	add_instantiation_interface bri_slave avalon INPUT
+	set_instantiation_interface_parameter_value bri_slave addressAlignment {DYNAMIC}
+	set_instantiation_interface_parameter_value bri_slave addressGroup {0}
+	set_instantiation_interface_parameter_value bri_slave addressSpan {524288}
+	set_instantiation_interface_parameter_value bri_slave addressUnits {SYMBOLS}
+	set_instantiation_interface_parameter_value bri_slave alwaysBurstMaxBurst {false}
+	set_instantiation_interface_parameter_value bri_slave associatedClock {clk}
+	set_instantiation_interface_parameter_value bri_slave associatedReset {reset}
+	set_instantiation_interface_parameter_value bri_slave bitsPerSymbol {8}
+	set_instantiation_interface_parameter_value bri_slave bridgedAddressOffset {0}
+	set_instantiation_interface_parameter_value bri_slave bridgesToMaster {}
+	set_instantiation_interface_parameter_value bri_slave burstOnBurstBoundariesOnly {false}
+	set_instantiation_interface_parameter_value bri_slave burstcountUnits {WORDS}
+	set_instantiation_interface_parameter_value bri_slave constantBurstBehavior {false}
+	set_instantiation_interface_parameter_value bri_slave explicitAddressSpan {0}
+	set_instantiation_interface_parameter_value bri_slave holdTime {0}
+	set_instantiation_interface_parameter_value bri_slave interleaveBursts {false}
+	set_instantiation_interface_parameter_value bri_slave isBigEndian {false}
+	set_instantiation_interface_parameter_value bri_slave isFlash {false}
+	set_instantiation_interface_parameter_value bri_slave isMemoryDevice {false}
+	set_instantiation_interface_parameter_value bri_slave isNonVolatileStorage {false}
+	set_instantiation_interface_parameter_value bri_slave linewrapBursts {false}
+	set_instantiation_interface_parameter_value bri_slave maximumPendingReadTransactions {8}
+	set_instantiation_interface_parameter_value bri_slave maximumPendingWriteTransactions {0}
+	set_instantiation_interface_parameter_value bri_slave minimumReadLatency {1}
+	set_instantiation_interface_parameter_value bri_slave minimumResponseLatency {1}
+	set_instantiation_interface_parameter_value bri_slave minimumUninterruptedRunLength {1}
+	set_instantiation_interface_parameter_value bri_slave prSafe {false}
+	set_instantiation_interface_parameter_value bri_slave printableDevice {false}
+	set_instantiation_interface_parameter_value bri_slave readLatency {0}
+	set_instantiation_interface_parameter_value bri_slave readWaitStates {1}
+	set_instantiation_interface_parameter_value bri_slave readWaitTime {1}
+	set_instantiation_interface_parameter_value bri_slave registerIncomingSignals {false}
+	set_instantiation_interface_parameter_value bri_slave registerOutgoingSignals {false}
+	set_instantiation_interface_parameter_value bri_slave setupTime {0}
+	set_instantiation_interface_parameter_value bri_slave timingUnits {Cycles}
+	set_instantiation_interface_parameter_value bri_slave transparentBridge {false}
+	set_instantiation_interface_parameter_value bri_slave waitrequestAllowance {0}
+	set_instantiation_interface_parameter_value bri_slave wellBehavedWaitrequest {false}
+	set_instantiation_interface_parameter_value bri_slave writeLatency {0}
+	set_instantiation_interface_parameter_value bri_slave writeWaitStates {0}
+	set_instantiation_interface_parameter_value bri_slave writeWaitTime {0}
+	set_instantiation_interface_assignment_value bri_slave embeddedsw.configuration.isFlash {0}
+	set_instantiation_interface_assignment_value bri_slave embeddedsw.configuration.isMemoryDevice {0}
+	set_instantiation_interface_assignment_value bri_slave embeddedsw.configuration.isNonVolatileStorage {0}
+	set_instantiation_interface_assignment_value bri_slave embeddedsw.configuration.isPrintableDevice {0}
+	set_instantiation_interface_sysinfo_parameter_value bri_slave address_map {<address-map><slave name='bri_slave' start='0x0' end='0x80000' datawidth='512' /></address-map>}
+	set_instantiation_interface_sysinfo_parameter_value bri_slave address_width {19}
+	set_instantiation_interface_sysinfo_parameter_value bri_slave max_slave_data_width {512}
+	add_instantiation_interface_port bri_slave bri_s_address_i address 19 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port bri_slave bri_s_byteenable_i byteenable 64 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port bri_slave bri_s_read_i read 1 STD_LOGIC Input
+	add_instantiation_interface_port bri_slave bri_s_readdata_o readdata 512 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port bri_slave bri_s_readdatavalid_o readdatavalid 1 STD_LOGIC Output
+	add_instantiation_interface_port bri_slave bri_s_write_i write 1 STD_LOGIC Input
+	add_instantiation_interface_port bri_slave bri_s_writedata_i writedata 512 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port bri_slave bri_s_burstcount_i burstcount 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port bri_slave bri_s_waitrequest_o waitrequest 1 STD_LOGIC Output
+	add_instantiation_interface_port bri_slave bri_s_response_o response 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface bri_master avalon OUTPUT
+	set_instantiation_interface_parameter_value bri_master adaptsTo {}
+	set_instantiation_interface_parameter_value bri_master addressGroup {0}
+	set_instantiation_interface_parameter_value bri_master addressUnits {SYMBOLS}
+	set_instantiation_interface_parameter_value bri_master alwaysBurstMaxBurst {false}
+	set_instantiation_interface_parameter_value bri_master associatedClock {clk}
+	set_instantiation_interface_parameter_value bri_master associatedReset {reset}
+	set_instantiation_interface_parameter_value bri_master bitsPerSymbol {8}
+	set_instantiation_interface_parameter_value bri_master burstOnBurstBoundariesOnly {false}
+	set_instantiation_interface_parameter_value bri_master burstcountUnits {WORDS}
+	set_instantiation_interface_parameter_value bri_master constantBurstBehavior {false}
+	set_instantiation_interface_parameter_value bri_master dBSBigEndian {false}
+	set_instantiation_interface_parameter_value bri_master doStreamReads {false}
+	set_instantiation_interface_parameter_value bri_master doStreamWrites {false}
+	set_instantiation_interface_parameter_value bri_master holdTime {0}
+	set_instantiation_interface_parameter_value bri_master interleaveBursts {false}
+	set_instantiation_interface_parameter_value bri_master isAsynchronous {false}
+	set_instantiation_interface_parameter_value bri_master isBigEndian {false}
+	set_instantiation_interface_parameter_value bri_master isReadable {false}
+	set_instantiation_interface_parameter_value bri_master isWriteable {false}
+	set_instantiation_interface_parameter_value bri_master linewrapBursts {false}
+	set_instantiation_interface_parameter_value bri_master maxAddressWidth {32}
+	set_instantiation_interface_parameter_value bri_master maximumPendingReadTransactions {0}
+	set_instantiation_interface_parameter_value bri_master maximumPendingWriteTransactions {0}
+	set_instantiation_interface_parameter_value bri_master minimumReadLatency {1}
+	set_instantiation_interface_parameter_value bri_master minimumResponseLatency {1}
+	set_instantiation_interface_parameter_value bri_master prSafe {false}
+	set_instantiation_interface_parameter_value bri_master readLatency {0}
+	set_instantiation_interface_parameter_value bri_master readWaitTime {1}
+	set_instantiation_interface_parameter_value bri_master registerIncomingSignals {false}
+	set_instantiation_interface_parameter_value bri_master registerOutgoingSignals {false}
+	set_instantiation_interface_parameter_value bri_master setupTime {0}
+	set_instantiation_interface_parameter_value bri_master timingUnits {Cycles}
+	set_instantiation_interface_parameter_value bri_master waitrequestAllowance {8}
+	set_instantiation_interface_parameter_value bri_master writeWaitTime {0}
+	add_instantiation_interface_port bri_master bri_m_address_o address 23 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port bri_master bri_m_read_o read 1 STD_LOGIC Output
+	add_instantiation_interface_port bri_master bri_m_readdata_i readdata 512 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port bri_master bri_m_readdatavalid_i readdatavalid 1 STD_LOGIC Input
+	add_instantiation_interface_port bri_master bri_m_write_o write 1 STD_LOGIC Output
+	add_instantiation_interface_port bri_master bri_m_writedata_o writedata 512 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port bri_master bri_m_waitrequest_i waitrequest 1 STD_LOGIC Input
+	add_instantiation_interface_port bri_master bri_m_byteenable_o byteenable 64 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port bri_master bri_m_response_i response 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port bri_master bri_m_burstcount_o burstcount 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface bri_conduit conduit INPUT
+	set_instantiation_interface_parameter_value bri_conduit associatedClock {}
+	set_instantiation_interface_parameter_value bri_conduit associatedReset {}
+	set_instantiation_interface_parameter_value bri_conduit prSafe {false}
+	add_instantiation_interface_port bri_conduit bri_s_bar_i barnum 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port bri_conduit bri_s_pfnum_i pfnum 2 STD_LOGIC_VECTOR Input
+	save_instantiation
+	add_component DUT ip/pcie_example_design/pcie_example_design_DUT.ip avmm_bridge_512 DUT 20.0.0
+	load_component DUT
+	set_component_parameter_value anlg_voltage {1_0V}
+	set_component_parameter_value apps_type_hwtcl {14}
+	set_component_parameter_value bfm_drive_interface_clk_hwtcl {1}
+	set_component_parameter_value bfm_drive_interface_control_hwtcl {1}
+	set_component_parameter_value bfm_drive_interface_npor_hwtcl {1}
+	set_component_parameter_value bfm_drive_interface_pipe_hwtcl {1}
+	set_component_parameter_value bursting_slave_address_width_hwtcl {64}
+	set_component_parameter_value ceb_extend_pcie_hwtcl {0}
+	set_component_parameter_value chosen_devkit_hwtcl {Stratix 10 MX H-Tile ES1 FPGA Development Kit}
+	set_component_parameter_value cvp_user_id_hwtcl {0}
+	set_component_parameter_value design_environment {QSYS}
+	set_component_parameter_value en_order_rx_posted_cpl_hwtcl {1}
+	set_component_parameter_value enable_advanced_interrupt_hwtcl {0}
+	set_component_parameter_value enable_bursting_master_hwtcl {1}
+	set_component_parameter_value enable_bursting_slave_hwtcl {0}
+	set_component_parameter_value enable_completion_checking_hwtcl {0}
+	set_component_parameter_value enable_dma_msix_table_hwtcl {0}
+	set_component_parameter_value enable_example_design_qii_hwtcl {1}
+	set_component_parameter_value enable_example_design_sim_hwtcl {0}
+	set_component_parameter_value enable_example_design_sim_rp_hwtcl {0}
+	set_component_parameter_value enable_example_design_synth_hwtcl {1}
+	set_component_parameter_value enable_example_design_synth_rp_hwtcl {0}
+	set_component_parameter_value enable_example_design_tb_hwtcl {1}
+	set_component_parameter_value enable_hip_status_for_avmm_hwtcl {0}
+	set_component_parameter_value enable_legacy_interrupt_hwtcl {0}
+	set_component_parameter_value enable_pcie_cv_fix {0}
+	set_component_parameter_value enable_pipe32_phyip_ser_driver_hwtcl {0}
+	set_component_parameter_value enable_pld_warm_rst_rdy_hwtcl {0}
+	set_component_parameter_value enable_read_mover_hwtcl {1}
+	set_component_parameter_value enable_rx_buffer_limit_ports_hwtcl {1}
+	set_component_parameter_value enable_sriov_hwtcl {0}
+	set_component_parameter_value enable_test_out_hwtcl {0}
+	set_component_parameter_value enable_write_mover_hwtcl {1}
+	set_component_parameter_value hip_reconfig_hwtcl {0}
+	set_component_parameter_value interface_type_hwtcl {Avalon-MM}
+	set_component_parameter_value pcie_link_inspector_avmm_hwtcl {0}
+	set_component_parameter_value pcie_link_inspector_hwtcl {0}
+	set_component_parameter_value pf0_bar0_address_width_user_hwtcl {16}
+	set_component_parameter_value pf0_bar0_type_user_hwtcl {64-bit prefetchable memory}
+	set_component_parameter_value pf0_bar1_address_width_user_hwtcl {0}
+	set_component_parameter_value pf0_bar1_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf0_bar2_address_width_user_hwtcl {19}
+	set_component_parameter_value pf0_bar2_type_user_hwtcl {64-bit prefetchable memory}
+	set_component_parameter_value pf0_bar3_address_width_user_hwtcl {0}
+	set_component_parameter_value pf0_bar3_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf0_bar4_address_width_user_hwtcl {0}
+	set_component_parameter_value pf0_bar4_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf0_bar5_address_width_user_hwtcl {0}
+	set_component_parameter_value pf0_bar5_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf0_class_code_hwtcl {131072}
+	set_component_parameter_value pf0_expansion_base_address_register_hwtcl {0}
+	set_component_parameter_value pf0_pci_msi_multiple_msg_cap_hwtcl {1}
+	set_component_parameter_value pf0_pci_msix_bir_hwtcl {0}
+	set_component_parameter_value pf0_pci_msix_pba_hwtcl {0}
+	set_component_parameter_value pf0_pci_msix_pba_offset_hwtcl {0.0}
+	set_component_parameter_value pf0_pci_msix_table_offset_hwtcl {0.0}
+	set_component_parameter_value pf0_pci_msix_table_size_hwtcl {0}
+	set_component_parameter_value pf0_pci_type0_device_id_hwtcl {0}
+	set_component_parameter_value pf0_pci_type0_vendor_id_hwtcl {4466}
+	set_component_parameter_value pf0_pcie_cap_ep_l0s_accpt_latency_hwtcl {0}
+	set_component_parameter_value pf0_pcie_cap_ep_l1_accpt_latency_hwtcl {0}
+	set_component_parameter_value pf0_pcie_cap_ext_tag_supp_user_hwtcl {1}
+	set_component_parameter_value pf0_pcie_cap_flr_cap_user_hwtcl {1}
+	set_component_parameter_value pf0_pcie_cap_phy_slot_num_hwtcl {0}
+	set_component_parameter_value pf0_pcie_cap_port_num_hwtcl {1}
+	set_component_parameter_value pf0_pcie_cap_sel_deemphasis_hwtcl {6dB}
+	set_component_parameter_value pf0_pcie_cap_slot_clk_config_hwtcl {1}
+	set_component_parameter_value pf0_pcie_cap_slot_power_limit_scale_hwtcl {0}
+	set_component_parameter_value pf0_pcie_cap_slot_power_limit_value_hwtcl {0}
+	set_component_parameter_value pf0_pcie_slot_imp_hwtcl {0}
+	set_component_parameter_value pf0_revision_id_hwtcl {1}
+	set_component_parameter_value pf0_sriov_vf_bar0_address_width_hwtcl {0}
+	set_component_parameter_value pf0_sriov_vf_bar0_type_hwtcl {Disabled}
+	set_component_parameter_value pf0_sriov_vf_bar1_address_width_hwtcl {0}
+	set_component_parameter_value pf0_sriov_vf_bar1_type_hwtcl {Disabled}
+	set_component_parameter_value pf0_sriov_vf_bar2_address_width_hwtcl {0}
+	set_component_parameter_value pf0_sriov_vf_bar2_type_hwtcl {Disabled}
+	set_component_parameter_value pf0_sriov_vf_bar3_address_width_hwtcl {0}
+	set_component_parameter_value pf0_sriov_vf_bar3_type_hwtcl {Disabled}
+	set_component_parameter_value pf0_sriov_vf_bar4_address_width_hwtcl {0}
+	set_component_parameter_value pf0_sriov_vf_bar4_type_hwtcl {Disabled}
+	set_component_parameter_value pf0_sriov_vf_bar5_address_width_hwtcl {0}
+	set_component_parameter_value pf0_sriov_vf_bar5_type_hwtcl {Disabled}
+	set_component_parameter_value pf0_subsys_dev_id_hwtcl {0}
+	set_component_parameter_value pf0_subsys_vendor_id_hwtcl {0}
+	set_component_parameter_value pf0_tph_req_cap_st_table_loc_1_hwtcl {ST table not present}
+	set_component_parameter_value pf0_tph_req_cap_st_table_loc_1_vfcomm_cs2_hwtcl {ST table not present}
+	set_component_parameter_value pf0_tph_req_cap_st_table_size_hwtcl {0}
+	set_component_parameter_value pf0_tph_req_cap_st_table_size_vfcomm_cs2_hwtcl {0}
+	set_component_parameter_value pf0_tph_st_dev_spec_mode_hwtcl {0}
+	set_component_parameter_value pf0_tph_st_int_mode_hwtcl {0}
+	set_component_parameter_value pf0_vf_ats_cap_enable_hwtcl {0}
+	set_component_parameter_value pf0_vf_count_hwtcl {0}
+	set_component_parameter_value pf0_vf_tph_cap_enable_hwtcl {0}
+	set_component_parameter_value pf0_vf_tph_st_dev_spec_mode_hwtcl {0}
+	set_component_parameter_value pf0_vf_tph_st_int_mode_hwtcl {0}
+	set_component_parameter_value pf1_bar0_address_width_user_hwtcl {0}
+	set_component_parameter_value pf1_bar0_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf1_bar1_address_width_user_hwtcl {0}
+	set_component_parameter_value pf1_bar1_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf1_bar2_address_width_user_hwtcl {0}
+	set_component_parameter_value pf1_bar2_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf1_bar3_address_width_user_hwtcl {0}
+	set_component_parameter_value pf1_bar3_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf1_bar4_address_width_user_hwtcl {0}
+	set_component_parameter_value pf1_bar4_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf1_bar5_address_width_user_hwtcl {0}
+	set_component_parameter_value pf1_bar5_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf1_class_code_hwtcl {0}
+	set_component_parameter_value pf1_expansion_base_address_register_hwtcl {0}
+	set_component_parameter_value pf1_pci_msi_multiple_msg_cap_hwtcl {1}
+	set_component_parameter_value pf1_pci_msix_bir_hwtcl {0}
+	set_component_parameter_value pf1_pci_msix_pba_hwtcl {0}
+	set_component_parameter_value pf1_pci_msix_pba_offset_hwtcl {0.0}
+	set_component_parameter_value pf1_pci_msix_table_offset_hwtcl {0.0}
+	set_component_parameter_value pf1_pci_msix_table_size_hwtcl {0}
+	set_component_parameter_value pf1_pci_type0_device_id_hwtcl {0}
+	set_component_parameter_value pf1_pci_type0_vendor_id_hwtcl {0}
+	set_component_parameter_value pf1_revision_id_hwtcl {0}
+	set_component_parameter_value pf1_sriov_vf_bar0_address_width_hwtcl {0}
+	set_component_parameter_value pf1_sriov_vf_bar0_type_hwtcl {Disabled}
+	set_component_parameter_value pf1_sriov_vf_bar1_address_width_hwtcl {0}
+	set_component_parameter_value pf1_sriov_vf_bar1_type_hwtcl {Disabled}
+	set_component_parameter_value pf1_sriov_vf_bar2_address_width_hwtcl {0}
+	set_component_parameter_value pf1_sriov_vf_bar2_type_hwtcl {Disabled}
+	set_component_parameter_value pf1_sriov_vf_bar3_address_width_hwtcl {0}
+	set_component_parameter_value pf1_sriov_vf_bar3_type_hwtcl {Disabled}
+	set_component_parameter_value pf1_sriov_vf_bar4_address_width_hwtcl {0}
+	set_component_parameter_value pf1_sriov_vf_bar4_type_hwtcl {Disabled}
+	set_component_parameter_value pf1_sriov_vf_bar5_address_width_hwtcl {0}
+	set_component_parameter_value pf1_sriov_vf_bar5_type_hwtcl {Disabled}
+	set_component_parameter_value pf1_subsys_dev_id_hwtcl {0}
+	set_component_parameter_value pf1_subsys_vendor_id_hwtcl {0}
+	set_component_parameter_value pf1_tph_req_cap_st_table_loc_1_hwtcl {ST table not present}
+	set_component_parameter_value pf1_tph_req_cap_st_table_loc_1_vfcomm_cs2_hwtcl {ST table not present}
+	set_component_parameter_value pf1_tph_req_cap_st_table_size_hwtcl {0}
+	set_component_parameter_value pf1_tph_req_cap_st_table_size_vfcomm_cs2_hwtcl {0}
+	set_component_parameter_value pf1_tph_st_dev_spec_mode_hwtcl {0}
+	set_component_parameter_value pf1_tph_st_int_mode_hwtcl {0}
+	set_component_parameter_value pf1_vf_ats_cap_enable_hwtcl {0}
+	set_component_parameter_value pf1_vf_count_hwtcl {0}
+	set_component_parameter_value pf1_vf_tph_cap_enable_hwtcl {0}
+	set_component_parameter_value pf1_vf_tph_st_dev_spec_mode_hwtcl {0}
+	set_component_parameter_value pf1_vf_tph_st_int_mode_hwtcl {0}
+	set_component_parameter_value pf2_bar0_address_width_user_hwtcl {0}
+	set_component_parameter_value pf2_bar0_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf2_bar1_address_width_user_hwtcl {0}
+	set_component_parameter_value pf2_bar1_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf2_bar2_address_width_user_hwtcl {0}
+	set_component_parameter_value pf2_bar2_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf2_bar3_address_width_user_hwtcl {0}
+	set_component_parameter_value pf2_bar3_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf2_bar4_address_width_user_hwtcl {0}
+	set_component_parameter_value pf2_bar4_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf2_bar5_address_width_user_hwtcl {0}
+	set_component_parameter_value pf2_bar5_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf2_class_code_hwtcl {0}
+	set_component_parameter_value pf2_expansion_base_address_register_hwtcl {0}
+	set_component_parameter_value pf2_pci_msi_multiple_msg_cap_hwtcl {1}
+	set_component_parameter_value pf2_pci_msix_bir_hwtcl {0}
+	set_component_parameter_value pf2_pci_msix_pba_hwtcl {0}
+	set_component_parameter_value pf2_pci_msix_pba_offset_hwtcl {0.0}
+	set_component_parameter_value pf2_pci_msix_table_offset_hwtcl {0.0}
+	set_component_parameter_value pf2_pci_msix_table_size_hwtcl {0}
+	set_component_parameter_value pf2_pci_type0_device_id_hwtcl {0}
+	set_component_parameter_value pf2_pci_type0_vendor_id_hwtcl {0}
+	set_component_parameter_value pf2_revision_id_hwtcl {0}
+	set_component_parameter_value pf2_sriov_vf_bar0_address_width_hwtcl {0}
+	set_component_parameter_value pf2_sriov_vf_bar0_type_hwtcl {Disabled}
+	set_component_parameter_value pf2_sriov_vf_bar1_address_width_hwtcl {0}
+	set_component_parameter_value pf2_sriov_vf_bar1_type_hwtcl {Disabled}
+	set_component_parameter_value pf2_sriov_vf_bar2_address_width_hwtcl {0}
+	set_component_parameter_value pf2_sriov_vf_bar2_type_hwtcl {Disabled}
+	set_component_parameter_value pf2_sriov_vf_bar3_address_width_hwtcl {0}
+	set_component_parameter_value pf2_sriov_vf_bar3_type_hwtcl {Disabled}
+	set_component_parameter_value pf2_sriov_vf_bar4_address_width_hwtcl {0}
+	set_component_parameter_value pf2_sriov_vf_bar4_type_hwtcl {Disabled}
+	set_component_parameter_value pf2_sriov_vf_bar5_address_width_hwtcl {0}
+	set_component_parameter_value pf2_sriov_vf_bar5_type_hwtcl {Disabled}
+	set_component_parameter_value pf2_subsys_dev_id_hwtcl {0}
+	set_component_parameter_value pf2_subsys_vendor_id_hwtcl {0}
+	set_component_parameter_value pf2_tph_req_cap_st_table_loc_1_hwtcl {ST table not present}
+	set_component_parameter_value pf2_tph_req_cap_st_table_loc_1_vfcomm_cs2_hwtcl {ST table not present}
+	set_component_parameter_value pf2_tph_req_cap_st_table_size_hwtcl {0}
+	set_component_parameter_value pf2_tph_req_cap_st_table_size_vfcomm_cs2_hwtcl {0}
+	set_component_parameter_value pf2_tph_st_dev_spec_mode_hwtcl {0}
+	set_component_parameter_value pf2_tph_st_int_mode_hwtcl {0}
+	set_component_parameter_value pf2_vf_ats_cap_enable_hwtcl {0}
+	set_component_parameter_value pf2_vf_count_hwtcl {0}
+	set_component_parameter_value pf2_vf_tph_cap_enable_hwtcl {0}
+	set_component_parameter_value pf2_vf_tph_st_dev_spec_mode_hwtcl {0}
+	set_component_parameter_value pf2_vf_tph_st_int_mode_hwtcl {0}
+	set_component_parameter_value pf3_bar0_address_width_user_hwtcl {0}
+	set_component_parameter_value pf3_bar0_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf3_bar1_address_width_user_hwtcl {0}
+	set_component_parameter_value pf3_bar1_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf3_bar2_address_width_user_hwtcl {0}
+	set_component_parameter_value pf3_bar2_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf3_bar3_address_width_user_hwtcl {0}
+	set_component_parameter_value pf3_bar3_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf3_bar4_address_width_user_hwtcl {0}
+	set_component_parameter_value pf3_bar4_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf3_bar5_address_width_user_hwtcl {0}
+	set_component_parameter_value pf3_bar5_type_user_hwtcl {Disabled}
+	set_component_parameter_value pf3_class_code_hwtcl {0}
+	set_component_parameter_value pf3_expansion_base_address_register_hwtcl {0}
+	set_component_parameter_value pf3_pci_msi_multiple_msg_cap_hwtcl {1}
+	set_component_parameter_value pf3_pci_msix_bir_hwtcl {0}
+	set_component_parameter_value pf3_pci_msix_pba_hwtcl {0}
+	set_component_parameter_value pf3_pci_msix_pba_offset_hwtcl {0.0}
+	set_component_parameter_value pf3_pci_msix_table_offset_hwtcl {0.0}
+	set_component_parameter_value pf3_pci_msix_table_size_hwtcl {0}
+	set_component_parameter_value pf3_pci_type0_device_id_hwtcl {0}
+	set_component_parameter_value pf3_pci_type0_vendor_id_hwtcl {0}
+	set_component_parameter_value pf3_revision_id_hwtcl {0}
+	set_component_parameter_value pf3_sriov_vf_bar0_address_width_hwtcl {0}
+	set_component_parameter_value pf3_sriov_vf_bar0_type_hwtcl {Disabled}
+	set_component_parameter_value pf3_sriov_vf_bar1_address_width_hwtcl {0}
+	set_component_parameter_value pf3_sriov_vf_bar1_type_hwtcl {Disabled}
+	set_component_parameter_value pf3_sriov_vf_bar2_address_width_hwtcl {0}
+	set_component_parameter_value pf3_sriov_vf_bar2_type_hwtcl {Disabled}
+	set_component_parameter_value pf3_sriov_vf_bar3_address_width_hwtcl {0}
+	set_component_parameter_value pf3_sriov_vf_bar3_type_hwtcl {Disabled}
+	set_component_parameter_value pf3_sriov_vf_bar4_address_width_hwtcl {0}
+	set_component_parameter_value pf3_sriov_vf_bar4_type_hwtcl {Disabled}
+	set_component_parameter_value pf3_sriov_vf_bar5_address_width_hwtcl {0}
+	set_component_parameter_value pf3_sriov_vf_bar5_type_hwtcl {Disabled}
+	set_component_parameter_value pf3_subsys_dev_id_hwtcl {0}
+	set_component_parameter_value pf3_subsys_vendor_id_hwtcl {0}
+	set_component_parameter_value pf3_tph_req_cap_st_table_loc_1_hwtcl {ST table not present}
+	set_component_parameter_value pf3_tph_req_cap_st_table_loc_1_vfcomm_cs2_hwtcl {ST table not present}
+	set_component_parameter_value pf3_tph_req_cap_st_table_size_hwtcl {0}
+	set_component_parameter_value pf3_tph_req_cap_st_table_size_vfcomm_cs2_hwtcl {0}
+	set_component_parameter_value pf3_tph_st_dev_spec_mode_hwtcl {0}
+	set_component_parameter_value pf3_tph_st_int_mode_hwtcl {0}
+	set_component_parameter_value pf3_vf_ats_cap_enable_hwtcl {0}
+	set_component_parameter_value pf3_vf_count_hwtcl {0}
+	set_component_parameter_value pf3_vf_tph_cap_enable_hwtcl {0}
+	set_component_parameter_value pf3_vf_tph_st_dev_spec_mode_hwtcl {0}
+	set_component_parameter_value pf3_vf_tph_st_int_mode_hwtcl {0}
+	set_component_parameter_value pll_refclk_freq_hwtcl {100 MHz}
+	set_component_parameter_value read_mover_address_width_hwtcl {64}
+	set_component_parameter_value select_design_example_rtl_lang_hwtcl {Verilog}
+	set_component_parameter_value select_example_design_sim_BFM_hwtcl {Intel FPGA BFM}
+	set_component_parameter_value serial_sim_hwtcl {1}
+	set_component_parameter_value targeted_devkit_hwtcl {NONE}
+	set_component_parameter_value use_pll_lock_hwtcl {1}
+	set_component_parameter_value use_rpbfm_pro {0}
+	set_component_parameter_value user_bursting_master_address_width_hwtcl {64}
+	set_component_parameter_value user_total_pf_count_hwtcl {1}
+	set_component_parameter_value virtual_ep_native_hwtcl {Native}
+	set_component_parameter_value virtual_maxpayload_size_hwtcl {512}
+	set_component_parameter_value virtual_pf0_ats_cap_enable_hwtcl {0}
+	set_component_parameter_value virtual_pf0_msi_enable_user_hwtcl {0}
+	set_component_parameter_value virtual_pf0_msix_enable_hwtcl {0}
+	set_component_parameter_value virtual_pf0_tph_cap_enable_hwtcl {0}
+	set_component_parameter_value virtual_pf1_ats_cap_enable_hwtcl {0}
+	set_component_parameter_value virtual_pf1_msi_enable_user_hwtcl {0}
+	set_component_parameter_value virtual_pf1_msix_enable_hwtcl {0}
+	set_component_parameter_value virtual_pf1_tph_cap_enable_hwtcl {0}
+	set_component_parameter_value virtual_pf2_ats_cap_enable_hwtcl {0}
+	set_component_parameter_value virtual_pf2_msi_enable_user_hwtcl {0}
+	set_component_parameter_value virtual_pf2_msix_enable_hwtcl {0}
+	set_component_parameter_value virtual_pf2_tph_cap_enable_hwtcl {0}
+	set_component_parameter_value virtual_pf3_ats_cap_enable_hwtcl {0}
+	set_component_parameter_value virtual_pf3_msi_enable_user_hwtcl {0}
+	set_component_parameter_value virtual_pf3_msix_enable_hwtcl {0}
+	set_component_parameter_value virtual_pf3_tph_cap_enable_hwtcl {0}
+	set_component_parameter_value virtual_rp_ep_mode_hwtcl {Native Endpoint}
+	set_component_parameter_value wrala_hwtcl {Gen3x16, Interface - 512 bit, 250 MHz}
+	set_component_parameter_value write_mover_address_width_hwtcl {64}
+	set_component_parameter_value xcvr_adme_hwtcl {0}
+	set_component_parameter_value xcvr_reconfig_hwtcl {0}
+	set_component_project_property HIDE_FROM_IP_CATALOG {false}
+	save_component
+	load_instantiation DUT
+	remove_instantiation_interfaces_and_ports
+	set_instantiation_assignment_value testbench.partner.map.hip_ctrl {pcie_tb.hip_ctrl}
+	set_instantiation_assignment_value testbench.partner.map.hip_pipe {pcie_tb.hip_pipe}
+	set_instantiation_assignment_value testbench.partner.map.hip_serial {pcie_tb.hip_serial}
+	set_instantiation_assignment_value testbench.partner.map.npor {pcie_tb.npor}
+	set_instantiation_assignment_value testbench.partner.map.refclk {pcie_tb.refclk}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.class {altera_pcie_s10_tbed}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.CRETE_TYPE {}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.apps_type_hwtcl {14}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.bfm_drive_interface_clk_hwtcl {1}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.bfm_drive_interface_control_hwtcl {1}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.bfm_drive_interface_npor_hwtcl {1}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.bfm_drive_interface_pipe_hwtcl {1}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.gen123_lane_rate_mode_hwtcl {Gen3 (8.0 Gbps)}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.lane_mask_hwtcl {x16}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.pll_refclk_freq_hwtcl {100 MHz}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.port_type_hwtcl {Root Port}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.select_example_design_sim_BFM_hwtcl {Intel FPGA BFM}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.parameter.serial_sim_hwtcl {1}
+	set_instantiation_assignment_value testbench.partner.pcie_tb.version {20.0.0}
+	add_instantiation_interface refclk clock INPUT
+	set_instantiation_interface_parameter_value refclk clockRate {100000000}
+	set_instantiation_interface_parameter_value refclk externallyDriven {false}
+	set_instantiation_interface_parameter_value refclk ptfSchematicName {}
+	add_instantiation_interface_port refclk refclk clk 1 STD_LOGIC Input
+	add_instantiation_interface coreclkout_hip clock OUTPUT
+	set_instantiation_interface_parameter_value coreclkout_hip associatedDirectClock {}
+	set_instantiation_interface_parameter_value coreclkout_hip clockRate {125000000}
+	set_instantiation_interface_parameter_value coreclkout_hip clockRateKnown {true}
+	set_instantiation_interface_parameter_value coreclkout_hip externallyDriven {false}
+	set_instantiation_interface_parameter_value coreclkout_hip ptfSchematicName {}
+	set_instantiation_interface_sysinfo_parameter_value coreclkout_hip clock_rate {125000000}
+	add_instantiation_interface_port coreclkout_hip coreclkout_hip clk 1 STD_LOGIC Output
+	add_instantiation_interface npor conduit INPUT
+	set_instantiation_interface_parameter_value npor associatedClock {}
+	set_instantiation_interface_parameter_value npor associatedReset {}
+	set_instantiation_interface_parameter_value npor prSafe {false}
+	add_instantiation_interface_port npor npor npor 1 STD_LOGIC Input
+	add_instantiation_interface_port npor pin_perst pin_perst 1 STD_LOGIC Input
+	add_instantiation_interface app_nreset_status reset OUTPUT
+	set_instantiation_interface_parameter_value app_nreset_status associatedClock {coreclkout_hip}
+	set_instantiation_interface_parameter_value app_nreset_status associatedDirectReset {}
+	set_instantiation_interface_parameter_value app_nreset_status associatedResetSinks {none}
+	set_instantiation_interface_parameter_value app_nreset_status synchronousEdges {BOTH}
+	add_instantiation_interface_port app_nreset_status app_nreset_status reset_n 1 STD_LOGIC Output
+	add_instantiation_interface wrdm_conduit conduit INPUT
+	set_instantiation_interface_parameter_value wrdm_conduit associatedClock {}
+	set_instantiation_interface_parameter_value wrdm_conduit associatedReset {}
+	set_instantiation_interface_parameter_value wrdm_conduit prSafe {false}
+	add_instantiation_interface_port wrdm_conduit wrdm_pfnum_o pfnum 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface wrdm_master avalon OUTPUT
+	set_instantiation_interface_parameter_value wrdm_master adaptsTo {}
+	set_instantiation_interface_parameter_value wrdm_master addressGroup {0}
+	set_instantiation_interface_parameter_value wrdm_master addressUnits {SYMBOLS}
+	set_instantiation_interface_parameter_value wrdm_master alwaysBurstMaxBurst {false}
+	set_instantiation_interface_parameter_value wrdm_master associatedClock {coreclkout_hip}
+	set_instantiation_interface_parameter_value wrdm_master associatedReset {app_nreset_status}
+	set_instantiation_interface_parameter_value wrdm_master bitsPerSymbol {8}
+	set_instantiation_interface_parameter_value wrdm_master burstOnBurstBoundariesOnly {false}
+	set_instantiation_interface_parameter_value wrdm_master burstcountUnits {WORDS}
+	set_instantiation_interface_parameter_value wrdm_master constantBurstBehavior {false}
+	set_instantiation_interface_parameter_value wrdm_master dBSBigEndian {false}
+	set_instantiation_interface_parameter_value wrdm_master doStreamReads {false}
+	set_instantiation_interface_parameter_value wrdm_master doStreamWrites {false}
+	set_instantiation_interface_parameter_value wrdm_master holdTime {0}
+	set_instantiation_interface_parameter_value wrdm_master interleaveBursts {false}
+	set_instantiation_interface_parameter_value wrdm_master isAsynchronous {false}
+	set_instantiation_interface_parameter_value wrdm_master isBigEndian {false}
+	set_instantiation_interface_parameter_value wrdm_master isReadable {false}
+	set_instantiation_interface_parameter_value wrdm_master isWriteable {false}
+	set_instantiation_interface_parameter_value wrdm_master linewrapBursts {false}
+	set_instantiation_interface_parameter_value wrdm_master maxAddressWidth {32}
+	set_instantiation_interface_parameter_value wrdm_master maximumPendingReadTransactions {32}
+	set_instantiation_interface_parameter_value wrdm_master maximumPendingWriteTransactions {0}
+	set_instantiation_interface_parameter_value wrdm_master minimumReadLatency {1}
+	set_instantiation_interface_parameter_value wrdm_master minimumResponseLatency {1}
+	set_instantiation_interface_parameter_value wrdm_master prSafe {false}
+	set_instantiation_interface_parameter_value wrdm_master readLatency {0}
+	set_instantiation_interface_parameter_value wrdm_master readWaitTime {1}
+	set_instantiation_interface_parameter_value wrdm_master registerIncomingSignals {false}
+	set_instantiation_interface_parameter_value wrdm_master registerOutgoingSignals {false}
+	set_instantiation_interface_parameter_value wrdm_master setupTime {0}
+	set_instantiation_interface_parameter_value wrdm_master timingUnits {Cycles}
+	set_instantiation_interface_parameter_value wrdm_master waitrequestAllowance {4}
+	set_instantiation_interface_parameter_value wrdm_master writeWaitTime {0}
+	add_instantiation_interface_port wrdm_master wrdm_waitrequest_i waitrequest 1 STD_LOGIC Input
+	add_instantiation_interface_port wrdm_master wrdm_read_o read 1 STD_LOGIC Output
+	add_instantiation_interface_port wrdm_master wrdm_address_o address 64 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port wrdm_master wrdm_burstcount_o burstcount 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port wrdm_master wrdm_byteenable_o byteenable 64 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port wrdm_master wrdm_readdatavalid_i readdatavalid 1 STD_LOGIC Input
+	add_instantiation_interface_port wrdm_master wrdm_readdata_i readdata 512 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port wrdm_master wrdm_response_i response 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface wrdm_desc avalon_streaming INPUT
+	set_instantiation_interface_parameter_value wrdm_desc associatedClock {coreclkout_hip}
+	set_instantiation_interface_parameter_value wrdm_desc associatedReset {app_nreset_status}
+	set_instantiation_interface_parameter_value wrdm_desc beatsPerCycle {1}
+	set_instantiation_interface_parameter_value wrdm_desc dataBitsPerSymbol {174}
+	set_instantiation_interface_parameter_value wrdm_desc emptyWithinPacket {false}
+	set_instantiation_interface_parameter_value wrdm_desc errorDescriptor {}
+	set_instantiation_interface_parameter_value wrdm_desc firstSymbolInHighOrderBits {true}
+	set_instantiation_interface_parameter_value wrdm_desc highOrderSymbolAtMSB {false}
+	set_instantiation_interface_parameter_value wrdm_desc maxChannel {0}
+	set_instantiation_interface_parameter_value wrdm_desc packetDescription {}
+	set_instantiation_interface_parameter_value wrdm_desc prSafe {false}
+	set_instantiation_interface_parameter_value wrdm_desc readyAllowance {0}
+	set_instantiation_interface_parameter_value wrdm_desc readyLatency {3}
+	set_instantiation_interface_parameter_value wrdm_desc symbolsPerBeat {1}
+	add_instantiation_interface_port wrdm_desc wrdm_desc_ready_o ready 1 STD_LOGIC Output
+	add_instantiation_interface_port wrdm_desc wrdm_desc_valid_i valid 1 STD_LOGIC Input
+	add_instantiation_interface_port wrdm_desc wrdm_desc_data_i data 174 STD_LOGIC_VECTOR Input
+	add_instantiation_interface wrdm_prio avalon_streaming INPUT
+	set_instantiation_interface_parameter_value wrdm_prio associatedClock {coreclkout_hip}
+	set_instantiation_interface_parameter_value wrdm_prio associatedReset {app_nreset_status}
+	set_instantiation_interface_parameter_value wrdm_prio beatsPerCycle {1}
+	set_instantiation_interface_parameter_value wrdm_prio dataBitsPerSymbol {174}
+	set_instantiation_interface_parameter_value wrdm_prio emptyWithinPacket {false}
+	set_instantiation_interface_parameter_value wrdm_prio errorDescriptor {}
+	set_instantiation_interface_parameter_value wrdm_prio firstSymbolInHighOrderBits {true}
+	set_instantiation_interface_parameter_value wrdm_prio highOrderSymbolAtMSB {false}
+	set_instantiation_interface_parameter_value wrdm_prio maxChannel {0}
+	set_instantiation_interface_parameter_value wrdm_prio packetDescription {}
+	set_instantiation_interface_parameter_value wrdm_prio prSafe {false}
+	set_instantiation_interface_parameter_value wrdm_prio readyAllowance {0}
+	set_instantiation_interface_parameter_value wrdm_prio readyLatency {3}
+	set_instantiation_interface_parameter_value wrdm_prio symbolsPerBeat {1}
+	add_instantiation_interface_port wrdm_prio wrdm_prio_ready_o ready 1 STD_LOGIC Output
+	add_instantiation_interface_port wrdm_prio wrdm_prio_valid_i valid 1 STD_LOGIC Input
+	add_instantiation_interface_port wrdm_prio wrdm_prio_data_i data 174 STD_LOGIC_VECTOR Input
+	add_instantiation_interface wrdm_tx avalon_streaming OUTPUT
+	set_instantiation_interface_parameter_value wrdm_tx associatedClock {coreclkout_hip}
+	set_instantiation_interface_parameter_value wrdm_tx associatedReset {app_nreset_status}
+	set_instantiation_interface_parameter_value wrdm_tx beatsPerCycle {1}
+	set_instantiation_interface_parameter_value wrdm_tx dataBitsPerSymbol {32}
+	set_instantiation_interface_parameter_value wrdm_tx emptyWithinPacket {false}
+	set_instantiation_interface_parameter_value wrdm_tx errorDescriptor {}
+	set_instantiation_interface_parameter_value wrdm_tx firstSymbolInHighOrderBits {true}
+	set_instantiation_interface_parameter_value wrdm_tx highOrderSymbolAtMSB {false}
+	set_instantiation_interface_parameter_value wrdm_tx maxChannel {0}
+	set_instantiation_interface_parameter_value wrdm_tx packetDescription {}
+	set_instantiation_interface_parameter_value wrdm_tx prSafe {false}
+	set_instantiation_interface_parameter_value wrdm_tx readyAllowance {0}
+	set_instantiation_interface_parameter_value wrdm_tx readyLatency {0}
+	set_instantiation_interface_parameter_value wrdm_tx symbolsPerBeat {1}
+	add_instantiation_interface_port wrdm_tx wrdm_tx_valid_o valid 1 STD_LOGIC Output
+	add_instantiation_interface_port wrdm_tx wrdm_tx_data_o data 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface rddm_conduit conduit INPUT
+	set_instantiation_interface_parameter_value rddm_conduit associatedClock {}
+	set_instantiation_interface_parameter_value rddm_conduit associatedReset {}
+	set_instantiation_interface_parameter_value rddm_conduit prSafe {false}
+	add_instantiation_interface_port rddm_conduit rddm_pfnum_o pfnum 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface rddm_master avalon OUTPUT
+	set_instantiation_interface_parameter_value rddm_master adaptsTo {}
+	set_instantiation_interface_parameter_value rddm_master addressGroup {0}
+	set_instantiation_interface_parameter_value rddm_master addressUnits {SYMBOLS}
+	set_instantiation_interface_parameter_value rddm_master alwaysBurstMaxBurst {false}
+	set_instantiation_interface_parameter_value rddm_master associatedClock {coreclkout_hip}
+	set_instantiation_interface_parameter_value rddm_master associatedReset {app_nreset_status}
+	set_instantiation_interface_parameter_value rddm_master bitsPerSymbol {8}
+	set_instantiation_interface_parameter_value rddm_master burstOnBurstBoundariesOnly {false}
+	set_instantiation_interface_parameter_value rddm_master burstcountUnits {WORDS}
+	set_instantiation_interface_parameter_value rddm_master constantBurstBehavior {false}
+	set_instantiation_interface_parameter_value rddm_master dBSBigEndian {false}
+	set_instantiation_interface_parameter_value rddm_master doStreamReads {false}
+	set_instantiation_interface_parameter_value rddm_master doStreamWrites {false}
+	set_instantiation_interface_parameter_value rddm_master holdTime {0}
+	set_instantiation_interface_parameter_value rddm_master interleaveBursts {false}
+	set_instantiation_interface_parameter_value rddm_master isAsynchronous {false}
+	set_instantiation_interface_parameter_value rddm_master isBigEndian {false}
+	set_instantiation_interface_parameter_value rddm_master isReadable {false}
+	set_instantiation_interface_parameter_value rddm_master isWriteable {false}
+	set_instantiation_interface_parameter_value rddm_master linewrapBursts {false}
+	set_instantiation_interface_parameter_value rddm_master maxAddressWidth {32}
+	set_instantiation_interface_parameter_value rddm_master maximumPendingReadTransactions {0}
+	set_instantiation_interface_parameter_value rddm_master maximumPendingWriteTransactions {0}
+	set_instantiation_interface_parameter_value rddm_master minimumReadLatency {1}
+	set_instantiation_interface_parameter_value rddm_master minimumResponseLatency {1}
+	set_instantiation_interface_parameter_value rddm_master prSafe {false}
+	set_instantiation_interface_parameter_value rddm_master readLatency {0}
+	set_instantiation_interface_parameter_value rddm_master readWaitTime {1}
+	set_instantiation_interface_parameter_value rddm_master registerIncomingSignals {false}
+	set_instantiation_interface_parameter_value rddm_master registerOutgoingSignals {false}
+	set_instantiation_interface_parameter_value rddm_master setupTime {0}
+	set_instantiation_interface_parameter_value rddm_master timingUnits {Cycles}
+	set_instantiation_interface_parameter_value rddm_master waitrequestAllowance {16}
+	set_instantiation_interface_parameter_value rddm_master writeWaitTime {0}
+	add_instantiation_interface_port rddm_master rddm_waitrequest_i waitrequest 1 STD_LOGIC Input
+	add_instantiation_interface_port rddm_master rddm_write_o write 1 STD_LOGIC Output
+	add_instantiation_interface_port rddm_master rddm_address_o address 64 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port rddm_master rddm_burstcount_o burstcount 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port rddm_master rddm_byteenable_o byteenable 64 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port rddm_master rddm_writedata_o writedata 512 STD_LOGIC_VECTOR Output
+	add_instantiation_interface rddm_desc avalon_streaming INPUT
+	set_instantiation_interface_parameter_value rddm_desc associatedClock {coreclkout_hip}
+	set_instantiation_interface_parameter_value rddm_desc associatedReset {app_nreset_status}
+	set_instantiation_interface_parameter_value rddm_desc beatsPerCycle {1}
+	set_instantiation_interface_parameter_value rddm_desc dataBitsPerSymbol {174}
+	set_instantiation_interface_parameter_value rddm_desc emptyWithinPacket {false}
+	set_instantiation_interface_parameter_value rddm_desc errorDescriptor {}
+	set_instantiation_interface_parameter_value rddm_desc firstSymbolInHighOrderBits {true}
+	set_instantiation_interface_parameter_value rddm_desc highOrderSymbolAtMSB {false}
+	set_instantiation_interface_parameter_value rddm_desc maxChannel {0}
+	set_instantiation_interface_parameter_value rddm_desc packetDescription {}
+	set_instantiation_interface_parameter_value rddm_desc prSafe {false}
+	set_instantiation_interface_parameter_value rddm_desc readyAllowance {0}
+	set_instantiation_interface_parameter_value rddm_desc readyLatency {3}
+	set_instantiation_interface_parameter_value rddm_desc symbolsPerBeat {1}
+	add_instantiation_interface_port rddm_desc rddm_desc_ready_o ready 1 STD_LOGIC Output
+	add_instantiation_interface_port rddm_desc rddm_desc_valid_i valid 1 STD_LOGIC Input
+	add_instantiation_interface_port rddm_desc rddm_desc_data_i data 174 STD_LOGIC_VECTOR Input
+	add_instantiation_interface rddm_prio avalon_streaming INPUT
+	set_instantiation_interface_parameter_value rddm_prio associatedClock {coreclkout_hip}
+	set_instantiation_interface_parameter_value rddm_prio associatedReset {app_nreset_status}
+	set_instantiation_interface_parameter_value rddm_prio beatsPerCycle {1}
+	set_instantiation_interface_parameter_value rddm_prio dataBitsPerSymbol {174}
+	set_instantiation_interface_parameter_value rddm_prio emptyWithinPacket {false}
+	set_instantiation_interface_parameter_value rddm_prio errorDescriptor {}
+	set_instantiation_interface_parameter_value rddm_prio firstSymbolInHighOrderBits {true}
+	set_instantiation_interface_parameter_value rddm_prio highOrderSymbolAtMSB {false}
+	set_instantiation_interface_parameter_value rddm_prio maxChannel {0}
+	set_instantiation_interface_parameter_value rddm_prio packetDescription {}
+	set_instantiation_interface_parameter_value rddm_prio prSafe {false}
+	set_instantiation_interface_parameter_value rddm_prio readyAllowance {0}
+	set_instantiation_interface_parameter_value rddm_prio readyLatency {3}
+	set_instantiation_interface_parameter_value rddm_prio symbolsPerBeat {1}
+	add_instantiation_interface_port rddm_prio rddm_prio_ready_o ready 1 STD_LOGIC Output
+	add_instantiation_interface_port rddm_prio rddm_prio_valid_i valid 1 STD_LOGIC Input
+	add_instantiation_interface_port rddm_prio rddm_prio_data_i data 174 STD_LOGIC_VECTOR Input
+	add_instantiation_interface rddm_tx avalon_streaming OUTPUT
+	set_instantiation_interface_parameter_value rddm_tx associatedClock {coreclkout_hip}
+	set_instantiation_interface_parameter_value rddm_tx associatedReset {app_nreset_status}
+	set_instantiation_interface_parameter_value rddm_tx beatsPerCycle {1}
+	set_instantiation_interface_parameter_value rddm_tx dataBitsPerSymbol {32}
+	set_instantiation_interface_parameter_value rddm_tx emptyWithinPacket {false}
+	set_instantiation_interface_parameter_value rddm_tx errorDescriptor {}
+	set_instantiation_interface_parameter_value rddm_tx firstSymbolInHighOrderBits {true}
+	set_instantiation_interface_parameter_value rddm_tx highOrderSymbolAtMSB {false}
+	set_instantiation_interface_parameter_value rddm_tx maxChannel {0}
+	set_instantiation_interface_parameter_value rddm_tx packetDescription {}
+	set_instantiation_interface_parameter_value rddm_tx prSafe {false}
+	set_instantiation_interface_parameter_value rddm_tx readyAllowance {0}
+	set_instantiation_interface_parameter_value rddm_tx readyLatency {0}
+	set_instantiation_interface_parameter_value rddm_tx symbolsPerBeat {1}
+	add_instantiation_interface_port rddm_tx rddm_tx_valid_o valid 1 STD_LOGIC Output
+	add_instantiation_interface_port rddm_tx rddm_tx_data_o data 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface bam_conduit conduit INPUT
+	set_instantiation_interface_parameter_value bam_conduit associatedClock {}
+	set_instantiation_interface_parameter_value bam_conduit associatedReset {}
+	set_instantiation_interface_parameter_value bam_conduit prSafe {false}
+	add_instantiation_interface_port bam_conduit bam_pfnum_o pfnum 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port bam_conduit bam_bar_o barnum 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface bam_master avalon OUTPUT
+	set_instantiation_interface_parameter_value bam_master adaptsTo {}
+	set_instantiation_interface_parameter_value bam_master addressGroup {0}
+	set_instantiation_interface_parameter_value bam_master addressUnits {SYMBOLS}
+	set_instantiation_interface_parameter_value bam_master alwaysBurstMaxBurst {false}
+	set_instantiation_interface_parameter_value bam_master associatedClock {coreclkout_hip}
+	set_instantiation_interface_parameter_value bam_master associatedReset {app_nreset_status}
+	set_instantiation_interface_parameter_value bam_master bitsPerSymbol {8}
+	set_instantiation_interface_parameter_value bam_master burstOnBurstBoundariesOnly {false}
+	set_instantiation_interface_parameter_value bam_master burstcountUnits {WORDS}
+	set_instantiation_interface_parameter_value bam_master constantBurstBehavior {false}
+	set_instantiation_interface_parameter_value bam_master dBSBigEndian {false}
+	set_instantiation_interface_parameter_value bam_master doStreamReads {false}
+	set_instantiation_interface_parameter_value bam_master doStreamWrites {false}
+	set_instantiation_interface_parameter_value bam_master holdTime {0}
+	set_instantiation_interface_parameter_value bam_master interleaveBursts {false}
+	set_instantiation_interface_parameter_value bam_master isAsynchronous {false}
+	set_instantiation_interface_parameter_value bam_master isBigEndian {false}
+	set_instantiation_interface_parameter_value bam_master isReadable {false}
+	set_instantiation_interface_parameter_value bam_master isWriteable {false}
+	set_instantiation_interface_parameter_value bam_master linewrapBursts {false}
+	set_instantiation_interface_parameter_value bam_master maxAddressWidth {32}
+	set_instantiation_interface_parameter_value bam_master maximumPendingReadTransactions {0}
+	set_instantiation_interface_parameter_value bam_master maximumPendingWriteTransactions {0}
+	set_instantiation_interface_parameter_value bam_master minimumReadLatency {1}
+	set_instantiation_interface_parameter_value bam_master minimumResponseLatency {1}
+	set_instantiation_interface_parameter_value bam_master prSafe {false}
+	set_instantiation_interface_parameter_value bam_master readLatency {0}
+	set_instantiation_interface_parameter_value bam_master readWaitTime {1}
+	set_instantiation_interface_parameter_value bam_master registerIncomingSignals {false}
+	set_instantiation_interface_parameter_value bam_master registerOutgoingSignals {false}
+	set_instantiation_interface_parameter_value bam_master setupTime {0}
+	set_instantiation_interface_parameter_value bam_master timingUnits {Cycles}
+	set_instantiation_interface_parameter_value bam_master waitrequestAllowance {8}
+	set_instantiation_interface_parameter_value bam_master writeWaitTime {0}
+	add_instantiation_interface_port bam_master bam_waitrequest_i waitrequest 1 STD_LOGIC Input
+	add_instantiation_interface_port bam_master bam_address_o address 19 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port bam_master bam_byteenable_o byteenable 64 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port bam_master bam_read_o read 1 STD_LOGIC Output
+	add_instantiation_interface_port bam_master bam_readdata_i readdata 512 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port bam_master bam_readdatavalid_i readdatavalid 1 STD_LOGIC Input
+	add_instantiation_interface_port bam_master bam_write_o write 1 STD_LOGIC Output
+	add_instantiation_interface_port bam_master bam_writedata_o writedata 512 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port bam_master bam_burstcount_o burstcount 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port bam_master bam_response_i response 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port bam_master bam_writeresponsevalid_i writeresponsevalid 1 STD_LOGIC Input
+	add_instantiation_interface flr_ctrl conduit INPUT
+	set_instantiation_interface_parameter_value flr_ctrl associatedClock {}
+	set_instantiation_interface_parameter_value flr_ctrl associatedReset {}
+	set_instantiation_interface_parameter_value flr_ctrl prSafe {false}
+	add_instantiation_interface_port flr_ctrl flr_pf_done_i flr_pf_done 1 STD_LOGIC Input
+	add_instantiation_interface_port flr_ctrl flr_pf_active_o flr_pf_active 1 STD_LOGIC Output
+	add_instantiation_interface bus_master_enable conduit INPUT
+	set_instantiation_interface_parameter_value bus_master_enable associatedClock {}
+	set_instantiation_interface_parameter_value bus_master_enable associatedReset {}
+	set_instantiation_interface_parameter_value bus_master_enable prSafe {false}
+	add_instantiation_interface_port bus_master_enable bus_master_enable_o bus_master_enable 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface hip_ctrl conduit INPUT
+	set_instantiation_interface_parameter_value hip_ctrl associatedClock {}
+	set_instantiation_interface_parameter_value hip_ctrl associatedReset {}
+	set_instantiation_interface_parameter_value hip_ctrl prSafe {false}
+	add_instantiation_interface_port hip_ctrl simu_mode_pipe simu_mode_pipe 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_ctrl test_in test_in 67 STD_LOGIC_VECTOR Input
+	add_instantiation_interface hip_pipe conduit INPUT
+	set_instantiation_interface_parameter_value hip_pipe associatedClock {}
+	set_instantiation_interface_parameter_value hip_pipe associatedReset {}
+	set_instantiation_interface_parameter_value hip_pipe prSafe {false}
+	add_instantiation_interface_port hip_pipe sim_pipe_pclk_in sim_pipe_pclk_in 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe sim_pipe_rate sim_pipe_rate 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe sim_ltssmstate sim_ltssmstate 6 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata0 txdata0 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata1 txdata1 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata2 txdata2 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata3 txdata3 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata4 txdata4 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata5 txdata5 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata6 txdata6 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata7 txdata7 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata8 txdata8 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata9 txdata9 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata10 txdata10 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata11 txdata11 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata12 txdata12 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata13 txdata13 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata14 txdata14 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdata15 txdata15 32 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak0 txdatak0 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak1 txdatak1 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak2 txdatak2 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak3 txdatak3 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak4 txdatak4 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak5 txdatak5 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak6 txdatak6 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak7 txdatak7 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak8 txdatak8 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak9 txdatak9 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak10 txdatak10 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak11 txdatak11 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak12 txdatak12 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak13 txdatak13 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak14 txdatak14 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdatak15 txdatak15 4 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txcompl0 txcompl0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl1 txcompl1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl2 txcompl2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl3 txcompl3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl4 txcompl4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl5 txcompl5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl6 txcompl6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl7 txcompl7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl8 txcompl8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl9 txcompl9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl10 txcompl10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl11 txcompl11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl12 txcompl12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl13 txcompl13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl14 txcompl14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txcompl15 txcompl15 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle0 txelecidle0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle1 txelecidle1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle2 txelecidle2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle3 txelecidle3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle4 txelecidle4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle5 txelecidle5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle6 txelecidle6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle7 txelecidle7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle8 txelecidle8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle9 txelecidle9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle10 txelecidle10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle11 txelecidle11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle12 txelecidle12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle13 txelecidle13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle14 txelecidle14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txelecidle15 txelecidle15 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx0 txdetectrx0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx1 txdetectrx1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx2 txdetectrx2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx3 txdetectrx3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx4 txdetectrx4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx5 txdetectrx5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx6 txdetectrx6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx7 txdetectrx7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx8 txdetectrx8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx9 txdetectrx9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx10 txdetectrx10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx11 txdetectrx11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx12 txdetectrx12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx13 txdetectrx13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx14 txdetectrx14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdetectrx15 txdetectrx15 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe powerdown0 powerdown0 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown1 powerdown1 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown2 powerdown2 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown3 powerdown3 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown4 powerdown4 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown5 powerdown5 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown6 powerdown6 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown7 powerdown7 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown8 powerdown8 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown9 powerdown9 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown10 powerdown10 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown11 powerdown11 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown12 powerdown12 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown13 powerdown13 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown14 powerdown14 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe powerdown15 powerdown15 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin0 txmargin0 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin1 txmargin1 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin2 txmargin2 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin3 txmargin3 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin4 txmargin4 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin5 txmargin5 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin6 txmargin6 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin7 txmargin7 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin8 txmargin8 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin9 txmargin9 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin10 txmargin10 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin11 txmargin11 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin12 txmargin12 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin13 txmargin13 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin14 txmargin14 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txmargin15 txmargin15 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txdeemph0 txdeemph0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph1 txdeemph1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph2 txdeemph2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph3 txdeemph3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph4 txdeemph4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph5 txdeemph5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph6 txdeemph6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph7 txdeemph7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph8 txdeemph8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph9 txdeemph9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph10 txdeemph10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph11 txdeemph11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph12 txdeemph12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph13 txdeemph13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph14 txdeemph14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdeemph15 txdeemph15 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing0 txswing0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing1 txswing1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing2 txswing2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing3 txswing3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing4 txswing4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing5 txswing5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing6 txswing6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing7 txswing7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing8 txswing8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing9 txswing9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing10 txswing10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing11 txswing11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing12 txswing12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing13 txswing13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing14 txswing14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txswing15 txswing15 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txsynchd0 txsynchd0 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd1 txsynchd1 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd2 txsynchd2 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd3 txsynchd3 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd4 txsynchd4 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd5 txsynchd5 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd6 txsynchd6 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd7 txsynchd7 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd8 txsynchd8 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd9 txsynchd9 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd10 txsynchd10 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd11 txsynchd11 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd12 txsynchd12 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd13 txsynchd13 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd14 txsynchd14 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txsynchd15 txsynchd15 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe txblkst0 txblkst0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst1 txblkst1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst2 txblkst2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst3 txblkst3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst4 txblkst4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst5 txblkst5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst6 txblkst6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst7 txblkst7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst8 txblkst8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst9 txblkst9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst10 txblkst10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst11 txblkst11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst12 txblkst12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst13 txblkst13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst14 txblkst14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txblkst15 txblkst15 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip0 txdataskip0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip1 txdataskip1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip2 txdataskip2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip3 txdataskip3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip4 txdataskip4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip5 txdataskip5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip6 txdataskip6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip7 txdataskip7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip8 txdataskip8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip9 txdataskip9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip10 txdataskip10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip11 txdataskip11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip12 txdataskip12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip13 txdataskip13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip14 txdataskip14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe txdataskip15 txdataskip15 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rate0 rate0 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate1 rate1 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate2 rate2 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate3 rate3 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate4 rate4 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate5 rate5 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate6 rate6 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate7 rate7 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate8 rate8 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate9 rate9 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate10 rate10 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate11 rate11 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate12 rate12 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate13 rate13 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate14 rate14 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rate15 rate15 2 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rxpolarity0 rxpolarity0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity1 rxpolarity1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity2 rxpolarity2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity3 rxpolarity3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity4 rxpolarity4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity5 rxpolarity5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity6 rxpolarity6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity7 rxpolarity7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity8 rxpolarity8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity9 rxpolarity9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity10 rxpolarity10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity11 rxpolarity11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity12 rxpolarity12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity13 rxpolarity13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity14 rxpolarity14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxpolarity15 rxpolarity15 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe currentrxpreset0 currentrxpreset0 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset1 currentrxpreset1 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset2 currentrxpreset2 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset3 currentrxpreset3 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset4 currentrxpreset4 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset5 currentrxpreset5 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset6 currentrxpreset6 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset7 currentrxpreset7 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset8 currentrxpreset8 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset9 currentrxpreset9 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset10 currentrxpreset10 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset11 currentrxpreset11 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset12 currentrxpreset12 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset13 currentrxpreset13 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset14 currentrxpreset14 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentrxpreset15 currentrxpreset15 3 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff0 currentcoeff0 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff1 currentcoeff1 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff2 currentcoeff2 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff3 currentcoeff3 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff4 currentcoeff4 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff5 currentcoeff5 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff6 currentcoeff6 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff7 currentcoeff7 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff8 currentcoeff8 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff9 currentcoeff9 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff10 currentcoeff10 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff11 currentcoeff11 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff12 currentcoeff12 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff13 currentcoeff13 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff14 currentcoeff14 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe currentcoeff15 currentcoeff15 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port hip_pipe rxeqeval0 rxeqeval0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval1 rxeqeval1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval2 rxeqeval2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval3 rxeqeval3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval4 rxeqeval4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval5 rxeqeval5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval6 rxeqeval6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval7 rxeqeval7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval8 rxeqeval8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval9 rxeqeval9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval10 rxeqeval10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval11 rxeqeval11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval12 rxeqeval12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval13 rxeqeval13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval14 rxeqeval14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqeval15 rxeqeval15 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress0 rxeqinprogress0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress1 rxeqinprogress1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress2 rxeqinprogress2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress3 rxeqinprogress3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress4 rxeqinprogress4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress5 rxeqinprogress5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress6 rxeqinprogress6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress7 rxeqinprogress7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress8 rxeqinprogress8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress9 rxeqinprogress9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress10 rxeqinprogress10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress11 rxeqinprogress11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress12 rxeqinprogress12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress13 rxeqinprogress13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress14 rxeqinprogress14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxeqinprogress15 rxeqinprogress15 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq0 invalidreq0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq1 invalidreq1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq2 invalidreq2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq3 invalidreq3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq4 invalidreq4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq5 invalidreq5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq6 invalidreq6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq7 invalidreq7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq8 invalidreq8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq9 invalidreq9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq10 invalidreq10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq11 invalidreq11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq12 invalidreq12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq13 invalidreq13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq14 invalidreq14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe invalidreq15 invalidreq15 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_pipe rxdata0 rxdata0 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata1 rxdata1 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata2 rxdata2 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata3 rxdata3 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata4 rxdata4 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata5 rxdata5 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata6 rxdata6 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata7 rxdata7 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata8 rxdata8 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata9 rxdata9 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata10 rxdata10 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata11 rxdata11 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata12 rxdata12 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata13 rxdata13 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata14 rxdata14 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdata15 rxdata15 32 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak0 rxdatak0 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak1 rxdatak1 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak2 rxdatak2 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak3 rxdatak3 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak4 rxdatak4 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak5 rxdatak5 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak6 rxdatak6 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak7 rxdatak7 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak8 rxdatak8 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak9 rxdatak9 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak10 rxdatak10 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak11 rxdatak11 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak12 rxdatak12 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak13 rxdatak13 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak14 rxdatak14 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxdatak15 rxdatak15 4 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe phystatus0 phystatus0 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus1 phystatus1 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus2 phystatus2 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus3 phystatus3 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus4 phystatus4 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus5 phystatus5 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus6 phystatus6 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus7 phystatus7 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus8 phystatus8 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus9 phystatus9 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus10 phystatus10 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus11 phystatus11 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus12 phystatus12 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus13 phystatus13 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus14 phystatus14 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe phystatus15 phystatus15 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid0 rxvalid0 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid1 rxvalid1 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid2 rxvalid2 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid3 rxvalid3 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid4 rxvalid4 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid5 rxvalid5 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid6 rxvalid6 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid7 rxvalid7 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid8 rxvalid8 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid9 rxvalid9 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid10 rxvalid10 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid11 rxvalid11 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid12 rxvalid12 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid13 rxvalid13 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid14 rxvalid14 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxvalid15 rxvalid15 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxstatus0 rxstatus0 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus1 rxstatus1 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus2 rxstatus2 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus3 rxstatus3 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus4 rxstatus4 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus5 rxstatus5 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus6 rxstatus6 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus7 rxstatus7 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus8 rxstatus8 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus9 rxstatus9 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus10 rxstatus10 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus11 rxstatus11 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus12 rxstatus12 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus13 rxstatus13 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus14 rxstatus14 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxstatus15 rxstatus15 3 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxelecidle0 rxelecidle0 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle1 rxelecidle1 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle2 rxelecidle2 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle3 rxelecidle3 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle4 rxelecidle4 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle5 rxelecidle5 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle6 rxelecidle6 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle7 rxelecidle7 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle8 rxelecidle8 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle9 rxelecidle9 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle10 rxelecidle10 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle11 rxelecidle11 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle12 rxelecidle12 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle13 rxelecidle13 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle14 rxelecidle14 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxelecidle15 rxelecidle15 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxsynchd0 rxsynchd0 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd1 rxsynchd1 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd2 rxsynchd2 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd3 rxsynchd3 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd4 rxsynchd4 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd5 rxsynchd5 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd6 rxsynchd6 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd7 rxsynchd7 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd8 rxsynchd8 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd9 rxsynchd9 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd10 rxsynchd10 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd11 rxsynchd11 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd12 rxsynchd12 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd13 rxsynchd13 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd14 rxsynchd14 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxsynchd15 rxsynchd15 2 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe rxblkst0 rxblkst0 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst1 rxblkst1 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst2 rxblkst2 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst3 rxblkst3 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst4 rxblkst4 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst5 rxblkst5 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst6 rxblkst6 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst7 rxblkst7 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst8 rxblkst8 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst9 rxblkst9 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst10 rxblkst10 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst11 rxblkst11 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst12 rxblkst12 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst13 rxblkst13 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst14 rxblkst14 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxblkst15 rxblkst15 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip0 rxdataskip0 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip1 rxdataskip1 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip2 rxdataskip2 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip3 rxdataskip3 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip4 rxdataskip4 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip5 rxdataskip5 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip6 rxdataskip6 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip7 rxdataskip7 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip8 rxdataskip8 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip9 rxdataskip9 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip10 rxdataskip10 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip11 rxdataskip11 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip12 rxdataskip12 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip13 rxdataskip13 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip14 rxdataskip14 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe rxdataskip15 rxdataskip15 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_pipe dirfeedback0 dirfeedback0 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback1 dirfeedback1 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback2 dirfeedback2 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback3 dirfeedback3 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback4 dirfeedback4 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback5 dirfeedback5 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback6 dirfeedback6 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback7 dirfeedback7 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback8 dirfeedback8 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback9 dirfeedback9 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback10 dirfeedback10 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback11 dirfeedback11 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback12 dirfeedback12 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback13 dirfeedback13 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback14 dirfeedback14 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe dirfeedback15 dirfeedback15 6 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port hip_pipe sim_pipe_mask_tx_pll_lock sim_pipe_mask_tx_pll_lock 1 STD_LOGIC Input
+	add_instantiation_interface hip_serial conduit INPUT
+	set_instantiation_interface_parameter_value hip_serial associatedClock {}
+	set_instantiation_interface_parameter_value hip_serial associatedReset {}
+	set_instantiation_interface_parameter_value hip_serial prSafe {false}
+	add_instantiation_interface_port hip_serial rx_in0 rx_in0 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in1 rx_in1 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in2 rx_in2 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in3 rx_in3 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in4 rx_in4 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in5 rx_in5 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in6 rx_in6 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in7 rx_in7 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in8 rx_in8 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in9 rx_in9 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in10 rx_in10 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in11 rx_in11 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in12 rx_in12 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in13 rx_in13 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in14 rx_in14 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial rx_in15 rx_in15 1 STD_LOGIC Input
+	add_instantiation_interface_port hip_serial tx_out0 tx_out0 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out1 tx_out1 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out2 tx_out2 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out3 tx_out3 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out4 tx_out4 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out5 tx_out5 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out6 tx_out6 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out7 tx_out7 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out8 tx_out8 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out9 tx_out9 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out10 tx_out10 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out11 tx_out11 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out12 tx_out12 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out13 tx_out13 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out14 tx_out14 1 STD_LOGIC Output
+	add_instantiation_interface_port hip_serial tx_out15 tx_out15 1 STD_LOGIC Output
+	save_instantiation
+	add_instance generic_component_0 altera_generic_component
+	load_instantiation generic_component_0
+	set_instantiation_property HDL_COMPILATION_LIBRARY {generic_component_0}
+	set_instantiation_property HDL_ENTITY_NAME {generic_component_0}
+	set_instantiation_property IP_FILE {}
+	add_instantiation_hdl_file {generic_component_0.v}
+	set_instantiation_hdl_file_property generic_component_0.v CONTAINS_INLINE_CONFIGURATION {false}
+	set_instantiation_hdl_file_property generic_component_0.v IS_CONFIGURATION_PACKAGE {false}
+	set_instantiation_hdl_file_property generic_component_0.v IS_TOP_LEVEL {true}
+	set_instantiation_hdl_file_property generic_component_0.v TYPE {VERILOG}
+	set_instantiation_hdl_file_property generic_component_0.v PATH {generic_component_0.v}
+	add_instantiation_interface coreclkin_hip clock INPUT
+	set_instantiation_interface_parameter_value coreclkin_hip clockRate {125000000}
+	set_instantiation_interface_parameter_value coreclkin_hip externallyDriven {false}
+	set_instantiation_interface_parameter_value coreclkin_hip ptfSchematicName {}
+	add_instantiation_interface_port coreclkin_hip coreclkin_hip clk 1 STD_LOGIC Input
+	add_instantiation_interface app_nreset_status reset INPUT
+	set_instantiation_interface_parameter_value app_nreset_status associatedClock {coreclkin_hip}
+	set_instantiation_interface_parameter_value app_nreset_status synchronousEdges {BOTH}
+	add_instantiation_interface_port app_nreset_status app_nreset_status reset_n 1 STD_LOGIC Input
+	add_instantiation_interface coreclkout_hip clock OUTPUT
+	set_instantiation_interface_parameter_value coreclkout_hip associatedDirectClock {}
+	set_instantiation_interface_parameter_value coreclkout_hip clockRate {125000000}
+	set_instantiation_interface_parameter_value coreclkout_hip clockRateKnown {true}
+	set_instantiation_interface_parameter_value coreclkout_hip externallyDriven {false}
+	set_instantiation_interface_parameter_value coreclkout_hip ptfSchematicName {}
+	set_instantiation_interface_sysinfo_parameter_value coreclkout_hip clock_rate {125000000}
+	add_instantiation_interface_port coreclkout_hip coreclkout_hip clk 1 STD_LOGIC Output
+	add_instantiation_interface app_nreset_status_1 reset OUTPUT
+	set_instantiation_interface_parameter_value app_nreset_status_1 associatedClock {coreclkout_hip}
+	set_instantiation_interface_parameter_value app_nreset_status_1 associatedDirectReset {}
+	set_instantiation_interface_parameter_value app_nreset_status_1 associatedResetSinks {none}
+	set_instantiation_interface_parameter_value app_nreset_status_1 synchronousEdges {BOTH}
+	add_instantiation_interface_port app_nreset_status_1 app_nreset_status_1 reset_n 1 STD_LOGIC Output
+	save_instantiation
+	add_component mm_bridge_0 ip/pcie_example_design/pcie_example_design_mm_bridge_0.ip altera_avalon_mm_bridge mm_bridge_0 19.1
+	load_component mm_bridge_0
+	set_component_parameter_value ADDRESS_UNITS {SYMBOLS}
+	set_component_parameter_value ADDRESS_WIDTH {18}
+	set_component_parameter_value DATA_WIDTH {512}
+	set_component_parameter_value LINEWRAPBURSTS {0}
+	set_component_parameter_value MAX_BURST_SIZE {1}
+	set_component_parameter_value MAX_PENDING_RESPONSES {4}
+	set_component_parameter_value PIPELINE_COMMAND {1}
+	set_component_parameter_value PIPELINE_RESPONSE {1}
+	set_component_parameter_value SYMBOL_WIDTH {8}
+	set_component_parameter_value SYNC_RESET {0}
+	set_component_parameter_value USE_AUTO_ADDRESS_WIDTH {0}
+	set_component_parameter_value USE_RESPONSE {0}
+	set_component_project_property HIDE_FROM_IP_CATALOG {false}
+	save_component
+	load_instantiation mm_bridge_0
+	remove_instantiation_interfaces_and_ports
+	add_instantiation_interface clk clock INPUT
+	set_instantiation_interface_parameter_value clk clockRate {0}
+	set_instantiation_interface_parameter_value clk externallyDriven {false}
+	set_instantiation_interface_parameter_value clk ptfSchematicName {}
+	add_instantiation_interface_port clk clk clk 1 STD_LOGIC Input
+	add_instantiation_interface reset reset INPUT
+	set_instantiation_interface_parameter_value reset associatedClock {clk}
+	set_instantiation_interface_parameter_value reset synchronousEdges {DEASSERT}
+	add_instantiation_interface_port reset reset reset 1 STD_LOGIC Input
+	add_instantiation_interface s0 avalon INPUT
+	set_instantiation_interface_parameter_value s0 addressAlignment {DYNAMIC}
+	set_instantiation_interface_parameter_value s0 addressGroup {0}
+	set_instantiation_interface_parameter_value s0 addressSpan {262144}
+	set_instantiation_interface_parameter_value s0 addressUnits {SYMBOLS}
+	set_instantiation_interface_parameter_value s0 alwaysBurstMaxBurst {false}
+	set_instantiation_interface_parameter_value s0 associatedClock {clk}
+	set_instantiation_interface_parameter_value s0 associatedReset {reset}
+	set_instantiation_interface_parameter_value s0 bitsPerSymbol {8}
+	set_instantiation_interface_parameter_value s0 bridgedAddressOffset {0}
+	set_instantiation_interface_parameter_value s0 bridgesToMaster {m0}
+	set_instantiation_interface_parameter_value s0 burstOnBurstBoundariesOnly {false}
+	set_instantiation_interface_parameter_value s0 burstcountUnits {WORDS}
+	set_instantiation_interface_parameter_value s0 constantBurstBehavior {false}
+	set_instantiation_interface_parameter_value s0 explicitAddressSpan {0}
+	set_instantiation_interface_parameter_value s0 holdTime {0}
+	set_instantiation_interface_parameter_value s0 interleaveBursts {false}
+	set_instantiation_interface_parameter_value s0 isBigEndian {false}
+	set_instantiation_interface_parameter_value s0 isFlash {false}
+	set_instantiation_interface_parameter_value s0 isMemoryDevice {false}
+	set_instantiation_interface_parameter_value s0 isNonVolatileStorage {false}
+	set_instantiation_interface_parameter_value s0 linewrapBursts {false}
+	set_instantiation_interface_parameter_value s0 maximumPendingReadTransactions {4}
+	set_instantiation_interface_parameter_value s0 maximumPendingWriteTransactions {0}
+	set_instantiation_interface_parameter_value s0 minimumReadLatency {1}
+	set_instantiation_interface_parameter_value s0 minimumResponseLatency {1}
+	set_instantiation_interface_parameter_value s0 minimumUninterruptedRunLength {1}
+	set_instantiation_interface_parameter_value s0 prSafe {false}
+	set_instantiation_interface_parameter_value s0 printableDevice {false}
+	set_instantiation_interface_parameter_value s0 readLatency {0}
+	set_instantiation_interface_parameter_value s0 readWaitStates {0}
+	set_instantiation_interface_parameter_value s0 readWaitTime {0}
+	set_instantiation_interface_parameter_value s0 registerIncomingSignals {false}
+	set_instantiation_interface_parameter_value s0 registerOutgoingSignals {false}
+	set_instantiation_interface_parameter_value s0 setupTime {0}
+	set_instantiation_interface_parameter_value s0 timingUnits {Cycles}
+	set_instantiation_interface_parameter_value s0 transparentBridge {false}
+	set_instantiation_interface_parameter_value s0 waitrequestAllowance {0}
+	set_instantiation_interface_parameter_value s0 wellBehavedWaitrequest {false}
+	set_instantiation_interface_parameter_value s0 writeLatency {0}
+	set_instantiation_interface_parameter_value s0 writeWaitStates {0}
+	set_instantiation_interface_parameter_value s0 writeWaitTime {0}
+	set_instantiation_interface_assignment_value s0 embeddedsw.configuration.isFlash {0}
+	set_instantiation_interface_assignment_value s0 embeddedsw.configuration.isMemoryDevice {0}
+	set_instantiation_interface_assignment_value s0 embeddedsw.configuration.isNonVolatileStorage {0}
+	set_instantiation_interface_assignment_value s0 embeddedsw.configuration.isPrintableDevice {0}
+	set_instantiation_interface_sysinfo_parameter_value s0 address_map {}
+	set_instantiation_interface_sysinfo_parameter_value s0 address_width {}
+	set_instantiation_interface_sysinfo_parameter_value s0 max_slave_data_width {}
+	add_instantiation_interface_port s0 s0_waitrequest waitrequest 1 STD_LOGIC Output
+	add_instantiation_interface_port s0 s0_readdata readdata 512 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port s0 s0_readdatavalid readdatavalid 1 STD_LOGIC Output
+	add_instantiation_interface_port s0 s0_burstcount burstcount 1 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port s0 s0_writedata writedata 512 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port s0 s0_address address 18 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port s0 s0_write write 1 STD_LOGIC Input
+	add_instantiation_interface_port s0 s0_read read 1 STD_LOGIC Input
+	add_instantiation_interface_port s0 s0_byteenable byteenable 64 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port s0 s0_debugaccess debugaccess 1 STD_LOGIC Input
+	add_instantiation_interface m0 avalon OUTPUT
+	set_instantiation_interface_parameter_value m0 adaptsTo {}
+	set_instantiation_interface_parameter_value m0 addressGroup {0}
+	set_instantiation_interface_parameter_value m0 addressUnits {SYMBOLS}
+	set_instantiation_interface_parameter_value m0 alwaysBurstMaxBurst {false}
+	set_instantiation_interface_parameter_value m0 associatedClock {clk}
+	set_instantiation_interface_parameter_value m0 associatedReset {reset}
+	set_instantiation_interface_parameter_value m0 bitsPerSymbol {8}
+	set_instantiation_interface_parameter_value m0 burstOnBurstBoundariesOnly {false}
+	set_instantiation_interface_parameter_value m0 burstcountUnits {WORDS}
+	set_instantiation_interface_parameter_value m0 constantBurstBehavior {false}
+	set_instantiation_interface_parameter_value m0 dBSBigEndian {false}
+	set_instantiation_interface_parameter_value m0 doStreamReads {false}
+	set_instantiation_interface_parameter_value m0 doStreamWrites {false}
+	set_instantiation_interface_parameter_value m0 holdTime {0}
+	set_instantiation_interface_parameter_value m0 interleaveBursts {false}
+	set_instantiation_interface_parameter_value m0 isAsynchronous {false}
+	set_instantiation_interface_parameter_value m0 isBigEndian {false}
+	set_instantiation_interface_parameter_value m0 isReadable {false}
+	set_instantiation_interface_parameter_value m0 isWriteable {false}
+	set_instantiation_interface_parameter_value m0 linewrapBursts {false}
+	set_instantiation_interface_parameter_value m0 maxAddressWidth {32}
+	set_instantiation_interface_parameter_value m0 maximumPendingReadTransactions {0}
+	set_instantiation_interface_parameter_value m0 maximumPendingWriteTransactions {0}
+	set_instantiation_interface_parameter_value m0 minimumReadLatency {1}
+	set_instantiation_interface_parameter_value m0 minimumResponseLatency {1}
+	set_instantiation_interface_parameter_value m0 prSafe {false}
+	set_instantiation_interface_parameter_value m0 readLatency {0}
+	set_instantiation_interface_parameter_value m0 readWaitTime {1}
+	set_instantiation_interface_parameter_value m0 registerIncomingSignals {false}
+	set_instantiation_interface_parameter_value m0 registerOutgoingSignals {false}
+	set_instantiation_interface_parameter_value m0 setupTime {0}
+	set_instantiation_interface_parameter_value m0 timingUnits {Cycles}
+	set_instantiation_interface_parameter_value m0 waitrequestAllowance {0}
+	set_instantiation_interface_parameter_value m0 writeWaitTime {0}
+	add_instantiation_interface_port m0 m0_waitrequest waitrequest 1 STD_LOGIC Input
+	add_instantiation_interface_port m0 m0_readdata readdata 512 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port m0 m0_readdatavalid readdatavalid 1 STD_LOGIC Input
+	add_instantiation_interface_port m0 m0_burstcount burstcount 1 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port m0 m0_writedata writedata 512 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port m0 m0_address address 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port m0 m0_write write 1 STD_LOGIC Output
+	add_instantiation_interface_port m0 m0_read read 1 STD_LOGIC Output
+	add_instantiation_interface_port m0 m0_byteenable byteenable 64 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port m0 m0_debugaccess debugaccess 1 STD_LOGIC Output
+	save_instantiation
+	add_component mm_bridge_1 ip/pcie_example_design/pcie_example_design_mm_bridge_1.ip altera_avalon_mm_bridge mm_bridge_1 19.1
+	load_component mm_bridge_1
+	set_component_parameter_value ADDRESS_UNITS {SYMBOLS}
+	set_component_parameter_value ADDRESS_WIDTH {18}
+	set_component_parameter_value DATA_WIDTH {512}
+	set_component_parameter_value LINEWRAPBURSTS {0}
+	set_component_parameter_value MAX_BURST_SIZE {1}
+	set_component_parameter_value MAX_PENDING_RESPONSES {4}
+	set_component_parameter_value PIPELINE_COMMAND {1}
+	set_component_parameter_value PIPELINE_RESPONSE {1}
+	set_component_parameter_value SYMBOL_WIDTH {8}
+	set_component_parameter_value SYNC_RESET {0}
+	set_component_parameter_value USE_AUTO_ADDRESS_WIDTH {0}
+	set_component_parameter_value USE_RESPONSE {0}
+	set_component_project_property HIDE_FROM_IP_CATALOG {false}
+	save_component
+	load_instantiation mm_bridge_1
+	remove_instantiation_interfaces_and_ports
+	add_instantiation_interface clk clock INPUT
+	set_instantiation_interface_parameter_value clk clockRate {0}
+	set_instantiation_interface_parameter_value clk externallyDriven {false}
+	set_instantiation_interface_parameter_value clk ptfSchematicName {}
+	add_instantiation_interface_port clk clk clk 1 STD_LOGIC Input
+	add_instantiation_interface reset reset INPUT
+	set_instantiation_interface_parameter_value reset associatedClock {clk}
+	set_instantiation_interface_parameter_value reset synchronousEdges {DEASSERT}
+	add_instantiation_interface_port reset reset reset 1 STD_LOGIC Input
+	add_instantiation_interface s0 avalon INPUT
+	set_instantiation_interface_parameter_value s0 addressAlignment {DYNAMIC}
+	set_instantiation_interface_parameter_value s0 addressGroup {0}
+	set_instantiation_interface_parameter_value s0 addressSpan {262144}
+	set_instantiation_interface_parameter_value s0 addressUnits {SYMBOLS}
+	set_instantiation_interface_parameter_value s0 alwaysBurstMaxBurst {false}
+	set_instantiation_interface_parameter_value s0 associatedClock {clk}
+	set_instantiation_interface_parameter_value s0 associatedReset {reset}
+	set_instantiation_interface_parameter_value s0 bitsPerSymbol {8}
+	set_instantiation_interface_parameter_value s0 bridgedAddressOffset {0}
+	set_instantiation_interface_parameter_value s0 bridgesToMaster {m0}
+	set_instantiation_interface_parameter_value s0 burstOnBurstBoundariesOnly {false}
+	set_instantiation_interface_parameter_value s0 burstcountUnits {WORDS}
+	set_instantiation_interface_parameter_value s0 constantBurstBehavior {false}
+	set_instantiation_interface_parameter_value s0 explicitAddressSpan {0}
+	set_instantiation_interface_parameter_value s0 holdTime {0}
+	set_instantiation_interface_parameter_value s0 interleaveBursts {false}
+	set_instantiation_interface_parameter_value s0 isBigEndian {false}
+	set_instantiation_interface_parameter_value s0 isFlash {false}
+	set_instantiation_interface_parameter_value s0 isMemoryDevice {false}
+	set_instantiation_interface_parameter_value s0 isNonVolatileStorage {false}
+	set_instantiation_interface_parameter_value s0 linewrapBursts {false}
+	set_instantiation_interface_parameter_value s0 maximumPendingReadTransactions {4}
+	set_instantiation_interface_parameter_value s0 maximumPendingWriteTransactions {0}
+	set_instantiation_interface_parameter_value s0 minimumReadLatency {1}
+	set_instantiation_interface_parameter_value s0 minimumResponseLatency {1}
+	set_instantiation_interface_parameter_value s0 minimumUninterruptedRunLength {1}
+	set_instantiation_interface_parameter_value s0 prSafe {false}
+	set_instantiation_interface_parameter_value s0 printableDevice {false}
+	set_instantiation_interface_parameter_value s0 readLatency {0}
+	set_instantiation_interface_parameter_value s0 readWaitStates {0}
+	set_instantiation_interface_parameter_value s0 readWaitTime {0}
+	set_instantiation_interface_parameter_value s0 registerIncomingSignals {false}
+	set_instantiation_interface_parameter_value s0 registerOutgoingSignals {false}
+	set_instantiation_interface_parameter_value s0 setupTime {0}
+	set_instantiation_interface_parameter_value s0 timingUnits {Cycles}
+	set_instantiation_interface_parameter_value s0 transparentBridge {false}
+	set_instantiation_interface_parameter_value s0 waitrequestAllowance {0}
+	set_instantiation_interface_parameter_value s0 wellBehavedWaitrequest {false}
+	set_instantiation_interface_parameter_value s0 writeLatency {0}
+	set_instantiation_interface_parameter_value s0 writeWaitStates {0}
+	set_instantiation_interface_parameter_value s0 writeWaitTime {0}
+	set_instantiation_interface_assignment_value s0 embeddedsw.configuration.isFlash {0}
+	set_instantiation_interface_assignment_value s0 embeddedsw.configuration.isMemoryDevice {0}
+	set_instantiation_interface_assignment_value s0 embeddedsw.configuration.isNonVolatileStorage {0}
+	set_instantiation_interface_assignment_value s0 embeddedsw.configuration.isPrintableDevice {0}
+	set_instantiation_interface_sysinfo_parameter_value s0 address_map {}
+	set_instantiation_interface_sysinfo_parameter_value s0 address_width {}
+	set_instantiation_interface_sysinfo_parameter_value s0 max_slave_data_width {}
+	add_instantiation_interface_port s0 s0_waitrequest waitrequest 1 STD_LOGIC Output
+	add_instantiation_interface_port s0 s0_readdata readdata 512 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port s0 s0_readdatavalid readdatavalid 1 STD_LOGIC Output
+	add_instantiation_interface_port s0 s0_burstcount burstcount 1 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port s0 s0_writedata writedata 512 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port s0 s0_address address 18 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port s0 s0_write write 1 STD_LOGIC Input
+	add_instantiation_interface_port s0 s0_read read 1 STD_LOGIC Input
+	add_instantiation_interface_port s0 s0_byteenable byteenable 64 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port s0 s0_debugaccess debugaccess 1 STD_LOGIC Input
+	add_instantiation_interface m0 avalon OUTPUT
+	set_instantiation_interface_parameter_value m0 adaptsTo {}
+	set_instantiation_interface_parameter_value m0 addressGroup {0}
+	set_instantiation_interface_parameter_value m0 addressUnits {SYMBOLS}
+	set_instantiation_interface_parameter_value m0 alwaysBurstMaxBurst {false}
+	set_instantiation_interface_parameter_value m0 associatedClock {clk}
+	set_instantiation_interface_parameter_value m0 associatedReset {reset}
+	set_instantiation_interface_parameter_value m0 bitsPerSymbol {8}
+	set_instantiation_interface_parameter_value m0 burstOnBurstBoundariesOnly {false}
+	set_instantiation_interface_parameter_value m0 burstcountUnits {WORDS}
+	set_instantiation_interface_parameter_value m0 constantBurstBehavior {false}
+	set_instantiation_interface_parameter_value m0 dBSBigEndian {false}
+	set_instantiation_interface_parameter_value m0 doStreamReads {false}
+	set_instantiation_interface_parameter_value m0 doStreamWrites {false}
+	set_instantiation_interface_parameter_value m0 holdTime {0}
+	set_instantiation_interface_parameter_value m0 interleaveBursts {false}
+	set_instantiation_interface_parameter_value m0 isAsynchronous {false}
+	set_instantiation_interface_parameter_value m0 isBigEndian {false}
+	set_instantiation_interface_parameter_value m0 isReadable {false}
+	set_instantiation_interface_parameter_value m0 isWriteable {false}
+	set_instantiation_interface_parameter_value m0 linewrapBursts {false}
+	set_instantiation_interface_parameter_value m0 maxAddressWidth {32}
+	set_instantiation_interface_parameter_value m0 maximumPendingReadTransactions {0}
+	set_instantiation_interface_parameter_value m0 maximumPendingWriteTransactions {0}
+	set_instantiation_interface_parameter_value m0 minimumReadLatency {1}
+	set_instantiation_interface_parameter_value m0 minimumResponseLatency {1}
+	set_instantiation_interface_parameter_value m0 prSafe {false}
+	set_instantiation_interface_parameter_value m0 readLatency {0}
+	set_instantiation_interface_parameter_value m0 readWaitTime {1}
+	set_instantiation_interface_parameter_value m0 registerIncomingSignals {false}
+	set_instantiation_interface_parameter_value m0 registerOutgoingSignals {false}
+	set_instantiation_interface_parameter_value m0 setupTime {0}
+	set_instantiation_interface_parameter_value m0 timingUnits {Cycles}
+	set_instantiation_interface_parameter_value m0 waitrequestAllowance {0}
+	set_instantiation_interface_parameter_value m0 writeWaitTime {0}
+	add_instantiation_interface_port m0 m0_waitrequest waitrequest 1 STD_LOGIC Input
+	add_instantiation_interface_port m0 m0_readdata readdata 512 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port m0 m0_readdatavalid readdatavalid 1 STD_LOGIC Input
+	add_instantiation_interface_port m0 m0_burstcount burstcount 1 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port m0 m0_writedata writedata 512 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port m0 m0_address address 18 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port m0 m0_write write 1 STD_LOGIC Output
+	add_instantiation_interface_port m0 m0_read read 1 STD_LOGIC Output
+	add_instantiation_interface_port m0 m0_byteenable byteenable 64 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port m0 m0_debugaccess debugaccess 1 STD_LOGIC Output
+	save_instantiation
+
+	# add wirelevel expressions
+
+	# add the connections
+	add_connection BAR_INTERPRETER.bri_master/mm_bridge_0.s0
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 addressMapSysInfo {}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 addressWidthSysInfo {18}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 arbitrationPriority {1}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 baseAddress {0x0000}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 defaultConnection {0}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 domainAlias {}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.burstAdapterImplementation {PER_BURST_TYPE_CONVERTER}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.clockCrossingAdapter {HANDSHAKE}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.enableEccProtection {FALSE}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.enableInstrumentation {FALSE}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.insertDefaultSlave {FALSE}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.interconnectResetSource {DEFAULT}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.interconnectType {STANDARD}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.maxAdditionalLatency {2}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.syncResets {FALSE}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.widthAdapterImplementation {GENERIC_CONVERTER}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 slaveDataWidthSysInfo {-1}
+	add_connection DUT.app_nreset_status/BAR_INTERPRETER.reset
+	set_connection_parameter_value DUT.app_nreset_status/BAR_INTERPRETER.reset clockDomainSysInfo {-1}
+	set_connection_parameter_value DUT.app_nreset_status/BAR_INTERPRETER.reset clockResetSysInfo {}
+	set_connection_parameter_value DUT.app_nreset_status/BAR_INTERPRETER.reset resetDomainSysInfo {-1}
+	add_connection DUT.app_nreset_status/generic_component_0.app_nreset_status
+	set_connection_parameter_value DUT.app_nreset_status/generic_component_0.app_nreset_status clockDomainSysInfo {-1}
+	set_connection_parameter_value DUT.app_nreset_status/generic_component_0.app_nreset_status clockResetSysInfo {}
+	set_connection_parameter_value DUT.app_nreset_status/generic_component_0.app_nreset_status resetDomainSysInfo {-1}
+	add_connection DUT.app_nreset_status/mm_bridge_0.reset
+	set_connection_parameter_value DUT.app_nreset_status/mm_bridge_0.reset clockDomainSysInfo {-1}
+	set_connection_parameter_value DUT.app_nreset_status/mm_bridge_0.reset clockResetSysInfo {}
+	set_connection_parameter_value DUT.app_nreset_status/mm_bridge_0.reset resetDomainSysInfo {-1}
+	add_connection DUT.app_nreset_status/mm_bridge_1.reset
+	set_connection_parameter_value DUT.app_nreset_status/mm_bridge_1.reset clockDomainSysInfo {-1}
+	set_connection_parameter_value DUT.app_nreset_status/mm_bridge_1.reset clockResetSysInfo {}
+	set_connection_parameter_value DUT.app_nreset_status/mm_bridge_1.reset resetDomainSysInfo {-1}
+	add_connection DUT.bam_conduit/BAR_INTERPRETER.bri_conduit
+	set_connection_parameter_value DUT.bam_conduit/BAR_INTERPRETER.bri_conduit endPort {}
+	set_connection_parameter_value DUT.bam_conduit/BAR_INTERPRETER.bri_conduit endPortLSB {0}
+	set_connection_parameter_value DUT.bam_conduit/BAR_INTERPRETER.bri_conduit startPort {}
+	set_connection_parameter_value DUT.bam_conduit/BAR_INTERPRETER.bri_conduit startPortLSB {0}
+	set_connection_parameter_value DUT.bam_conduit/BAR_INTERPRETER.bri_conduit width {0}
+	add_connection DUT.bam_master/BAR_INTERPRETER.bri_slave
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave addressMapSysInfo {}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave addressWidthSysInfo {19}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave arbitrationPriority {1}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave baseAddress {0x0000}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave defaultConnection {0}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave domainAlias {}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave qsys_mm.burstAdapterImplementation {PER_BURST_TYPE_CONVERTER}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave qsys_mm.clockCrossingAdapter {HANDSHAKE}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave qsys_mm.enableEccProtection {FALSE}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave qsys_mm.enableInstrumentation {FALSE}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave qsys_mm.insertDefaultSlave {FALSE}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave qsys_mm.interconnectResetSource {DEFAULT}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave qsys_mm.interconnectType {STANDARD}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave qsys_mm.maxAdditionalLatency {2}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave qsys_mm.syncResets {FALSE}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave qsys_mm.widthAdapterImplementation {GENERIC_CONVERTER}
+	set_connection_parameter_value DUT.bam_master/BAR_INTERPRETER.bri_slave slaveDataWidthSysInfo {-1}
+	add_connection DUT.coreclkout_hip/BAR_INTERPRETER.clk
+	set_connection_parameter_value DUT.coreclkout_hip/BAR_INTERPRETER.clk clockDomainSysInfo {-1}
+	set_connection_parameter_value DUT.coreclkout_hip/BAR_INTERPRETER.clk clockRateSysInfo {-1.0}
+	set_connection_parameter_value DUT.coreclkout_hip/BAR_INTERPRETER.clk clockResetSysInfo {}
+	set_connection_parameter_value DUT.coreclkout_hip/BAR_INTERPRETER.clk resetDomainSysInfo {-1}
+	add_connection DUT.coreclkout_hip/generic_component_0.coreclkin_hip
+	set_connection_parameter_value DUT.coreclkout_hip/generic_component_0.coreclkin_hip clockDomainSysInfo {-1}
+	set_connection_parameter_value DUT.coreclkout_hip/generic_component_0.coreclkin_hip clockRateSysInfo {-1.0}
+	set_connection_parameter_value DUT.coreclkout_hip/generic_component_0.coreclkin_hip clockResetSysInfo {}
+	set_connection_parameter_value DUT.coreclkout_hip/generic_component_0.coreclkin_hip resetDomainSysInfo {-1}
+	add_connection DUT.coreclkout_hip/mm_bridge_0.clk
+	set_connection_parameter_value DUT.coreclkout_hip/mm_bridge_0.clk clockDomainSysInfo {-1}
+	set_connection_parameter_value DUT.coreclkout_hip/mm_bridge_0.clk clockRateSysInfo {-1.0}
+	set_connection_parameter_value DUT.coreclkout_hip/mm_bridge_0.clk clockResetSysInfo {}
+	set_connection_parameter_value DUT.coreclkout_hip/mm_bridge_0.clk resetDomainSysInfo {-1}
+	add_connection DUT.coreclkout_hip/mm_bridge_1.clk
+	set_connection_parameter_value DUT.coreclkout_hip/mm_bridge_1.clk clockDomainSysInfo {-1}
+	set_connection_parameter_value DUT.coreclkout_hip/mm_bridge_1.clk clockRateSysInfo {-1.0}
+	set_connection_parameter_value DUT.coreclkout_hip/mm_bridge_1.clk clockResetSysInfo {}
+	set_connection_parameter_value DUT.coreclkout_hip/mm_bridge_1.clk resetDomainSysInfo {-1}
+	add_connection DUT.rddm_master/mm_bridge_1.s0
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 addressMapSysInfo {}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 addressWidthSysInfo {19}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 arbitrationPriority {1}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 baseAddress {0x00040000}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 defaultConnection {0}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 domainAlias {}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.burstAdapterImplementation {PER_BURST_TYPE_CONVERTER}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.clockCrossingAdapter {HANDSHAKE}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.enableEccProtection {FALSE}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.enableInstrumentation {FALSE}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.insertDefaultSlave {FALSE}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.interconnectResetSource {DEFAULT}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.interconnectType {STANDARD}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.maxAdditionalLatency {2}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.syncResets {FALSE}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.widthAdapterImplementation {GENERIC_CONVERTER}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 slaveDataWidthSysInfo {-1}
+	add_connection DUT.wrdm_master/mm_bridge_0.s0
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 addressMapSysInfo {}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 addressWidthSysInfo {19}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 arbitrationPriority {1}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 baseAddress {0x00040000}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 defaultConnection {0}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 domainAlias {}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.burstAdapterImplementation {PER_BURST_TYPE_CONVERTER}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.clockCrossingAdapter {HANDSHAKE}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.enableEccProtection {FALSE}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.enableInstrumentation {FALSE}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.insertDefaultSlave {FALSE}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.interconnectResetSource {DEFAULT}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.interconnectType {STANDARD}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.maxAdditionalLatency {2}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.syncResets {FALSE}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.widthAdapterImplementation {GENERIC_CONVERTER}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 slaveDataWidthSysInfo {-1}
+
+	# add the exports
+	set_interface_property refclk EXPORT_OF DUT.refclk
+	set_interface_property pcie_rstn EXPORT_OF DUT.npor
+	set_interface_property dut_wrdm_conduit EXPORT_OF DUT.wrdm_conduit
+	set_interface_property dut_wrdm_desc EXPORT_OF DUT.wrdm_desc
+	set_interface_property dut_wrdm_prio EXPORT_OF DUT.wrdm_prio
+	set_interface_property dut_wrdm_tx EXPORT_OF DUT.wrdm_tx
+	set_interface_property dut_rddm_conduit EXPORT_OF DUT.rddm_conduit
+	set_interface_property dut_rddm_desc EXPORT_OF DUT.rddm_desc
+	set_interface_property dut_rddm_prio EXPORT_OF DUT.rddm_prio
+	set_interface_property dut_rddm_tx EXPORT_OF DUT.rddm_tx
+	set_interface_property hip_ctrl EXPORT_OF DUT.hip_ctrl
+	set_interface_property pipe_sim_only EXPORT_OF DUT.hip_pipe
+	set_interface_property xcvr EXPORT_OF DUT.hip_serial
+	set_interface_property generic_component_0_coreclkout_hip EXPORT_OF generic_component_0.coreclkout_hip
+	set_interface_property generic_component_0_app_nreset_status_1 EXPORT_OF generic_component_0.app_nreset_status_1
+	set_interface_property mm_bridge_0_m0 EXPORT_OF mm_bridge_0.m0
+	set_interface_property mm_bridge_1_m0 EXPORT_OF mm_bridge_1.m0
+
+	# set the the module properties
+	set_module_property BONUS_DATA {<?xml version="1.0" encoding="UTF-8"?>
+<bonusData>
+ <element __value="BAR_INTERPRETER">
+  <datum __value="_sortIndex" value="1" type="int" />
+ </element>
+ <element __value="BAR_INTERPRETER.bri_slave">
+  <datum __value="baseAddress" value="0" type="String" />
+ </element>
+ <element __value="DUT">
+  <datum __value="_sortIndex" value="0" type="int" />
+ </element>
+ <element __value="generic_component_0">
+  <datum __value="_sortIndex" value="4" type="int" />
+ </element>
+ <element __value="mm_bridge_0">
+  <datum __value="_sortIndex" value="2" type="int" />
+ </element>
+ <element __value="mm_bridge_0.s0">
+  <datum __value="_lockedAddress" value="0" type="boolean" />
+  <datum __value="baseAddress" value="0" type="String" />
+ </element>
+ <element __value="mm_bridge_1">
+  <datum __value="_sortIndex" value="3" type="int" />
+ </element>
+</bonusData>
+}
+	set_module_property FILE {pcie_example_design.qsys}
+	set_module_property GENERATION_ID {0x00000000}
+	set_module_property NAME {pcie_example_design}
+
+	# save the system
+	sync_sysinfo_parameters
+	save_system pcie_example_design
+}
+
+# create all the systems, from bottom up
+do_create_pcie_example_design
