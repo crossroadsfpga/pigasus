@@ -104,7 +104,7 @@ cd $pigasus_rep_dir/hardware/scripts/
 Generate the bitstream. This step could take a few hours. We suggest running this step using a multi-core CPU with a large memory (e.g., 64GB). 
 ```bash
 cd $pigasus_rep_dir/hardware/scripts/
-./run_quartus_syn.sh
+./run_quartus_synth.sh
 ```
 
 Load the bitstream to the Intel MX development kit.
@@ -252,7 +252,7 @@ To speedup the simulation, you can disable MSPM in your first few runs by uncomm
 ### Hardware Synthesis
 ```bash
 cd $pigasus_rep_dir/hardware/scripts
-./run_quartus_syn.sh
+./run_quartus_synth.sh
 ```
 
 
