@@ -1,7 +1,7 @@
 #! /usr/bin/env sh
 
 cd ..
-rm -r quartus_project
+rm -rf quartus_project
 mkdir quartus_project
 
 cd scripts

@@ -1,13 +1,13 @@
 #! /usr/bin/env sh
 
 #Clean old data
-rm ip_gen.qsf
-rm ip_gen.qpf
-rm ip_gen.qsys
-rm -r ip_gen
-rm -r qdb
-rm -r ip
-rm -r generated_files
+rm -f ip_gen.qsf
+rm -f ip_gen.qpf
+rm -f ip_gen.qsys
+rm -rf ip_gen
+rm -rf qdb
+rm -rf ip
+rm -rf generated_files
 
 #generate the ip_gen.qsys
 qsys-script --script=ip_gen.tcl
@@ -15,7 +15,7 @@ qsys-script --script=ip_gen.tcl
 qsys-generate ip_gen.qsys --synthesis=VERILOG
 
 #Generate Ethernet
-rm -r ethernet
+rm -rf ethernet
 mkdir ethernet
 cp eth.tcl ethernet/
 cd ethernet
@@ -32,7 +32,7 @@ cd ../../../../../
 
 
 ##Generate PCIe
-rm -r pcie
+rm -rf pcie
 mkdir pcie
 cp pcie_example_design.tcl pcie/
 cd pcie
