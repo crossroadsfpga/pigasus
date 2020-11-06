@@ -51,8 +51,8 @@ source ~/.bashrc
 Then install the dependencies using the provided script:
 
 ```bash
-$ cd $pigasus_rep_dir
-$ ./install_deps.sh
+cd $pigasus_rep_dir
+./install_deps.sh
 ```
 
 ### Building Software
