@@ -4,7 +4,7 @@
 
 Pigasus is an Intrusion Detection and Prevention System (IDS/IPS) that achieves 100Gbps using a single FPGA-equipped server. Pigasus's FPGA-first design ensures that most packets are processed entirely using the FPGA, while some packets are sent to the CPU for full evaluation. Refer to the [OSDI '20 paper](https://www.usenix.org/conference/osdi20/presentation/zhao-zhipeng) for details about the design.
 
-If you have already configured your system and wants to run Pigasus, you can skip directly to [Running Pigasus](#running-pigasus).
+If you have already configured your system and want to run Pigasus, you can skip directly to [Running Pigasus](#running-pigasus).
 
 ## Getting Started
 
@@ -15,7 +15,7 @@ To start, clone this repository:
 git clone https://github.com/cmu-snap/pigasus.git
 ```
 
-If you just want to do RTL simulation, please jump to [Developing Pigasus](#developing-pigasus). The [Software Configuration](#software-configuration) is only necessary for running Pigasus in real system. 
+If you just want to do RTL simulation, please jump to [Developing Pigasus](#developing-pigasus). The [Software Configuration](#software-configuration) is only necessary for running Pigasus in a real system. 
 
 ### Software Configuration
 
@@ -92,7 +92,7 @@ source ~/.bashrc
 
 ## Running Pigasus
 
-Once both the software and hardware components are configured, you can run Pigasus by building it, loading the bitstream and then running the software.
+Once both the software and hardware components are configured, you can run Pigasus by building it, loading the bitstream, and then running the software.
 
 Generate the Quartus IP cores used by Pigasus and create a Quartus project. This step could take about 10 minutes.
 ```bash
@@ -113,7 +113,7 @@ cd $pigasus_rep_dir/hardware/hw_test
 ./load_bitstream.sh
 ```
 
-Note that the JTAG system console should be closed when loading the bitstream. And the USB port number should be adjusted according to the machine.
+Note that the JTAG system console should be closed when loading the bitstream and the USB port number should be adjusted according to the machine.
 
 After the bitstream finishes loading, reboot the machine:
 ```bash
@@ -152,7 +152,7 @@ You can also verify the FPGA counter stats with:
 get_results
 ```
 
-You may consider leaving the tcl console open while you run Pigasus, to be let you check the counters. Once you are ready to exit it, use Ctrl-C.
+You may consider leaving the tcl console open while you run Pigasus to let you check the counters. Once you are ready to exit it, use Ctrl-C.
 
 To run the software, first insert the kernel module:
 ```bash
@@ -160,7 +160,7 @@ cd $pigasus_rep_dir/software/src/pigasus/pcie/kernel/linux
 sudo ./install
 ```
 
-Then execute the software application, specifying the `snort.lua` configuration file and the rule_list file (specifying which rule is used). We do not provide rule set as it requires registration on [Snort](https://www.snort.org/downloads). 
+Then execute the software application, specifying the `snort.lua` configuration file and the rule_list file (specifying which rule is used). We do not provide a rule set as it requires registration on [Snort](https://www.snort.org/downloads). 
 ```bash
 cd $pigasus_rep_dir/software/lua
 sudo pigasus -c snort.lua --patterns ~/rule_list
@@ -178,7 +178,7 @@ cd dpdk/pktgen-dpdk/
 ```
 > Refer to the [DPDK Pktgen docs](https://pktgen-dpdk.readthedocs.io/en/latest/index.html) for details on how to run it.
 
-Remember to set the number of packets to match the pcap. Otherwise the packet generator sends the pcap repeatedly. And set the rate. Y = 1 means 1 Gbps.
+Remember to set the number of packets to match the pcap, otherwise the packet generator sends the pcap repeatedly, and set the rate. Y = 1 means 1 Gbps.
 ```
 set 0 count X
 set 0 rate Y
@@ -191,7 +191,7 @@ After the packet generator finishes sending the number of packets that you speci
 get_results
 ```
 
-Now exit the software application, with Ctrl-C. You should expect to see the number of `rx_pkt` should match up the dma pkts. 
+Now exit the software application with Ctrl-C. You should expect to see that the number of `rx_pkt` should match up the dma pkts. 
 
 
 ## Developing Pigasus
@@ -212,7 +212,7 @@ cd $pigasus_rep_dir/hardware/scripts/
 
 Simulation Setup:
 1. Compile Quartus 19.3 IP library for RTL simulation. Open Quartus 19.3. Select "Launch Simulation Library Compiler" under the "Tools" Tab. Select "ModelSim" as the "Tool name" and specify the path for "Executable location." Then select "Stratix 10" as Library families. Specify the output directory and click "Start Compilation".
-2. Add compiled library path as enviroment variable, by `export SIM_LIB_PATH=your_install_path/sim_lib/verilog_libs`
+2. Add the compiled library path as the environment variable, by `export SIM_LIB_PATH=your_install_path/sim_lib/verilog_libs`
 
 
 Synthesis Setup:
@@ -224,7 +224,7 @@ cd $pigasus_rep_dir/hardware/scripts/
 
 ### RTL Simulation
 
-Before you synthesize your changes an run them on the FPGA, you should verify your design using RTL simulation. The simulation testbed does not include the Ethernet IP core, PCIe IP core, and full matcher on CPU. The `testbench.sv` drives the FPGA datapth, including parser, TCP Reassembly and MSPM by dumping converted pcap file. Once the simulation finishes, the testbench will report statistics of FPGA datapth to help developers verify functionality and diagnose performance bottleneck. The following instructions assume that you have Modelsim installed. 
+Before you synthesize your changes and run them on the FPGA, you should verify your design using RTL simulation. The simulation testbed does not include the Ethernet IP core, PCIe IP core, and full matcher on CPU. The `testbench.sv` drives the FPGA datapth, including parser, TCP Reassembly and MSPM by dumping the converted pcap file. Once the simulation finishes, the testbench will report statistics of FPGA datapth to help developers verify functionality and diagnose any performance bottlenecks. The following instructions assume that you have Modelsim installed. 
 
 Go to the input generator and convert the example pcap into a pkt format, that can be used as input for the simulation:
 
@@ -239,7 +239,7 @@ Now run the simulation using Modelsim and your newly generated input:
 ./run_vsim.sh ./input_gen/output.pkt
 ```
 
-After the simulation, you should expect the key counter values match up with the `input_gen/example_expected_res`
+After the simulation, you should expect the key counter values to match up with the `input_gen/example_expected_res`
 
 We also provide an example script `run_vsim.bat` for Windows users. Please set up the `SIM_LIB_PATH` and the RTL simulator environment variables before running this script in cmd or powershell. 
 
