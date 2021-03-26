@@ -33,7 +33,7 @@ export installation_path_pigasus=$HOME/pigasus_install
 
 export LUA_PATH="$installation_path_pigasus/include/snort/lua/?.lua;;"
 
-export SNORT_LUA_PATH="$pigasus_rep_dir/lua"
+export SNORT_LUA_PATH="$pigasus_rep_dir/software/lua"
 export LUA_CONFIG_FILE="$SNORT_LUA_PATH/snort.lua"
 
 alias pigasus="taskset --cpu-list 0 $installation_path_pigasus/bin/snort"
@@ -47,6 +47,20 @@ Make sure these changes are applied:
 ```bash
 source ~/.bashrc
 ```
+
+To ensure that the Lua variables are passed to sudo open the sudoers config file with:
+
+```bash
+sudo visudo
+```
+
+And add the following line to the opened file:
+
+```
+Defaults env_keep += "LUA_PATH SNORT_LUA_PATH"
+```
+
+Save and close the file.
 
 Then install the dependencies using the provided script:
 
