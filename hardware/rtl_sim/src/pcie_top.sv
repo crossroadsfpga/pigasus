@@ -1549,7 +1549,7 @@ cpu2fpga_pcie c2f_inst (
     .c2f_address            (address_1[14:6])
 );
 
-pcie_example_design pcie (
+pcie_ed pcie (
     .refclk_clk                              (refclk_clk),                              //   input,    width = 1,         refclk.clk
     .pcie_rstn_npor                          (pcie_rstn_npor),                          //   input,    width = 1,      pcie_rstn.npor
     .pcie_rstn_pin_perst                     (pcie_rstn_pin_perst),                     //   input,    width = 1,               .pin_perst

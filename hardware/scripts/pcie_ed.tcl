@@ -1,16 +1,16 @@
 package require -exact qsys 18.0
 
-# create the system "pcie_example_design"
-proc do_create_pcie_example_design {} {
+# create the system "pcie_ed"
+proc do_create_pcie_ed {} {
 	# create the system
-	create_system pcie_example_design
-	set_project_property DEVICE {1SM21BHU2F53E2VGS1}
+	create_system pcie_ed
+	set_project_property DEVICE {1SM21BHU2F53E1VG}
 	set_project_property DEVICE_FAMILY {Stratix 10}
 	set_project_property HIDE_FROM_IP_CATALOG {false}
 	set_use_testbench_naming_pattern 0 {}
 
 	# add the components
-	add_component BAR_INTERPRETER ip/pcie_example_design/pcie_example_design_BAR_INTERPRETER.ip intel_pcie_bri BAR_INTERPRETER 19.1
+	add_component BAR_INTERPRETER ip/pcie_ed/pcie_ed_BAR_INTERPRETER.ip intel_pcie_bri BAR_INTERPRETER 19.1
 	load_component BAR_INTERPRETER
 	set_component_parameter_value BAM_ADDR_WIDTH {19}
 	set_component_parameter_value BRI_DATA_WIDTH {512}
@@ -120,7 +120,7 @@ proc do_create_pcie_example_design {} {
 	set_instantiation_interface_parameter_value bri_master registerOutgoingSignals {false}
 	set_instantiation_interface_parameter_value bri_master setupTime {0}
 	set_instantiation_interface_parameter_value bri_master timingUnits {Cycles}
-	set_instantiation_interface_parameter_value bri_master waitrequestAllowance {8}
+	set_instantiation_interface_parameter_value bri_master waitrequestAllowance {0}
 	set_instantiation_interface_parameter_value bri_master writeWaitTime {0}
 	add_instantiation_interface_port bri_master bri_m_address_o address 23 STD_LOGIC_VECTOR Output
 	add_instantiation_interface_port bri_master bri_m_read_o read 1 STD_LOGIC Output
@@ -139,7 +139,7 @@ proc do_create_pcie_example_design {} {
 	add_instantiation_interface_port bri_conduit bri_s_bar_i barnum 3 STD_LOGIC_VECTOR Input
 	add_instantiation_interface_port bri_conduit bri_s_pfnum_i pfnum 2 STD_LOGIC_VECTOR Input
 	save_instantiation
-	add_component DUT ip/pcie_example_design/pcie_example_design_DUT.ip avmm_bridge_512 DUT 20.0.0
+	add_component DUT ip/pcie_ed/pcie_ed_DUT.ip avmm_bridge_512 DUT 20.0.0
 	load_component DUT
 	set_component_parameter_value anlg_voltage {1_0V}
 	set_component_parameter_value apps_type_hwtcl {14}
@@ -149,7 +149,7 @@ proc do_create_pcie_example_design {} {
 	set_component_parameter_value bfm_drive_interface_pipe_hwtcl {1}
 	set_component_parameter_value bursting_slave_address_width_hwtcl {64}
 	set_component_parameter_value ceb_extend_pcie_hwtcl {0}
-	set_component_parameter_value chosen_devkit_hwtcl {Stratix 10 MX H-Tile ES1 FPGA Development Kit}
+	set_component_parameter_value chosen_devkit_hwtcl {Stratix 10 MX H-Tile Production FPGA Development Kit}
 	set_component_parameter_value cvp_user_id_hwtcl {0}
 	set_component_parameter_value design_environment {QSYS}
 	set_component_parameter_value en_order_rx_posted_cpl_hwtcl {1}
@@ -190,7 +190,7 @@ proc do_create_pcie_example_design {} {
 	set_component_parameter_value pf0_bar4_type_user_hwtcl {Disabled}
 	set_component_parameter_value pf0_bar5_address_width_user_hwtcl {0}
 	set_component_parameter_value pf0_bar5_type_user_hwtcl {Disabled}
-	set_component_parameter_value pf0_class_code_hwtcl {131072}
+	set_component_parameter_value pf0_class_code_hwtcl {0}
 	set_component_parameter_value pf0_expansion_base_address_register_hwtcl {0}
 	set_component_parameter_value pf0_pci_msi_multiple_msg_cap_hwtcl {1}
 	set_component_parameter_value pf0_pci_msix_bir_hwtcl {0}
@@ -1275,7 +1275,7 @@ proc do_create_pcie_example_design {} {
 	set_instantiation_interface_parameter_value app_nreset_status_1 synchronousEdges {BOTH}
 	add_instantiation_interface_port app_nreset_status_1 app_nreset_status_1 reset_n 1 STD_LOGIC Output
 	save_instantiation
-	add_component mm_bridge_0 ip/pcie_example_design/pcie_example_design_mm_bridge_0.ip altera_avalon_mm_bridge mm_bridge_0 19.1
+	add_component mm_bridge_0 ip/pcie_ed/pcie_ed_mm_bridge_0.ip altera_avalon_mm_bridge mm_bridge_0 19.1
 	load_component mm_bridge_0
 	set_component_parameter_value ADDRESS_UNITS {SYMBOLS}
 	set_component_parameter_value ADDRESS_WIDTH {18}
@@ -1407,7 +1407,7 @@ proc do_create_pcie_example_design {} {
 	add_instantiation_interface_port m0 m0_byteenable byteenable 64 STD_LOGIC_VECTOR Output
 	add_instantiation_interface_port m0 m0_debugaccess debugaccess 1 STD_LOGIC Output
 	save_instantiation
-	add_component mm_bridge_1 ip/pcie_example_design/pcie_example_design_mm_bridge_1.ip altera_avalon_mm_bridge mm_bridge_1 19.1
+	add_component mm_bridge_1 ip/pcie_ed/pcie_ed_mm_bridge_1.ip altera_avalon_mm_bridge mm_bridge_1 19.1
 	load_component mm_bridge_1
 	set_component_parameter_value ADDRESS_UNITS {SYMBOLS}
 	set_component_parameter_value ADDRESS_WIDTH {18}
@@ -1550,15 +1550,15 @@ proc do_create_pcie_example_design {} {
 	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 baseAddress {0x0000}
 	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 defaultConnection {0}
 	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 domainAlias {}
-	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.burstAdapterImplementation {PER_BURST_TYPE_CONVERTER}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.burstAdapterImplementation {GENERIC_CONVERTER}
 	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.clockCrossingAdapter {HANDSHAKE}
 	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.enableEccProtection {FALSE}
 	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.enableInstrumentation {FALSE}
 	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.insertDefaultSlave {FALSE}
 	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.interconnectResetSource {DEFAULT}
 	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.interconnectType {STANDARD}
-	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.maxAdditionalLatency {2}
-	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.syncResets {FALSE}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.maxAdditionalLatency {1}
+	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.syncResets {TRUE}
 	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 qsys_mm.widthAdapterImplementation {GENERIC_CONVERTER}
 	set_connection_parameter_value BAR_INTERPRETER.bri_master/mm_bridge_0.s0 slaveDataWidthSysInfo {-1}
 	add_connection DUT.app_nreset_status/BAR_INTERPRETER.reset
@@ -1628,15 +1628,15 @@ proc do_create_pcie_example_design {} {
 	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 baseAddress {0x00040000}
 	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 defaultConnection {0}
 	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 domainAlias {}
-	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.burstAdapterImplementation {PER_BURST_TYPE_CONVERTER}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.burstAdapterImplementation {GENERIC_CONVERTER}
 	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.clockCrossingAdapter {HANDSHAKE}
 	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.enableEccProtection {FALSE}
 	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.enableInstrumentation {FALSE}
 	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.insertDefaultSlave {FALSE}
 	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.interconnectResetSource {DEFAULT}
 	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.interconnectType {STANDARD}
-	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.maxAdditionalLatency {2}
-	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.syncResets {FALSE}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.maxAdditionalLatency {1}
+	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.syncResets {TRUE}
 	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 qsys_mm.widthAdapterImplementation {GENERIC_CONVERTER}
 	set_connection_parameter_value DUT.rddm_master/mm_bridge_1.s0 slaveDataWidthSysInfo {-1}
 	add_connection DUT.wrdm_master/mm_bridge_0.s0
@@ -1646,15 +1646,15 @@ proc do_create_pcie_example_design {} {
 	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 baseAddress {0x00040000}
 	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 defaultConnection {0}
 	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 domainAlias {}
-	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.burstAdapterImplementation {PER_BURST_TYPE_CONVERTER}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.burstAdapterImplementation {GENERIC_CONVERTER}
 	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.clockCrossingAdapter {HANDSHAKE}
 	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.enableEccProtection {FALSE}
 	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.enableInstrumentation {FALSE}
 	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.insertDefaultSlave {FALSE}
 	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.interconnectResetSource {DEFAULT}
 	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.interconnectType {STANDARD}
-	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.maxAdditionalLatency {2}
-	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.syncResets {FALSE}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.maxAdditionalLatency {1}
+	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.syncResets {TRUE}
 	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 qsys_mm.widthAdapterImplementation {GENERIC_CONVERTER}
 	set_connection_parameter_value DUT.wrdm_master/mm_bridge_0.s0 slaveDataWidthSysInfo {-1}
 
@@ -1695,23 +1695,19 @@ proc do_create_pcie_example_design {} {
  <element __value="mm_bridge_0">
   <datum __value="_sortIndex" value="2" type="int" />
  </element>
- <element __value="mm_bridge_0.s0">
-  <datum __value="_lockedAddress" value="0" type="boolean" />
-  <datum __value="baseAddress" value="0" type="String" />
- </element>
  <element __value="mm_bridge_1">
   <datum __value="_sortIndex" value="3" type="int" />
  </element>
 </bonusData>
 }
-	set_module_property FILE {pcie_example_design.qsys}
+	set_module_property FILE {pcie_ed.qsys}
 	set_module_property GENERATION_ID {0x00000000}
-	set_module_property NAME {pcie_example_design}
+	set_module_property NAME {pcie_ed}
 
 	# save the system
 	sync_sysinfo_parameters
-	save_system pcie_example_design
+	save_system pcie_ed
 }
 
 # create all the systems, from bottom up
-do_create_pcie_example_design
+do_create_pcie_ed

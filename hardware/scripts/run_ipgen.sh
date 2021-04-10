@@ -23,24 +23,24 @@ qsys-script --script=eth.tcl
 #generate example design
 qsys-generate ip_gen_alt_ehipc2_0.ip -example-design
 cd ip_gen_alt_ehipc2_0_example_design/alt_ehipc2_0_example_design/hardware_test_design/common/
-qsys-generate reset_ip.ip --synthesis=VERILOG
-qsys-generate alt_ehipc2_jtag_avalon.ip --synthesis=VERILOG
-qsys-generate alt_ehipc2_sys_pll.ip --synthesis=VERILOG
-qsys-generate probe8.ip --synthesis=VERILOG
-qsys-generate reset_ip.ip --synthesis=VERILOG
+qsys-generate reset_ip.ip --synthesis=VERILOG --part=1SMBHU2F53E1VG 
+qsys-generate alt_ehipc2_jtag_avalon.ip --synthesis=VERILOG --part=1SMBHU2F53E1VG 
+qsys-generate alt_ehipc2_sys_pll.ip --synthesis=VERILOG --part=1SMBHU2F53E1VG
+qsys-generate probe8.ip --synthesis=VERILOG --part=1SMBHU2F53E1VG 
+qsys-generate reset_ip.ip --synthesis=VERILOG --part=1SMBHU2F53E1VG 
 cd ../../../../../
 
 
-##Generate PCIe
+#Generate PCIe
 rm -rf pcie
 mkdir pcie
-cp pcie_example_design.tcl pcie/
+cp pcie_ed.tcl pcie/
 cd pcie
-qsys-script --script=pcie_example_design.tcl
-qsys-generate pcie_example_design.qsys --synthesis=VERILOG
+qsys-script --script=pcie_ed.tcl
+qsys-generate pcie_ed.qsys --synthesis=VERILOG
 cd ..
 #Replace Generic_component
-cp src/generic_component_0.v ./pcie/pcie_example_design/generic_component_0/synth/
+cp src/generic_component_0.v ./pcie/pcie_ed/generic_component_0/synth/
 
 #manipulate the IP files
 ./manipulate.py

@@ -4,7 +4,7 @@ package require -exact qsys 18.0
 proc do_create_ip_gen_alt_ehipc2_0 {} {
 	# create the system
 	create_system ip_gen_alt_ehipc2_0
-	set_project_property DEVICE {1SM21BHU2F53E2VGS1}
+	set_project_property DEVICE {1SM21BHU2F53E1VG}
 	set_project_property DEVICE_FAMILY {Stratix 10}
 	set_project_property HIDE_FROM_IP_CATALOG {false}
 	set_use_testbench_naming_pattern 0 {}
@@ -26,7 +26,7 @@ proc do_create_ip_gen_alt_ehipc2_0 {} {
 	set_instance_parameter_value alt_ehipc2_0 {GEN_SIM} {0}
 	set_instance_parameter_value alt_ehipc2_0 {GEN_SYNTH} {1}
 	set_instance_parameter_value alt_ehipc2_0 {HDL_FORMAT} {1}
-	set_instance_parameter_value alt_ehipc2_0 {HW_DEVICE} {0}
+	set_instance_parameter_value alt_ehipc2_0 {HW_DEVICE} {1}
 	set_instance_parameter_value alt_ehipc2_0 {INITMAINVAL} {25}
 	set_instance_parameter_value alt_ehipc2_0 {INITPOSTVAL} {13}
 	set_instance_parameter_value alt_ehipc2_0 {INITPREVAL} {3}

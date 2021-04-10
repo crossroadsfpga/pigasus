@@ -4,7 +4,7 @@ package require -exact qsys 18.0
 proc do_create_ip_gen {} {
 	# create the system
 	create_system ip_gen
-	set_project_property DEVICE {1SM21BHU2F53E2VGS1}
+	set_project_property DEVICE {1SM21BHU2F53E1VG}
 	set_project_property DEVICE_FAMILY {Stratix 10}
 	set_project_property HIDE_FROM_IP_CATALOG {false}
 	set_use_testbench_naming_pattern 0 {}
