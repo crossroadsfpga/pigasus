@@ -20,22 +20,37 @@ output wire dout_valid_{{i}}_{{j}};
 
 {% for i in range(0,context['bucket_size'])%}
 {% for j in range(0,context['byte_size'])%}
-wire [63:0] din_{{i}}_{{j}};
+reg  [{{context['nbits'][i]}}-1:0] addr_{{i}}_{{j}};
 wire din_valid_{{i}}_{{j}};
+wire addr_valid_{{i}}_{{j}};
 {% endfor %}
 {% endfor %}
 
 reg [63:0] din_reg;
 reg din_valid_reg;
 
-{% for i in range(0,context['bucket_size'])%}
-{% for j in range(0,7)%}
-assign din_{{i}}_{{j}} = {din[{{(j+1)*8-1}}:0],din_reg[63:{{(j+1)*8}}]};
+// Doing all necessary multiplies per input byte
+wire [({{context['byte_size']}}+7)*8-1:0] padded_din;
+
+{% for i in range(0,context['byte_size']+7)%}
+wire [23:0] din_{{i}}_ab0;
+wire [23:0] din_{{i}}_ab1;
+wire [23:0] din_{{i}}_ab2;
+wire [23:0] din_{{i}}_ab3;
 {% endfor %}
 
-{% for j in range(7,context['byte_size'])%}
-assign din_{{i}}_{{j}} = din[{{(j+1)*8-1}}:{{((j+1)*8-64)}}];
-{% endfor %}
+assign padded_din = {din[{{context['byte_size']}}*8-1:0], din_reg[63:8]};
+
+{% for i in range(0,context['byte_size']+7) %}
+mul_hash din_{{i}}_mul_hash (
+    .clk(clk),
+    .a(padded_din[{{i}}*8+:8]), 
+    .ab0(din_{{i}}_ab0),                 
+    .ab1(din_{{i}}_ab1), 
+    .ab2(din_{{i}}_ab2),                 
+    .ab3(din_{{i}}_ab3)
+);
+
 {% endfor %}
 
 //Valid signals
@@ -97,11 +112,41 @@ always @ (posedge clk) begin
     din_valid_reg <= din_valid;
 end
 
+// 12 cycles latency for valid signals
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+hyper_pipe #(.NUM_PIPES(12)) addr_valid_{{i}}_{{j}}_pipe (
+    .clk(clk),.din(din_valid_{{i}}_{{j}}),.dout(addr_valid_{{i}}_{{j}}));
+{% endfor %}
+{% endfor %}
+
+// Multiply accumulation step. 
+// Mask and Nbits is dependent on bucket number
+// data selection is dependent on first byte location
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+acc_hash # (
+	.ANDMSK({{context['andmsk'][i]}}),
+	.NBITS({{context['nbits'][i]}})
+) addr_{{i}}_{{j}}_calc (
+  .clk(clk), .p(addr_{{i}}_{{j}}),
+  .a0b0(din_{{j}}_ab0), .a0b1(din_{{j}}_ab1), .a0b2(din_{{j}}_ab2), .a0b3(din_{{j}}_ab3),
+  .a1b0(din_{{j+1}}_ab0), .a1b1(din_{{j+1}}_ab1), .a1b2(din_{{j+1}}_ab2), .a1b3(din_{{j+1}}_ab3),
+  .a2b0(din_{{j+2}}_ab0), .a2b1(din_{{j+2}}_ab1), .a2b2(din_{{j+2}}_ab2),
+  .a3b0(din_{{j+3}}_ab0), .a3b1(din_{{j+3}}_ab1), .a3b2(din_{{j+3}}_ab2),
+  .a4b0(din_{{j+4}}_ab0), .a4b1(din_{{j+4}}_ab1),
+  .a5b0(din_{{j+5}}_ab0), .a5b1(din_{{j+5}}_ab1),
+  .a6b0(din_{{j+6}}_ab0),
+  .a7b0(din_{{j+7}}_ab0)
+);
+
+{% endfor %}
+{% endfor %}
+
 {% for i in range(0,context['bucket_size'])%}
 {% for j in range(0,context['half_byte_size'])%}
 
 hashtable #(
-	.ANDMSK({{context['andmsk'][i]}}),
 	.NBITS({{context['nbits'][i]}}),
 	.DWIDTH(RID_WIDTH),
 	.MEM_SIZE({{context['bm_size'][i]}}),
@@ -109,10 +154,10 @@ hashtable #(
 )
 hashtable_{{i}}_{{j}} (
 	.clk (clk),
-	.din0 (din_{{i}}_{{2*j}}),
-	.din0_valid (din_valid_{{i}}_{{2*j}}),
-	.din1 (din_{{i}}_{{2*j+1}}),
-	.din1_valid (din_valid_{{i}}_{{2*j+1}}),
+	.addr0 (addr_{{i}}_{{2*j}}),
+	.addr0_valid (addr_valid_{{i}}_{{2*j}}),
+	.addr1 (addr_{{i}}_{{2*j+1}}),
+	.addr1_valid (addr_valid_{{i}}_{{2*j+1}}),
 	.dout0 (dout_{{i}}_{{2*j}}),
 	.dout0_valid (dout_valid_{{i}}_{{2*j}}),
 	.dout1 (dout_{{i}}_{{2*j+1}}),

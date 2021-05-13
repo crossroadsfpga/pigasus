@@ -79,7 +79,7 @@ end
 //Hashtable signals
 {% for i in range(0,context['bucket_size'])%}
 {% for j in range(0,context['byte_size'])%}
-assign hash_out_valid_filter_{{i}}_{{j}} = hash_out_valid_{{i}}_{{j}} & !filter_out_r13[{{i+j*8}}];
+assign hash_out_valid_filter_{{i}}_{{j}} = hash_out_valid_{{i}}_{{j}} & !filter_out_r14[{{i+j*8}}];
 {% endfor %}
 {% endfor %}
 

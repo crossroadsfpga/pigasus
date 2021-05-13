@@ -439,6 +439,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE src/mspm/string_matcher/string_ma
 set_global_assignment -name SYSTEMVERILOG_FILE src/mspm/string_matcher/rr_arbiter_4.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/mspm/string_matcher/rr_arbiter.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/mspm/string_matcher/mul_hash.sv
+set_global_assignment -name SYSTEMVERILOG_FILE src/mspm/string_matcher/acc_hash.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/mspm/string_matcher/hashtable_top.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/mspm/string_matcher/hashtable.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/mspm/string_matcher/frontend.sv
