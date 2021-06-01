@@ -1,5 +1,5 @@
 `include "./src/struct_s.sv"
-
+//`define DEBUG
 module flow_table_wrapper(
     input   logic           clk,
     input   logic           rst,
@@ -16,15 +16,7 @@ module flow_table_wrapper(
     output  metadata_t      reorder_meta_data,
     output  logic           reorder_meta_valid,
     input   logic           reorder_meta_ready,
-    input   logic           reorder_meta_almost_full,
-    // Status register bus
-    input   logic           clk_status,
-    input   logic   [29:0]  status_addr,
-    input   logic           status_read,
-    input   logic           status_write,
-    input   logic   [31:0]  status_writedata,
-    output  logic   [31:0]  status_readdata,
-    output  logic           status_readdata_valid
+    input   logic           reorder_meta_almost_full
 );
 
 tuple_t         h0_tuple_in;

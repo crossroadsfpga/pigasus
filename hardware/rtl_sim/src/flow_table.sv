@@ -304,8 +304,8 @@ always @(posedge clk) begin
     endcase
 end
 assign ch0_rd_stall = (rd_valid_a_r | rd_valid_a | ch0_rd_valid |
-                       ch1_wren | q_deque_en | q_deque_en_r |
-                       q_deque_done | q_deque_done_r | slow_conflict);
+                       ch1_wren | (p_state == P_LOOKUP) | (p_state == P_FILL)
+                       | q_deque_done_r | slow_conflict);
 
 always @(posedge clk) begin
     if (!rst) begin
