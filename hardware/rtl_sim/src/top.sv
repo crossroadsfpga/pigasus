@@ -1275,10 +1275,10 @@ always @(posedge clk_status) begin
         status_readdata_valid <= 1'b1;
         status_readdata <= status_readdata_top;
     end
-    else if (status_readdata_valid_ft) begin
-        status_readdata_valid <= 1'b1;
-        status_readdata <= status_readdata_ft;
-    end
+    //else if (status_readdata_valid_ft) begin
+    //    status_readdata_valid <= 1'b1;
+    //    status_readdata <= status_readdata_ft;
+    //end
     else if (status_readdata_valid_ruleID) begin
         status_readdata_valid <= 1'b1;
         status_readdata <= status_readdata_ruleID;
@@ -1508,14 +1508,14 @@ flow_table_wrapper ftw_0 (
     .reorder_meta_data         (ftw_reorder_meta_data),
     .reorder_meta_valid        (ftw_reorder_meta_valid),
     .reorder_meta_ready        (ftw_reorder_meta_ready),
-    .reorder_meta_almost_full  (ftw_reorder_meta_almost_full),
-    .clk_status                (clk_status),
-    .status_addr               (status_addr),
-    .status_read               (status_read),
-    .status_write              (status_write),
-    .status_writedata          (status_writedata),
-    .status_readdata           (status_readdata_ft),
-    .status_readdata_valid     (status_readdata_valid_ft)
+    .reorder_meta_almost_full  (ftw_reorder_meta_almost_full)
+    //.clk_status                (clk_status),
+    //.status_addr               (status_addr),
+    //.status_read               (status_read),
+    //.status_write              (status_write),
+    //.status_writedata          (status_writedata),
+    //.status_readdata           (status_readdata_ft),
+    //.status_readdata_valid     (status_readdata_valid_ft)
 );
 
 arb_2_wrapper_infill #(
