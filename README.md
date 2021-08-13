@@ -174,10 +174,10 @@ cd $pigasus_rep_dir/software/src/pigasus/pcie/kernel/linux
 sudo ./install
 ```
 
-Then execute the software application, specifying the `snort.lua` configuration file and the rule_list file (specifying which rule is used). We do not provide a rule set as it requires registration on [Snort](https://www.snort.org/downloads). 
+Then execute the software application, specifying the `snort.lua` configuration file and the rule_list file (specifying the `sid` of the rules are used). We only provide a sample rule as the Snort Registered Rules requires registration on [Snort](https://www.snort.org/downloads). This sample rule will be triggered 10 times by our sample trace `$pigasus_rep_dir/hardware/rtl_sim/input_gen/m10_100.pcap`.
 ```bash
 cd $pigasus_rep_dir/software/lua
-sudo pigasus -c snort.lua --patterns ~/rule_list
+sudo pigasus -c snort.lua --patterns ./rule_list
 ```
 
 ### Example using DPDK pktgen
@@ -205,8 +205,33 @@ After the packet generator finishes sending the number of packets that you speci
 get_results
 ```
 
-Now exit the software application with Ctrl-C. You should expect to see that the number of `rx_pkt` should match up the dma pkts. 
+If you are using our sample rule and pcap (`m10_100.pcap`). You should expect to see the results below.
+```
+IN_PKT: 100
+PROCESSED_PKT: 100
+DMA_PKT: 10
+```
 
+Now exit the software application with Ctrl-C. You should expect to see that the number of `rx_pkt` should match up the `DMA_PKT`. 
+
+### Hardware-only Test
+
+We also provide an easy way to just exercise the FPGA datapath without interacting with the software. In this case, you don't need to install and run the software. 
+After loading the bitstream to the FPGA, you can just run the JTAG system console without rebooting, as PCIe is not used in this experiment. 
+
+```bash
+cd $pigasus_rep_dir/hardware/hw_test
+./run_console
+```
+
+After the console starts, run:
+```
+source path.tcl
+disable_pcie
+```
+
+Now you can start the packet generator and read the counter on FPGA side. The `DMA_PKT` will be discarded in this experiment. 
+This is a faster way to get the FPGA running and an effective way to isolate any potential hardware/software integration issues. 
 
 ## Developing Pigasus
 
