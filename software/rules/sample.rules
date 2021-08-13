@@ -1,0 +1,2 @@
+#Sample rule, will be triggered by the sample m10_100.pcap
+alert tcp $EXTERNAL_NET any -> $HOME_NET any ( msg:"Sample rule"; content:"|FA A5 F8 FB 22 88|",fast_pattern; pcre:"/\xFA\xA5\xF8\xFB\x22\x88/smi"; metadata:policy max-detect-ips drop,ruleset community;classtype:web-application-attack; sid:60200; rev:1; )

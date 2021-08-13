@@ -91,9 +91,11 @@ include 'classification.config.lua'
 
 include 'reference.config.lua'
 
--- add rules here
+-- Add rules here. We only provide a sample rule here. 
+-- To get Snort Registered Rules, please purchase it from snort.org
 local_rules = 
 [[
+include ../rules/sample.rules
 ]]
 
 deleted_snort_config_options =
