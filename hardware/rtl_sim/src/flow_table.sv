@@ -505,11 +505,11 @@ always @(posedge clk) begin
     ch0_tuple_r1 <= ch0_meta.tuple;
 
     // ch0_tuple_latch keeps the tuple value before next read
-    if (ch0_rden) begin
+    if (ft0_rden_a) begin
         ch0_tuple_latch_r <= ch0_meta.tuple;
     end
 end
-assign ch0_tuple_latch = ch0_rden ? ch0_meta.tuple : ch0_tuple_latch_r;
+assign ch0_tuple_latch = ft0_rden_a ? ch0_meta.tuple : ch0_tuple_latch_r;
 
 // Random number used for eviction
 always @(posedge clk) begin
