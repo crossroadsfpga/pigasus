@@ -1,0 +1,382 @@
+`include "./src/struct_s.sv"
+//Rule reduction logic + rule table + rule packer + rule FIFO
+module backend(
+    input                clk,
+    input                rst,
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,context['byte_size']) %}
+    input rule_s_t       in_data_{{i}}_{{j}},
+    input                in_valid_{{i}}_{{j}},
+    output logic         in_ready_{{i}}_{{j}},
+{% endfor %}
+{% endfor %}
+    output logic [511:0] out_usr_data,
+    output logic         out_usr_valid,
+    output logic         out_usr_sop,
+    output logic         out_usr_eop,
+    output logic [5:0]   out_usr_empty,
+    input                out_usr_ready
+);
+
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,(context['layer']))%}
+{% for k in range(0,(context['layer_list'][j]))%}
+rule_s_t  data_{{i}}_{{j}}_{{k}};
+logic     valid_{{i}}_{{j}}_{{k}};
+logic     ready_{{i}}_{{j}}_{{k}};
+{% endfor %}
+{% endfor %}
+{% endfor %}
+
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,context['last_layer_width'])%}
+rule_s_t  last_layer_data_{{i}}_{{j}};
+logic     last_layer_valid_{{i}}_{{j}};
+logic     last_layer_ready_{{i}}_{{j}};
+{% endfor %}
+{% endfor %}
+
+//hastables
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['last_layer_width'])%}
+logic [RID_WIDTH-1:0] ht_addr_{{i}}_{{j}};
+logic [RID_WIDTH-1:0] ht_q_{{i}}_{{j}};
+logic ht_rd_{{i}}_{{j}};
+logic ht_rd_r1_{{i}}_{{j}};
+logic ht_rd_r2_{{i}}_{{j}};
+logic ht_rd_valid_{{i}}_{{j}};
+logic [RID_WIDTH-1:0] ht_data_{{i}}_{{j}};
+{% endfor %}
+{% endfor %}
+
+logic [{{context['last_layer_width']*context['bucket_size']*16-1}}:0] int_data;
+logic         int_valid;
+logic         int_sop;
+logic         int_eop;
+logic [{{context['last_layer_width']+2}}:0]   int_empty;
+logic         int_ready;
+logic [31:0]  int_csr_readdata;
+logic         int_almost_full;
+logic [7:0]   int_cnt;//Assume one pkt cannot trigger 256 of rule_flit.
+
+logic [{{context['last_layer_width']*context['bucket_size']*16-1}}:0] int_usr_data;
+logic         int_usr_valid;
+logic         int_usr_sop;
+logic         int_usr_eop;
+logic [{{context['last_layer_width']+2}}:0]   int_usr_empty;
+logic         int_usr_ready;
+
+logic         all_last;
+logic         all_last_r1;
+logic         all_last_r2;
+logic         all_last_r3;
+
+logic [31:0]  rule_packer_csr_readdata;
+logic [511:0] rule_packer_data;
+logic         rule_packer_valid;
+logic         rule_packer_sop;
+logic         rule_packer_eop;
+logic [5:0]   rule_packer_empty;
+logic         rule_packer_ready;
+
+
+//Assign layer 0 input
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,(context['byte_size']))%}
+assign data_{{i}}_0_{{j}} = in_data_{{i}}_{{j}};
+assign valid_{{i}}_0_{{j}} = in_valid_{{i}}_{{j}};
+assign in_ready_{{i}}_{{j}} = ready_{{i}}_0_{{j}};
+{% endfor %}
+{% endfor %}
+
+//Assign last_layer output
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,context['last_layer_width'])%}
+assign last_layer_ready_{{i}}_{{j}} = all_last | (!last_layer_data_{{i}}_{{j}}.last & !int_almost_full);
+{% endfor %}
+{% endfor %}
+
+
+//Last layer sync
+assign all_last = {% for i in range(0,context['bucket_size']) %} {% for j in range(0,context['last_layer_width']) %} last_layer_data_{{i}}_{{j}}.last & last_layer_valid_{{i}}_{{j}} & {% endfor %} {% endfor %} !int_almost_full;
+
+//For every rule, fetch the RULE ID from table. 
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['last_layer_width'])%}
+assign ht_addr_{{i}}_{{j}} = last_layer_data_{{i}}_{{j}}.data;
+assign ht_rd_{{i}}_{{j}} = last_layer_valid_{{i}}_{{j}} & !last_layer_data_{{i}}_{{j}}.last & !int_almost_full;
+{% endfor %}
+{% endfor %}
+
+always @(posedge clk)begin
+    all_last_r1 <= all_last;
+    all_last_r2 <= all_last_r1;
+    all_last_r3 <= all_last_r2;
+
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['last_layer_width'])%}
+    //two cycle delay and one more cycle for selecting right bucket
+    ht_rd_r1_{{i}}_{{j}} <= ht_rd_{{i}}_{{j}};
+    ht_rd_r2_{{i}}_{{j}} <= ht_rd_r1_{{i}}_{{j}};
+    ht_rd_valid_{{i}}_{{j}} <= ht_rd_r2_{{i}}_{{j}};
+    ht_data_{{i}}_{{j}} <= ht_q_{{i}}_{{j}};
+{% endfor %}
+{% endfor %}
+end
+
+//Assign data
+always @(posedge clk)begin
+{% for j in range(0,context['last_layer_width'])%}
+    {% for i in range(0,context['bucket_size']) %}
+    if(all_last_r3)begin
+        int_data[{{i*16+15+j*context['bucket_size']*16}}:{{i*16+j*context['bucket_size']*16}}] <= 0;
+    end else begin
+        if(ht_rd_valid_{{i}}_{{j}})begin
+            int_data[{{i*16+15+j*context['bucket_size']*16}}:{{i*16+j*context['bucket_size']*16}}] <= ht_data_{{i}}_{{j}};
+        end else begin
+            int_data[{{i*16+15+j*context['bucket_size']*16}}:{{i*16+j*context['bucket_size']*16}}] <= 0;
+        end
+    end
+    {% endfor %}
+{% endfor %}
+end
+
+//Assign metadata
+//Only the first one has sop
+assign int_sop = (int_cnt == 0) ? int_valid : 1'b0;
+always @(posedge clk)begin
+    if(rst)begin
+        int_empty <= 0;
+        int_eop <= 1'b0;
+        int_valid <= 1'b0;
+        int_cnt <= 0;
+    end else begin
+        int_eop <= 1'b0;
+        //sync case
+        if(all_last_r3) begin
+            int_valid <= 1'b1;
+            int_eop <= 1'b1;
+        //normal case
+        end else begin
+            //any dequeue 
+            int_valid <= {% for i in range(0,context['bucket_size']) %} {% for j in range(0,context['last_layer_width']) %} (ht_rd_valid_{{i}}_{{j}}) | {% endfor %} {% endfor %} 0;
+        end
+
+        //calculate int_cnt
+        if(int_valid)begin
+            if(int_eop)begin
+                int_cnt <= 0;
+            end else begin
+                int_cnt <= int_cnt + 1;
+            end
+        end
+    end
+end
+
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,context['layer']) %}
+{% if j==context['layer']-1 %}
+    {% for k in range(0,context['layer_list_half'][j]) %}
+    reduction_2t1 reduction_unit_{{i}}_{{j}}_{{k}} (
+        .clk          (clk), 
+        .rst          (rst),
+        .in_data_0    (data_{{i}}_{{j}}_{{2*k}}),
+        .in_valid_0   (valid_{{i}}_{{j}}_{{2*k}}),
+        .in_ready_0   (ready_{{i}}_{{j}}_{{2*k}}),
+        .in_data_1    (data_{{i}}_{{j}}_{{2*k+1}}),
+        .in_valid_1   (valid_{{i}}_{{j}}_{{2*k+1}}),
+        .in_ready_1   (ready_{{i}}_{{j}}_{{2*k+1}}),
+        .out_data     (last_layer_data_{{i}}_{{k}}),
+        .out_valid    (last_layer_valid_{{i}}_{{k}}),
+        .out_ready    (last_layer_ready_{{i}}_{{k}})
+    );
+    {% endfor %}
+{% else %}
+    {% for k in range(0,context['layer_list_half'][j]) %}
+    reduction_2t1 reduction_unit_{{i}}_{{j}}_{{k}} (
+        .clk          (clk), 
+        .rst          (rst),
+        .in_data_0    (data_{{i}}_{{j}}_{{2*k}}),
+        .in_valid_0   (valid_{{i}}_{{j}}_{{2*k}}),
+        .in_ready_0   (ready_{{i}}_{{j}}_{{2*k}}),
+        .in_data_1    (data_{{i}}_{{j}}_{{2*k+1}}),
+        .in_valid_1   (valid_{{i}}_{{j}}_{{2*k+1}}),
+        .in_ready_1   (ready_{{i}}_{{j}}_{{2*k+1}}),
+        .out_data     (data_{{i}}_{{j+1}}_{{k}}),
+        .out_valid    (valid_{{i}}_{{j+1}}_{{k}}),
+        .out_ready    (ready_{{i}}_{{j+1}}_{{k}})
+    );
+    {% endfor %}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+
+{% for i in range(0,context['bucket_size'])%}
+{% if context['last_layer_width']==1 %}
+rom_2port #(
+    .DWIDTH(RID_WIDTH),
+    .AWIDTH({{context['nbits'][i]}}),
+    .MEM_SIZE({{context['mem_size'][i]}}),
+    .INIT_FILE("./src/memory_init/hashtable{{i}}.mif")
+)
+hashtable_inst_{{i}}_0(
+    .q_a       (ht_q_{{i}}_0),    
+    .q_b       (),    
+    .address_a (ht_addr_{{i}}_0),
+    .address_b (),
+    .clock     (clk)   
+);
+{% elif context['last_layer_width']==2 %}
+rom_2port #(
+    .DWIDTH(RID_WIDTH),
+    .AWIDTH({{context['nbits'][i]}}),
+    .MEM_SIZE({{context['mem_size'][i]}}),
+    .INIT_FILE("./src/memory_init/hashtable{{i}}.mif")
+)
+hashtable_inst_{{i}}_0(
+    .q_a       (ht_q_{{i}}_0),    
+    .q_b       (ht_q_{{i}}_1),    
+    .address_a (ht_addr_{{i}}_0),
+    .address_b (ht_addr_{{i}}_1),
+    .clock     (clk)   
+);
+{% else %}
+rom_2port #(
+    .DWIDTH(RID_WIDTH),
+    .AWIDTH({{context['nbits'][i]}}),
+    .MEM_SIZE({{context['mem_size'][i]}}),
+    .INIT_FILE("./src/memory_init/hashtable{{i}}.mif")
+)
+hashtable_inst_{{i}}_0(
+    .q_a       (ht_q_{{i}}_0),    
+    .q_b       (ht_q_{{i}}_1),    
+    .address_a (ht_addr_{{i}}_0),
+    .address_b (ht_addr_{{i}}_1),
+    .clock     (clk)   
+);
+rom_2port #(
+    .DWIDTH(RID_WIDTH),
+    .AWIDTH({{context['nbits'][i]}}),
+    .MEM_SIZE({{context['mem_size'][i]}}),
+    .INIT_FILE("./src/memory_init/hashtable{{i}}.mif")
+)
+hashtable_inst_{{i}}_1(
+    .q_a       (ht_q_{{i}}_2),    
+    .q_b       (ht_q_{{i}}_3),    
+    .address_a (ht_addr_{{i}}_2),
+    .address_b (ht_addr_{{i}}_3),
+    .clock     (clk)   
+);
+{% endif %}
+{% endfor %}
+
+//internal rule FIFO
+unified_pkt_fifo  #(
+    .FIFO_NAME        ("[fast_pattern] rule_FIFO"),
+    .MEM_TYPE         ("M20K"),
+    .DUAL_CLOCK       (0),
+    .USE_ALMOST_FULL  (1),
+    .FULL_LEVEL       (450),
+    .SYMBOLS_PER_BEAT ({{context['last_layer_width']*context['bucket_size']*2}}),
+    .BITS_PER_SYMBOL  (8),
+    .FIFO_DEPTH       (512)
+) rule_fifo (
+    .in_clk            (clk),
+    .in_reset          (rst),
+    .out_clk           (),
+    .out_reset         (),
+    .in_data           (int_data),
+    .in_valid          (int_valid),
+    .in_ready          (int_ready),
+    .in_startofpacket  (int_sop),
+    .in_endofpacket    (int_eop),
+    .in_empty          (int_empty),
+    .out_data          (int_usr_data),
+    .out_valid         (int_usr_valid),
+    .out_ready         (int_usr_ready),
+    .out_startofpacket (int_usr_sop),
+    .out_endofpacket   (int_usr_eop),
+    .out_empty         (int_usr_empty),
+    .fill_level        (int_csr_readdata),
+    .almost_full       (int_almost_full),
+    .overflow          ()
+);
+
+{% if context['last_layer_width']==1 %}
+rule_packer_128_512 rule_packer_inst(
+    .clk            (clk),
+    .rst            (rst),
+    .in_rule_data   (int_usr_data),
+    .in_rule_valid  (int_usr_valid),
+    .in_rule_ready  (int_usr_ready),
+    .in_rule_sop    (int_usr_sop),
+    .in_rule_eop    (int_usr_eop),
+    .in_rule_empty  (int_usr_empty),
+    .out_rule_data  (rule_packer_data),
+    .out_rule_valid (rule_packer_valid),
+    .out_rule_ready (rule_packer_ready),
+    .out_rule_sop   (rule_packer_sop),
+    .out_rule_eop   (rule_packer_eop),
+    .out_rule_empty (rule_packer_empty)
+);
+{% elif context['last_layer_width']==2 %}
+rule_packer_256_512 rule_packer_inst(
+    .clk            (clk),
+    .rst            (rst),
+    .in_rule_data   (int_usr_data),
+    .in_rule_valid  (int_usr_valid),
+    .in_rule_ready  (int_usr_ready),
+    .in_rule_sop    (int_usr_sop),
+    .in_rule_eop    (int_usr_eop),
+    .in_rule_empty  (int_usr_empty),
+    .out_rule_data  (rule_packer_data),
+    .out_rule_valid (rule_packer_valid),
+    .out_rule_ready (rule_packer_ready),
+    .out_rule_sop   (rule_packer_sop),
+    .out_rule_eop   (rule_packer_eop),
+    .out_rule_empty (rule_packer_empty)
+);
+{% else %}
+    assign rule_packer_data  = int_usr_data;
+    assign rule_packer_valid = int_usr_valid;
+    assign rule_packer_sop   = int_usr_sop;
+    assign rule_packer_eop   = int_usr_eop;
+    assign rule_packer_empty = int_usr_empty;
+    assign int_usr_ready     = rule_packer_ready;
+{% endif %}
+
+//512-bit wide rule FIFO
+unified_pkt_fifo  #(
+    .FIFO_NAME        ("[fast_pattern] rule_packer_FIFO"),
+    .MEM_TYPE         ("M20K"),
+    .DUAL_CLOCK       (0),
+    .USE_ALMOST_FULL  (0),
+    .FULL_LEVEL       (450),
+    .SYMBOLS_PER_BEAT (64),
+    .BITS_PER_SYMBOL  (8),
+    .FIFO_DEPTH       (512)
+) rule_packer_fifo (
+    .in_clk            (clk),
+    .in_reset          (rst),
+    .out_clk           (),
+    .out_reset         (),
+    .in_data           (rule_packer_data),
+    .in_valid          (rule_packer_valid),
+    .in_ready          (rule_packer_ready),
+    .in_startofpacket  (rule_packer_sop),
+    .in_endofpacket    (rule_packer_eop),
+    .in_empty          (rule_packer_empty),
+    .out_data          (out_usr_data),
+    .out_valid         (out_usr_valid),
+    .out_ready         (out_usr_ready),
+    .out_startofpacket (out_usr_sop),
+    .out_endofpacket   (out_usr_eop),
+    .out_empty         (out_usr_empty),
+    .fill_level        (rule_packer_csr_readdata),
+    .almost_full       (),
+    .overflow          ()
+);
+
+endmodule
+

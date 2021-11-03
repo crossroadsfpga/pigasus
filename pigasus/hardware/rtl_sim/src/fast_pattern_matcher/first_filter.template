@@ -1,0 +1,125 @@
+`include "./src/struct_s.sv"
+module first_filter(
+    input                        clk,
+    input                        rst,
+    input [FP_DWIDTH-1:0]        in_data,
+    input                        in_valid,
+    input                        in_sop,
+    input                        in_eop,
+    input [FP_EWIDTH-1:0]        in_empty,
+    output logic [FP_DWIDTH-1:0] out_data,
+    output logic                 out_valid
+);
+
+
+{% for i in range(0,context['byte_size'])%}
+logic [12:0] addr{{i}};
+logic [63:0] q{{i}};
+logic [127:0] temp_st{{i}};
+{% endfor %}
+
+logic [FP_DWIDTH-1:0] in_reg;
+logic [63:0] state;
+logic [63:0] next_state;
+logic in_valid_reg;
+logic in_valid_reg_1;
+
+{% for i in range(0,context['shiftor_num'])%}
+logic [127:0] shiftor{{i}};
+logic [127:0] shiftor_state_{{i}};
+{% endfor %}
+
+logic new_pkt;
+logic new_pkt_reg;
+logic state_valid;
+logic last;
+logic last_r;
+logic last_r1;
+logic [FP_DWIDTH-1:0] mask;
+logic [8:0] shift;
+
+{% for i in range(0,context['byte_size']-1)%}
+assign addr{{i}} = in_reg[{{i}}*8+12:{{i}}*8];
+{% endfor %}
+{% for i in range(context['byte_size']-1,context['byte_size'])%}
+assign addr{{i}} = last ? {5'b0,in_reg[({{i}}+1)*8-1:{{i}}*8]} : {in_data[4:0],in_reg[({{i}}+1)*8-1:{{i}}*8]};
+{% endfor %}
+
+{% for i in range(0,context['shiftor_num'])%}
+{% for j in range(0,8)%}
+assign temp_st{{j+8*i}} = q{{j+8*i}} << {{j}}*8;
+{% endfor %}
+{% endfor %}
+
+
+{% for i in range(0,context['shiftor_num'])%}
+assign shiftor{{i}} = {% for j in range(0,8)%} temp_st{{i*8+j}} |{% endfor %} 0;
+{% endfor %}
+
+assign shiftor_state_0 = shiftor0 | state;
+{% for i in range(1,context['shiftor_num'])%}
+assign shiftor_state_{{i}} = shiftor{{i}} | shiftor_state_{{i-1}}[127:64];
+{% endfor %}
+
+{% for i in range(0,context['shiftor_num'])%}
+//assign out_data = {state_high2[63:0],state_high1[63:0],state_high[63:0],state_low[63:0]} | mask;
+assign out_data[64*{{i}}+63:64*{{i}}] = shiftor_state_{{i}}[63:0] | mask[64*{{i}}+63:64*{{i}}];
+{% endfor %}
+
+assign next_state = shiftor_state_{{context['shiftor_num']-1}}[127:64];
+//assign next_state = shiftor_state_{{context['shiftor_num']-1}}[127:64];
+
+
+always @ (posedge clk) begin
+    shift   <= ({{context['byte_size']}}-in_empty)*8;
+    last    <= in_valid & in_eop;
+    last_r  <= last;
+    last_r1 <= last_r;
+
+    if(last_r)begin
+        mask <= {FP_DWIDTH-1{1'b1}} << shift;
+    end else begin
+        mask <= 0;
+    end
+end
+
+always @ (posedge clk) begin
+    in_valid_reg   <= in_valid;
+    in_valid_reg_1 <= in_valid_reg;
+    out_valid      <= in_valid_reg_1;
+
+    // state update
+    if (out_valid)begin
+        if (last_r1) begin
+            state <= 64'h0003070f1f3f7fff;
+        end else begin
+            state <= next_state;
+        end
+    end
+
+    if (in_valid) begin
+        in_reg <= in_data;
+    end
+
+    if (rst) begin
+        state <= 64'h0003070f1f3f7fff;
+    end
+end
+
+{% for i in range(0,context['half_byte_size'])%}
+rom_2port #(
+	.DWIDTH(64),
+	.AWIDTH(13),
+	.MEM_SIZE(8192),
+	.INIT_FILE("./src/memory_init/match_table.mif")
+)
+match_table_{{i}} (
+	.q_a       (q{{2*i}}),    
+	.q_b       (q{{2*i+1}}),    
+	.address_a (addr{{2*i}}),
+	.address_b (addr{{2*i+1}}),
+	.clock     (clk)   
+);
+{% endfor %}
+
+endmodule

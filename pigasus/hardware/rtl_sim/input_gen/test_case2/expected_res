@@ -1,0 +1,63 @@
+# REG_IN_PKT                :	        16
+# REG_OUT_PKT               :	        10
+# REG_INCOMP_OUT_META       :	        16
+# REG_PARSER_OUT_META       :	        16
+# REG_FT_IN_META            :	        16
+# REG_FT_OUT_META           :	        16
+# REG_EMPTYLIST_IN          :	      1040
+# REG_EMPTYLIST_OUT         :	        16
+# REG_DM_IN_META            :	        16
+# REG_DM_OUT_META           :	        16
+# REG_DM_IN_FORWARD_META    :	         0
+# REG_DM_IN_DROP_META       :	         0
+# REG_DM_IN_CHECK_META      :	        16
+# REG_DM_IN_OOO_META        :	         0
+# REG_DM_IN_FORWARD_OOO_META:	         0
+# REG_NOPAYLOAD_PKT         :	         0
+# REG_DM_CHECK_PKT          :	        16
+# REG_SM_PKT                :	        16
+# REG_SM_META               :	        16
+# REG_SM_RULE               :	        37
+# REG_SM_CHECK_PKT          :	        16
+# REG_SM_CHECK_PKT_SOP      :	        16
+# REG_SM_NOCHECK_PKT        :	         0
+# REG_PG_PKT                :	        16
+# REG_PG_META               :	        16
+# REG_PG_RULE               :	        23
+# REG_PG_CHECK_PKT          :	        16
+# REG_PG_CHECK_PKT_SOP      :	        16
+# REG_PG_NOCHECK_PKT        :	         0
+# REG_BYPASS_PKT            :	         0
+# REG_BYPASS_PKT_SOP        :	         0
+# REG_BYPASS_META           :	         0
+# REG_BYPASS_RULE           :	         0
+# REG_NF_PKT                :	        16
+# REG_NF_META               :	         6
+# REG_NF_RULE               :	         7
+# REG_NF_CHECK_PKT          :	         6
+# REG_NF_CHECK_PKT_SOP      :	         6
+# REG_NF_NOCHECK_PKT        :	        10
+# REG_MERGE_PKT             :	         6
+# REG_MERGE_PKT_SOP         :	         6
+# REG_MERGE_META            :	         6
+# REG_MERGE_RULE            :	         7
+# REG_DMA_PKT               :	         6
+# REG_CPU_NOMATCH_PKT       :	         0
+# REG_CPU_MATCH_PKT         :	         0
+# REG_CTRL                  :	         0
+# REG_MAX_DM2SM             :	         3
+# REG_MAX_SM2PG             :	        10
+# REG_MAX_PG2NF             :	         5
+# REG_MAX_BYPASS2NF         :	         3
+# REG_MAX_NF2PDU            :	         5
+# REG_SM_BYPASS_AF          :	         0
+# REG_SM_CDC_AF             :	         0
+
+You should expect the above counter values when running the test_case2
+
+IN_PKT is number of the input packets of the system.
+OUT_PKT is the number of the output packets of the system.
+DMA_PKT is the number of packets that matches fast patterns in MSPM.
+NF_NO_CHECK_PKT_CNT is the number of packets that are evaluated by MSPM but do not match fast patterns.
+NO_MATCH_PKT_CNT is the number of packets that match the fast patterns in MSPM and non-fast patterns in NFMSPM but do not match the rest of the rule field in Full Matcher. (Assuming not match by default)
+MATCH_PKT_CNT is the number of packets that match both the fast patterns in MSPM and the rest of the rule field in Full Matcher. This counter is meaningless in simulation as Full Matcher is not included. 

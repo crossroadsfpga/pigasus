@@ -1,0 +1,163 @@
+`include "./src/struct_s.sv"
+module hashtable_top(
+    input clk,
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+	output logic [RID_WIDTH-1:0] dout_{{i}}_{{j}},
+    output logic dout_valid_{{i}}_{{j}},
+{% endfor %}
+{% endfor %}
+    input [FP_DWIDTH-1:0] din,
+    input din_valid
+);
+
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+logic [{{context['nbits'][i]}}-1:0] addr_{{i}}_{{j}};
+logic din_valid_{{i}}_{{j}};
+logic addr_valid_{{i}}_{{j}};
+{% endfor %}
+{% endfor %}
+
+logic [63:0] din_reg;
+logic din_valid_reg;
+
+
+// Doing all necessary multiplies per input byte
+wire [({{context['byte_size']}}+7)*8-1:0] padded_din;
+
+{% for i in range(0,context['byte_size']+7)%}
+wire [23:0] din_{{i}}_ab0;
+wire [23:0] din_{{i}}_ab1;
+wire [23:0] din_{{i}}_ab2;
+wire [23:0] din_{{i}}_ab3;
+{% endfor %}
+
+assign padded_din = {din[{{context['byte_size']}}*8-1:0], din_reg[63:8]};
+
+{% for i in range(0,context['byte_size']+7) %}
+mul_hash din_{{i}}_mul_hash (
+    .clk(clk),
+    .a(padded_din[{{i}}*8+:8]), 
+    .ab0(din_{{i}}_ab0),                 
+    .ab1(din_{{i}}_ab1), 
+    .ab2(din_{{i}}_ab2),                 
+    .ab3(din_{{i}}_ab3)
+);
+
+{% endfor %}
+
+//Valid signals
+{% for j in range(0,7)%}
+assign din_valid_0_{{j}} = din_valid & din_valid_reg;
+assign din_valid_1_{{j}} = din_valid & din_valid_reg;
+{% endfor %}
+{% for j in range(7,context['byte_size'])%}
+assign din_valid_0_{{j}} = din_valid;
+assign din_valid_1_{{j}} = din_valid;
+{% endfor %}
+
+{% for j in range(0,6)%}
+assign din_valid_2_{{j}} = din_valid & din_valid_reg;
+{% endfor %}
+{% for j in range(6,context['byte_size'])%}
+assign din_valid_2_{{j}} = din_valid;
+{% endfor %}
+
+{% for j in range(0,5)%}
+assign din_valid_3_{{j}} = din_valid & din_valid_reg;
+{% endfor %}
+{% for j in range(5,context['byte_size'])%}
+assign din_valid_3_{{j}} = din_valid;
+{% endfor %}
+
+{% for j in range(0,4)%}
+assign din_valid_4_{{j}} = din_valid & din_valid_reg;
+{% endfor %}
+{% for j in range(4,context['byte_size'])%}
+assign din_valid_4_{{j}} = din_valid;
+{% endfor %}
+
+{% for j in range(0,3)%}
+assign din_valid_5_{{j}} = din_valid & din_valid_reg;
+{% endfor %}
+{% for j in range(3,context['byte_size'])%}
+assign din_valid_5_{{j}} = din_valid;
+{% endfor %}
+
+{% for j in range(0,2)%}
+assign din_valid_6_{{j}} = din_valid & din_valid_reg;
+{% endfor %}
+{% for j in range(2,context['byte_size'])%}
+assign din_valid_6_{{j}} = din_valid;
+{% endfor %}
+
+{% for j in range(0,1)%}
+assign din_valid_7_{{j}} = din_valid & din_valid_reg;
+{% endfor %}
+{% for j in range(1,context['byte_size'])%}
+assign din_valid_7_{{j}} = din_valid;
+{% endfor %}
+
+
+always @ (posedge clk) begin
+    din_reg <= din[FP_DWIDTH-1:FP_DWIDTH-64];
+    din_valid_reg <= din_valid;
+end
+
+// 12 cycles latency for valid signals
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+hyper_pipe #(.NUM_PIPES(12)) addr_valid_{{i}}_{{j}}_pipe (
+    .clk(clk),.din(din_valid_{{i}}_{{j}}),.dout(addr_valid_{{i}}_{{j}}));
+{% endfor %}
+{% endfor %}
+
+// Multiply accumulation step. 
+// Mask and Nbits is dependent on bucket number
+// data selection is dependent on first byte location
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+acc_hash # (
+    .ANDMSK({{context['andmsk'][i]}}),
+    .NBITS({{context['nbits'][i]}})
+) addr_{{i}}_{{j}}_calc (
+  .clk(clk), .p(addr_{{i}}_{{j}}),
+  .a0b0(din_{{j}}_ab0), .a0b1(din_{{j}}_ab1), .a0b2(din_{{j}}_ab2), .a0b3(din_{{j}}_ab3),
+  .a1b0(din_{{j+1}}_ab0), .a1b1(din_{{j+1}}_ab1), .a1b2(din_{{j+1}}_ab2), .a1b3(din_{{j+1}}_ab3),
+  .a2b0(din_{{j+2}}_ab0), .a2b1(din_{{j+2}}_ab1), .a2b2(din_{{j+2}}_ab2),
+  .a3b0(din_{{j+3}}_ab0), .a3b1(din_{{j+3}}_ab1), .a3b2(din_{{j+3}}_ab2),
+  .a4b0(din_{{j+4}}_ab0), .a4b1(din_{{j+4}}_ab1),
+  .a5b0(din_{{j+5}}_ab0), .a5b1(din_{{j+5}}_ab1),
+  .a6b0(din_{{j+6}}_ab0),
+  .a7b0(din_{{j+7}}_ab0)
+);
+
+{% endfor %}
+{% endfor %}
+
+
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['half_byte_size'])%}
+
+hashtable #(
+	.NBITS({{context['nbits'][i]}}),
+	.DWIDTH(RID_WIDTH),
+	.MEM_SIZE({{context['bm_size'][i]}}),
+	.INIT_FILE("./src/memory_init/bitmap{{i}}.mif")
+)
+hashtable_{{i}}_{{j}} (
+	.clk (clk),
+    .addr0 (addr_{{i}}_{{2*j}}),
+    .addr0_valid (addr_valid_{{i}}_{{2*j}}),
+    .addr1 (addr_{{i}}_{{2*j+1}}),
+    .addr1_valid (addr_valid_{{i}}_{{2*j+1}}),
+	.dout0 (dout_{{i}}_{{2*j}}),
+	.dout0_valid (dout_valid_{{i}}_{{2*j}}),
+	.dout1 (dout_{{i}}_{{2*j+1}}),
+	.dout1_valid (dout_valid_{{i}}_{{2*j+1}})
+);
+{% endfor %}
+{% endfor %}
+
+endmodule

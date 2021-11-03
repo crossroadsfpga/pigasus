@@ -1,0 +1,122 @@
+`include "./src/struct_s.sv"
+module cal_fp(
+    input clk,
+    input rst,
+    output logic [FP_WIDTH-1:0] fp_data,
+    output logic                fp_valid,
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,context['byte_size']) %}
+    input [NF_WIDTH-1:0] din_{{i}}_{{j}},
+    input din_valid_{{i}}_{{j}},
+{% endfor %}
+{% endfor %}
+    input  last
+);
+
+//Layers
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,context['byte_size']) %}
+logic [BUCKET_BITS-1:0] index_trunc_{{i}}_{{j}};
+{% endfor %}
+{% endfor %}
+
+
+{% for l in range(0,context['cal_layer']) %}
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,context['byte_size_log'][l]) %}
+logic [BUCKET_WIDTH-1:0] l{{l}}_sub_fp_{{i}}_{{j}};
+logic                    l{{l}}_valid_{{i}}_{{j}};
+{% endfor %}
+{% endfor %}
+{% endfor %}
+
+
+//final layer
+{% for i in range(0,context['bucket_size']) %}
+logic [BUCKET_WIDTH-1:0] sub_fp_{{i}};
+{% endfor %}
+
+logic last_r;
+
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size']) %}
+assign index_trunc_{{i}}_{{j}} = din_{{i}}_{{j}}[BUCKET_BITS-1:0];
+{% endfor %}
+{% endfor %}
+
+
+//Layer 0
+always@(posedge clk)begin
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size']) %}
+    l0_sub_fp_{{i}}_{{j}} <= 0;
+    l0_valid_{{i}}_{{j}} <= 0;
+    if(din_valid_{{i}}_{{j}})begin
+        l0_sub_fp_{{i}}_{{j}} <= 1 << index_trunc_{{i}}_{{j}};
+        l0_valid_{{i}}_{{j}} <= 1;
+    end
+{% endfor %}
+{% endfor %}
+end
+
+//Layers
+always@(posedge clk)begin
+{% for l in range(1,context['cal_layer']) %}
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,context['byte_size_log'][l]) %}
+    l{{l}}_sub_fp_{{i}}_{{j}} <= 0;
+    l{{l}}_valid_{{i}}_{{j}}  <= 0;
+    if(l{{l-1}}_valid_{{i}}_{{2*j}} | l{{l-1}}_valid_{{i}}_{{2*j+1}})begin
+        l{{l}}_sub_fp_{{i}}_{{j}} <= l{{l-1}}_sub_fp_{{i}}_{{2*j}} | l{{l-1}}_sub_fp_{{i}}_{{2*j+1}};
+        l{{l}}_valid_{{i}}_{{j}} <= 1;
+    end
+{% endfor %}
+{% endfor %}
+{% endfor %}
+end
+
+
+//Final Layer, accumulate
+always@(posedge clk)begin
+    if(rst)begin
+{% for i in range(0,context['bucket_size']) %}
+        sub_fp_{{i}} <= 0;
+{% endfor %}
+    end else begin
+{% for i in range(0,context['bucket_size']) %}
+        if(last_r)begin
+            sub_fp_{{i}} <= 0;
+        end else if (l{{context['cal_layer']-1}}_valid_{{i}}_0)begin
+            sub_fp_{{i}} <= sub_fp_{{i}} | l{{context['cal_layer']-1}}_sub_fp_{{i}}_0;
+        end
+{% endfor %}
+    end
+end
+
+
+//generate fp
+always@(posedge clk)begin
+    if(rst)begin
+        fp_valid <= 0;
+    end else begin
+        fp_valid <= last_r;
+    end
+{% for i in range(0,context['bucket_size'])%}
+    fp_data[({{i}}+1)*BUCKET_WIDTH-1:{{i}}*BUCKET_WIDTH] <= sub_fp_{{i}};
+{% endfor %}
+end
+
+
+hyper_pipe #(
+    .WIDTH(1),
+    .NUM_PIPES({{context['cal_layer']}})
+) 
+last_reg (
+    .clk  (clk),
+    .din  (last),
+    .dout (last_r)
+);
+
+
+endmodule
+

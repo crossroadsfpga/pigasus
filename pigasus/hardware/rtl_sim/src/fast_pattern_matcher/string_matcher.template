@@ -1,0 +1,284 @@
+`include "./src/struct_s.sv"
+//`define DUMMY
+//`define DEBUG
+module string_matcher (
+    input  logic                 front_clk,
+    input  logic                 front_rst,
+    input  logic                 back_clk,
+    input  logic                 back_rst,
+    input  logic [FP_DWIDTH-1:0] in_pkt_data,
+    input  logic                 in_pkt_valid,
+    input  logic                 in_pkt_sop,
+    input  logic                 in_pkt_eop,
+    input  logic [FP_EWIDTH-1:0] in_pkt_empty,
+    output logic                 in_pkt_ready,
+    output logic [511:0]         out_usr_data,
+    output logic                 out_usr_valid,
+    output logic                 out_usr_sop,
+    output logic                 out_usr_eop,
+    output logic [5:0]           out_usr_empty,
+    input  logic                 out_usr_ready
+);
+
+`ifdef DUMMY
+
+assign in_pkt_ready = 1;
+assign out_usr_data = 0;
+assign out_usr_sop  = out_usr_eop;
+assign out_usr_empty = 0;
+unified_fifo  #(
+    .FIFO_NAME        ("[fast_pattern] dummy_FIFO"),
+    .MEM_TYPE         ("MLAB"),
+    .DUAL_CLOCK       (1),
+    .USE_ALMOST_FULL  (0),
+    .FULL_LEVEL       (20),
+    .SYMBOLS_PER_BEAT (1),
+    .BITS_PER_SYMBOL  (META_WIDTH),
+    .FIFO_DEPTH       (32)
+) in_meta_fifo (
+    .in_clk            (front_clk),
+    .in_reset          (front_rst),
+    .out_clk           (back_clk),
+    .out_reset         (back_rst),
+    .in_data           (1'b1),
+    .in_valid          (in_pkt_valid & in_pkt_eop),
+    .in_ready          (),
+    .out_data          (out_usr_eop),
+    .out_valid         (out_usr_valid),
+    .out_ready         (out_usr_ready),
+    .fill_level        (),
+    .almost_full       (),
+    .overflow          ()
+);
+
+`else
+///////NOT DUMMY////////////
+logic [FP_DWIDTH-1:0]  piped_pkt_data;
+logic                  piped_pkt_valid;
+logic                  piped_pkt_sop;
+logic                  piped_pkt_eop;
+logic [FP_EWIDTH-1:0]  piped_pkt_empty;
+logic [FP_DWIDTH-1:0]  piped_pkt_data_swap;
+logic                  piped_pkt_almost_full;
+
+//debug
+logic [31:0] in_pkt_cnt;
+logic [31:0] out_rule_cnt;
+logic [31:0] out_rule_last_cnt;
+
+
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+logic [RID_WIDTH-1:0] hash_out_{{i}}_{{j}};
+logic hash_out_valid_filter_{{i}}_{{j}};
+rule_s_t din_{{i}}_{{j}};
+rule_s_t din_{{i}}_{{j}}_r1;
+rule_s_t din_{{i}}_{{j}}_r2;
+logic din_valid_{{i}}_{{j}};
+logic din_valid_{{i}}_{{j}}_r1;
+logic din_valid_{{i}}_{{j}}_r2;
+logic din_ready_{{i}}_{{j}};
+logic din_almost_full_{{i}}_{{j}};
+logic [31:0] din_csr_readdata_{{i}}_{{j}};
+rule_s_t back_data_{{i}}_{{j}};
+logic    back_valid_{{i}}_{{j}};
+logic    back_ready_{{i}}_{{j}};
+{% endfor %}
+{% endfor %}
+
+logic out_new_pkt;
+
+{% for j in range(0,context['byte_size'])%}
+assign piped_pkt_data_swap[7+{{j}}*8:0+{{j}}*8] = piped_pkt_data[FP_DWIDTH-1-{{j}}*8:FP_DWIDTH-8-{{j}}*8];
+{% endfor %}
+
+//Insert retiming register for better timing
+always @ (posedge front_clk) begin
+    if(front_rst)begin
+        piped_pkt_almost_full <= 0;
+    end else begin
+        piped_pkt_almost_full <= {% for i in range(0,context['bucket_size'])%} {% for j in range(0,context['byte_size'])%} din_almost_full_{{i}}_{{j}} | {% endfor %} {% endfor %} 0;
+    end
+end
+
+//Debug
+//always @ (posedge front_clk) begin
+//   {% for i in range(0,context['bucket_size'])%} 
+//   {% for j in range(0,context['byte_size'])%} 
+//   if (din_almost_full_{{i}}_{{j}}) begin
+//       $display("din_almost_full_{{i}}_{{j}}");
+//   end  
+//   if (din_valid_{{i}}_{{j}}_r2 & !din_ready_{{i}}_{{j}})begin
+//       $display("overflow din_{{i}}_{{j}}");
+//       $finish;
+//   end
+//   {% endfor %} 
+//   {% endfor %}
+//end
+
+always @ (posedge front_clk) begin
+    if(front_rst)begin
+        in_pkt_cnt <= 0;
+    end else begin
+        if (in_pkt_valid & in_pkt_eop & in_pkt_ready) begin
+            in_pkt_cnt <= in_pkt_cnt + 1;
+        end
+    end
+end
+
+always @ (posedge back_clk) begin
+    if(back_rst)begin
+        out_rule_cnt <= 0;
+        out_rule_last_cnt <= 0;
+    end else begin
+        if(out_usr_valid & out_usr_ready)begin
+            out_rule_cnt <= out_rule_cnt + 1;
+            if(out_usr_eop)begin
+                out_rule_last_cnt <= out_rule_last_cnt + 1;
+            end
+        end
+    end
+end
+
+
+always@(posedge front_clk)begin
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+    din_valid_{{i}}_{{j}} <= out_new_pkt | hash_out_valid_filter_{{i}}_{{j}};
+    din_valid_{{i}}_{{j}}_r1 <= din_valid_{{i}}_{{j}};
+    din_valid_{{i}}_{{j}}_r2 <= din_valid_{{i}}_{{j}}_r1;
+
+    din_{{i}}_{{j}}.data <= hash_out_valid_filter_{{i}}_{{j}} ? hash_out_{{i}}_{{j}} : 0;
+    din_{{i}}_{{j}}.last <= out_new_pkt;
+    {% if i == 0 %}
+    din_{{i}}_{{j}}.bucket <= 0;
+    {% elif i==1 %}
+    din_{{i}}_{{j}}.bucket <= 1;
+    {% elif i==2 %}
+    din_{{i}}_{{j}}.bucket <= 2;
+    {% elif i==3 %}
+    din_{{i}}_{{j}}.bucket <= 3;
+    {% elif i==4 %}
+    din_{{i}}_{{j}}.bucket <= 4;
+    {% elif i==5 %}
+    din_{{i}}_{{j}}.bucket <= 5;
+    {% elif i==6 %}
+    din_{{i}}_{{j}}.bucket <= 6;
+    {% elif i==7 %}
+    din_{{i}}_{{j}}.bucket <= 7;
+    {% endif %}
+
+
+    din_{{i}}_{{j}}_r1 <= din_{{i}}_{{j}};
+    din_{{i}}_{{j}}_r2 <= din_{{i}}_{{j}}_r1;
+{% endfor %}
+{% endfor %}
+end
+
+//Instantiation
+pkt_almost_full #(
+    .DWIDTH(FP_DWIDTH),
+    .EWIDTH(FP_EWIDTH),
+    .NUM_PIPES(2)
+) pkt_almost_full_inst (
+    .clk                    (front_clk),
+    .rst                    (front_rst),
+    .in_data                (in_pkt_data),
+    .in_valid               (in_pkt_valid),
+    .in_ready               (in_pkt_ready),
+    .in_sop                 (in_pkt_sop),
+    .in_eop                 (in_pkt_eop),
+    .in_empty               (in_pkt_empty),
+    .out_data               (piped_pkt_data),
+    .out_valid              (piped_pkt_valid),
+    //.out_ready              (piped_pkt_ready),
+    .out_almost_full        (piped_pkt_almost_full),
+    .out_sop                (piped_pkt_sop),
+    .out_eop                (piped_pkt_eop),
+    .out_empty              (piped_pkt_empty)
+);
+
+
+frontend front(
+    .clk(front_clk),
+    .rst(front_rst),
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+    .hash_out_{{i}}_{{j}} (hash_out_{{i}}_{{j}}),
+    .hash_out_valid_filter_{{i}}_{{j}}(hash_out_valid_filter_{{i}}_{{j}}),
+{% endfor %}
+{% endfor %}
+    .in_data         (piped_pkt_data_swap),
+    .in_valid        (piped_pkt_valid),
+    .in_sop          (piped_pkt_sop),
+    .in_eop          (piped_pkt_eop),
+    .in_empty        (piped_pkt_empty),
+    .out_new_pkt     (out_new_pkt)
+);
+//RuleID reduction logic
+backend back(
+    .clk                     (back_clk),
+    .rst                     (back_rst),
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,context['byte_size']) %}
+    .in_data_{{i}}_{{j}}     (back_data_{{i}}_{{j}}),
+    .in_valid_{{i}}_{{j}}    (back_valid_{{i}}_{{j}}),
+    .in_ready_{{i}}_{{j}}    (back_ready_{{i}}_{{j}}),
+{% endfor %}
+{% endfor %}
+    .out_usr_data            (out_usr_data),
+    .out_usr_valid           (out_usr_valid),
+    .out_usr_sop             (out_usr_sop),
+    .out_usr_eop             (out_usr_eop),
+    .out_usr_empty           (out_usr_empty),
+    .out_usr_ready           (out_usr_ready)
+);
+
+
+//Cross clock domain
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,context['byte_size']) %}
+unified_fifo  #(
+    .FIFO_NAME        ("[fast_pattern] dc_FIFO_{{i}}_{{j}}"),
+    .MEM_TYPE         ("MLAB"),
+    .DUAL_CLOCK       (1),
+    .USE_ALMOST_FULL  (1),
+    .FULL_LEVEL       (40),
+    .SYMBOLS_PER_BEAT (1),
+    .BITS_PER_SYMBOL  (RULE_S_WIDTH),
+    .FIFO_DEPTH       (128)
+) l1_dc_fifo_mlab_{{i}}_{{j}} (
+    .in_clk            (front_clk),
+    .in_reset          (front_rst),
+    .out_clk           (back_clk),
+    .out_reset         (back_rst),
+    .in_data           (din_{{i}}_{{j}}_r2),              
+    .in_valid          (din_valid_{{i}}_{{j}}_r2),             
+    .in_ready          (din_ready_{{i}}_{{j}}),             
+    .out_data          (back_data_{{i}}_{{j}}),              
+    .out_valid         (back_valid_{{i}}_{{j}}),             
+    .out_ready         (back_ready_{{i}}_{{j}}),             
+    .fill_level        (din_csr_readdata_{{i}}_{{j}}),
+    .almost_full       (din_almost_full_{{i}}_{{j}}),
+    .overflow          ()
+);
+{% endfor %}
+{% endfor %}
+
+`endif
+
+`ifdef DEBUG
+stats_cnt_rule #(.DEBUG(1))
+out_rule_inst(
+    .Clk        (back_clk),
+    .Rst_n      (!back_rst),
+    .valid      (out_usr_valid),
+    .ready      (out_usr_ready),
+    .data       (out_usr_data),
+    .eop        (out_usr_eop),
+    .sop        (out_usr_sop),
+    .stats_rule ()
+);
+`endif
+	
+endmodule

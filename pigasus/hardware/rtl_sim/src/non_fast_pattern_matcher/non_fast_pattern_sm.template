@@ -1,0 +1,184 @@
+`include "./src/struct_s.sv"
+//`define DEBUG
+module non_fast_pattern_sm (
+    input   logic           clk,
+    input   logic           rst,
+    input   logic           in_sop,
+    input   logic           in_eop,
+    input   logic           in_valid,
+    input   logic [NFP_DWIDTH-1:0]   in_data,
+    input   logic [NFP_EWIDTH-1:0]   in_empty,
+    output  logic           in_ready,
+    output  logic [FP_WIDTH-1:0] fp_data,
+    output  logic           fp_valid
+);
+
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+logic [NF_WIDTH-1:0] hash_out_{{i}}_{{j}};
+logic hash_out_valid_filter_{{i}}_{{j}};
+logic [NF_WIDTH-1:0] index_data_{{i}}_{{j}};
+logic index_valid_{{i}}_{{j}};
+{% endfor %}
+{% endfor %}
+logic out_new_pkt;
+logic last;
+
+logic [NFP_DWIDTH-1:0] in_data_swap;
+
+//filter
+logic ce;
+logic [NFP_DWIDTH-1:0] filter_out;
+logic filter_out_valid;
+
+//hashtable_top
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+logic hash_out_valid_{{i}}_{{j}};
+{% endfor %}
+{% endfor %} //per bucket
+
+logic [NFP_DWIDTH-1:0] hash_in;
+logic hash_in_valid;
+logic hash_in_sop;
+
+//Other
+logic new_pkt;
+{% for i in range(1,17)%}
+logic [NFP_DWIDTH-1:0] filter_out_r{{i}};
+logic new_pkt_r{{i}};
+{% endfor %}
+
+//data swap
+{% for i in range(0,context['byte_size'])%}
+assign in_data_swap[7+{{i}}*8:0+{{i}}*8] = in_data[NFP_DWIDTH-1-{{i}}*8:NFP_DWIDTH-8-{{i}}*8];
+{% endfor %} //per bucket
+
+//no backpressure
+assign in_ready = 1;
+
+//Hashtable signals
+{% for j in range(0,context['byte_size'])%}
+
+{% for i in range(0,7)%}
+//assign hash_out_valid_filter_{{i}}_{{j}} = hash_out_valid_{{i}}_{{j}} & !filter_out_r14[{{i+j*8}}];
+assign hash_out_valid_filter_{{i}}_{{j}} = hash_out_valid_{{i}}_{{j}} & !filter_out_r13[{{i+j*8}}];
+{% endfor %}
+assign hash_out_valid_filter_7_{{j}} = hash_out_valid_7_{{j}};
+{% endfor %}
+
+assign new_pkt = in_eop & in_valid;
+
+//Make sure all the flits of the pkts have been checked before moving it. 
+always @ (posedge clk) begin
+    new_pkt_r1 <= new_pkt;
+{% for i in range(1,16)%}
+    new_pkt_r{{i+1}} <= new_pkt_r{{i}};
+{% endfor %}
+    out_new_pkt <= new_pkt_r16;
+end
+
+//consistent with the filter 
+always @ (posedge clk) begin
+    hash_in <= in_data_swap;
+    hash_in_valid <= in_valid;
+    hash_in_sop <= in_sop;
+end
+
+
+//Comb of filter and hashtable
+always @ (posedge clk) begin
+    if(filter_out_valid) begin
+        filter_out_r1 <= filter_out;
+    end else begin
+        filter_out_r1 <= {128{1'b1}};
+    end
+{% for i in range(1,14)%}
+    filter_out_r{{i+1}} <= filter_out_r{{i}};
+{% endfor %}
+end
+
+always@(posedge clk)begin
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+    index_valid_{{i}}_{{j}} <= hash_out_valid_filter_{{i}}_{{j}};
+
+    index_data_{{i}}_{{j}} <= hash_out_valid_filter_{{i}}_{{j}} ? hash_out_{{i}}_{{j}} : 0;
+{% endfor %}
+{% endfor %}
+    last <= out_new_pkt;
+end
+
+//Instantiation
+non_fast_pattern_shiftor shiftor_inst(
+    .clk        (clk),
+    .rst        (rst),
+    .in_data    (in_data_swap),
+    .in_valid   (in_valid),
+    .in_sop     (in_sop),
+    .in_eop     (in_eop),
+    .in_empty   (in_empty),
+    .out_data   (filter_out),
+    .out_valid  (filter_out_valid)
+);
+
+non_fast_pattern_ht hashtable_inst (
+    .clk (clk),
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+    .dout_{{i}}_{{j}} (hash_out_{{i}}_{{j}}),
+    .dout_valid_{{i}}_{{j}} (hash_out_valid_{{i}}_{{j}}),
+{% endfor %}
+{% endfor %}
+    .din (hash_in),
+    .din_sop (hash_in_sop),
+    .din_valid (hash_in_valid)
+);
+
+cal_fp cal_fp_inst(
+    .clk(clk),
+    .rst(rst),
+{% for i in range(0,context['bucket_size']) %}
+{% for j in range(0,context['byte_size']) %}
+    .din_{{i}}_{{j}}(index_data_{{i}}_{{j}}),
+    .din_valid_{{i}}_{{j}}(index_valid_{{i}}_{{j}}),
+{% endfor %}
+{% endfor %}
+    .last     (last),
+    .fp_data  (fp_data),
+    .fp_valid (fp_valid)
+);
+
+
+
+//Debug
+`ifdef DEBUG
+logic [31:0] cycle;
+always@(posedge clk)begin
+    if(rst)begin
+        cycle <= 0;
+    end else begin
+        cycle <= cycle + 1;
+        $display("==== NF SM cycle %d ===",cycle);
+        //{% for j in range(0,context['byte_size'])%}
+        //{% for i in range(0,context['bucket_size'])%}
+        //if(hash_out_valid_filter_{{i}}_{{j}})begin
+        //    $display("Match: bucket %d, byte_position %d, Index %d",
+        //        {{i}},{{j}},hash_out_{{i}}_{{j}});
+        //end
+        //{% endfor %}
+        //{% endfor %}
+        
+        {% for j in range(0,context['byte_size'])%}
+        if(hash_out_valid_filter_7_{{j}})begin
+            $display("Match: bucket %d, byte_position %d, Index %d",
+                7,{{j}},hash_out_7_{{j}});
+        end
+        {% endfor %}
+    end
+end
+`endif
+
+
+
+endmodule //top

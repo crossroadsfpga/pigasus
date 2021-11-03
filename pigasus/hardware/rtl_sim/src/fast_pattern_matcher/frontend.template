@@ -1,0 +1,127 @@
+`include "./src/struct_s.sv"
+//`define DUMMY
+module frontend (
+    input  logic                 clk,
+    input  logic                 rst,
+    input  logic [FP_DWIDTH-1:0] in_data,
+    input  logic                 in_valid,
+    input  logic                 in_sop,
+    input  logic                 in_eop,
+    input  logic [FP_EWIDTH-1:0] in_empty,
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+    output logic [RID_WIDTH-1:0] hash_out_{{i}}_{{j}},
+    output logic                 hash_out_valid_filter_{{i}}_{{j}},
+{% endfor %}
+{% endfor %}
+    output logic                 out_new_pkt
+);
+
+//filter
+logic ce;
+logic [FP_DWIDTH-1:0] filter_out;
+logic filter_out_valid;
+
+//hashtable_top
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+logic hash_out_valid_{{i}}_{{j}};
+{% endfor %}
+{% endfor %}
+logic [FP_DWIDTH-1:0] hash_in;
+logic hash_in_valid;
+
+logic new_pkt;
+{% for i in range(1,17)%}
+logic [FP_DWIDTH-1:0] filter_out_r{{i}};
+logic new_pkt_r{{i}};
+{% endfor %}
+
+
+`ifdef DUMMY
+//No match at all
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+assign hash_out_valid_filter_{{i}}_{{j}} = 0;
+assign hash_out_{{i}}_{{j}} = 0;
+{% endfor %}
+{% endfor %}
+
+assign new_pkt = in_eop & in_valid;
+
+//Make sure all the flits of the pkts have been checked before moving it. 
+always @ (posedge clk) begin
+    new_pkt_r1 <= new_pkt;
+{% for i in range(1,16)%}
+    new_pkt_r{{i+1}} <= new_pkt_r{{i}};
+{% endfor %}
+    out_new_pkt <= new_pkt_r16;
+end
+
+
+`else
+//Hashtable signals
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+//assign hash_out_valid_filter_{{i}}_{{j}} = hash_out_valid_{{i}}_{{j}} & !filter_out_r14[{{i+j*8}}];
+assign hash_out_valid_filter_{{i}}_{{j}} = hash_out_valid_{{i}}_{{j}} & !filter_out_r13[{{i+j*8}}];
+{% endfor %}
+{% endfor %}
+
+assign new_pkt = in_eop & in_valid;
+
+//Make sure all the flits of the pkts have been checked before moving it. 
+always @ (posedge clk) begin
+    new_pkt_r1 <= new_pkt;
+{% for i in range(1,16)%}
+    new_pkt_r{{i+1}} <= new_pkt_r{{i}};
+{% endfor %}
+    out_new_pkt <= new_pkt_r16;
+end
+
+//consistent with the filter 
+always @ (posedge clk) begin
+    hash_in <= in_data;
+    hash_in_valid <= in_valid;
+end
+
+//Comb of filter and hashtable
+always @ (posedge clk) begin
+    if(filter_out_valid) begin
+        filter_out_r1 <= filter_out;
+    end else begin
+        filter_out_r1 <= {FP_DWIDTH{1'b1}};
+    end
+{% for i in range(1,14)%}
+    filter_out_r{{i+1}} <= filter_out_r{{i}};
+{% endfor %}
+end
+
+
+//Instantiation
+first_filter filter_inst(
+    .clk(clk),
+    .rst(rst),
+    .in_data    (in_data),
+    .in_valid   (in_valid),
+    .in_sop     (in_sop),
+    .in_eop     (in_eop),
+    .in_empty   (in_empty),
+    .out_data   (filter_out),
+    .out_valid  (filter_out_valid)
+);
+
+hashtable_top hashtable_top_inst (
+    .clk (clk),
+{% for i in range(0,context['bucket_size'])%}
+{% for j in range(0,context['byte_size'])%}
+    .dout_{{i}}_{{j}} (hash_out_{{i}}_{{j}}),
+    .dout_valid_{{i}}_{{j}} (hash_out_valid_{{i}}_{{j}}),
+{% endfor %}
+{% endfor %}
+    .din (hash_in),
+    .din_valid (hash_in_valid)
+);
+
+`endif
+endmodule
