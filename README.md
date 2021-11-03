@@ -12,7 +12,7 @@ Pigasus has a hardware component, that runs on an FPGA, and a software component
 
 To start, clone this repository:
 ```bash
-git clone https://github.com/cmu-snap/pigasus.git
+git clone https://github.com/crossroadsfpga/pigasus.git
 ```
 
 If you just want to do RTL simulation, please jump to [Developing Pigasus](#developing-pigasus). The [Software Configuration](#software-configuration) is only necessary for running Pigasus in a real system. 
