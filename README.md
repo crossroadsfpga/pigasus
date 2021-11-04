@@ -31,4 +31,4 @@ Directory organization
 
 ## License
 
-Pigasus is developed at Carnegie Mellon University. The software component (`pigasus/software`) is adapted from Snort3 and released under the [GNU General Public License v2.0](software/LICENSE). The rest of the components including (`pigasus/hardware`,`pigasus_multi_fpga`,`fluid`) are released under the [BSD 3-Clause Clear License](hardware/LICENSE). 
+Pigasus is developed at Carnegie Mellon University. The software component (`pigasus/software`) is adapted from Snort3 and released under the [GNU General Public License v2.0](pigasus/software/LICENSE). The rest of the components including (`pigasus/hardware`,`pigasus_multi_fpga`,`fluid`) are released under the [BSD 3-Clause Clear License](pigasus/hardware/LICENSE). 
