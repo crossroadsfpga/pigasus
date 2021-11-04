@@ -7,10 +7,10 @@ Compared to Pigasus 1.0, Pigasus 2.0 enables easy customization and more efficie
 
 If you want to run Pigasus as it is, without customization, please go to `./pigasus` directly. 
 
+<img src="./services.gv.png">
+
 ## Customize Pigasus
 Instructions for customizing Pigasus 2.0 (what most users should need) are available in the comments of `pigasus.py`. After modifying that file run `run_pigasus.sh` to regenerate the Pigasus 2.0 RTL code in `./pigasus` with modifications. Similarly, to customize multi-FPGA Pigasus 2.0 edit `pigasus_multi.py` and then run `run_pigasus_multi.sh` to regenerate the multi-FPGA Pigasus RTL code in `./pigasus_multi` with modifications.
-
-<img src="./services.gv.png">
 
 Directory organization
 * `run_pigasus.sh`: driver script for generating Pigasus. This is what most users should need.
