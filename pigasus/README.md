@@ -37,6 +37,8 @@ cd $pigasus_rep_dir/pigasus/hardware/scripts/
 ./run_ipgen.sh
 ```
 
+> This step will generate the IP blocks (FIFOs, RAMs, Multiplexer, etc.) as well as the Ethernet and PCIe subsystems. Note that the Ethernet and PCIe subsystems are not used in simulation. The IP core generation step `qsys-generate ip_gen.qsys --synthesis=VERILOG` in `run_ipgen.sh` will create a folder called `generated_files` that includes the .sv files of the IP blocks. Since we force Qsys to generate those individual IP blocks without connecting them, Qsys will report connection errors `Error: qsys-generate failed with exit code 3: 44 Errors, 70 Warnings` in `ip_gen\ip_gen_generation.rpt`. These errors are expected. You should be fine as long as you observe the `generated_files` folder with a list of .sv files. (You can also refer to [Issue #10](https://github.com/crossroadsfpga/pigasus/issues/10) for more details.)
+
 Simulation Setup:
 1. Compile Quartus 19.3 IP library for RTL simulation. Open Quartus 19.3. Select "Launch Simulation Library Compiler" under the "Tools" Tab. Select "ModelSim" as the "Tool name" and specify the path for "Executable location." Then select "Stratix 10" as Library families. Specify the output directory and click "Start Compilation".
 2. Add the compiled library path as the environment variable, by `export SIM_LIB_PATH=your_install_path/sim_lib/verilog_libs`
