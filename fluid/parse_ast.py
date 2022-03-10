@@ -216,7 +216,8 @@ class BinOpType(enum.Enum):
     EQ = 8,
     NOT_EQ = 9,
     DIV = 10,
-    SL = 11
+    SL = 11,
+    POW = 12
 
     def __str__(self):
         if self == BinOpType.AND:
@@ -241,6 +242,8 @@ class BinOpType(enum.Enum):
             return "div"
         elif self == BinOpType.SL:
             return "sl"
+        elif self == BinOpType.POW:
+            return "pow"
 
     def to_string(self):
         if self == BinOpType.AND:
@@ -267,6 +270,8 @@ class BinOpType(enum.Enum):
             return "/"
         elif self == BinOpType.SL:
             return "<<"
+        elif self == BinOpType.POW:
+            return "**"
 
     @staticmethod
     def from_string(string):
@@ -294,6 +299,8 @@ class BinOpType(enum.Enum):
             return BinOpType.DIV
         elif string == "<<":
             return BinOpType.SL
+        elif string == "**":
+            return BinOpType.POW
         else:
             print(string, "unrecognized op type")
         
