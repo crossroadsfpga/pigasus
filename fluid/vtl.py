@@ -153,6 +153,8 @@ class VTLCompiler(ast.NodeVisitor):
                 op_str = "/"
             elif isinstance(expr.op, ast.LShift):
                 op_str = "<<"
+            elif isinstance(expr.op, ast.Pow):
+                op_str = "**"
             return mk_binary(op_str, self.compile_expr(expr.left), self.compile_expr(expr.right))
         elif isinstance(expr, ast.UnaryOp):
             op_str = "~"
