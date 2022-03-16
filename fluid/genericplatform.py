@@ -56,7 +56,8 @@ class GenericTopPass(Pass):
 
         #generate externs
         for extern in app.externs.values():
-            ports.port(extern.name, mk_type("logic", extern.size-1, 0), extern.direction)
+            upper = "{}-1".format(extern.size) if isinstance(extern.size, str) else (extern.size - 1)
+            ports.port(extern.name, mk_type("logic", upper, 0), extern.direction)
     
         for extifc in app.extern_interfaces.values():
             ports.port(extifc.name, Type(mk_attrib(extifc.type)))
