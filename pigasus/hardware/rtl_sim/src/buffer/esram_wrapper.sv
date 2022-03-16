@@ -1,28 +1,26 @@
 `include "./src/struct_s.sv"
 
 module esram_wrapper(
-    input   logic           clk_esram_ref, // 100 MHz
-    output  logic           esram_pll_lock,
+    input   logic                       clk_esram_ref, // 100 MHz
+    output  logic                       esram_pll_lock,
 `ifdef USE_BRAM
-    input   logic           clk_esram, // 200 MHz
+    input   logic                       clk_esram, // 200 MHz
 `elsif SIM
-    input   logic           clk_esram, // 200 MHz
+    input   logic                       clk_esram, // 200 MHz
 `else
-    output  logic           clk_esram, // 200 MHz
+    output  logic                       clk_esram, // 200 MHz
 `endif
-    input   logic           wren,
-    input   logic [16:0]    wraddress,
-    input   logic [519:0]   wrdata,
-    input   logic           rden,
-    input   logic [16:0]    rdaddress,
-    output  logic           rd_valid,
-    output  logic [519:0]   rddata
+    input   logic                       wren,
+    input   logic [PKTBUF_AWIDTH-1:0]   wraddress,
+    input   logic [519:0]               wrdata,
+    input   logic                       rden,
+    input   logic [PKTBUF_AWIDTH-1:0]   rdaddress,
+    output  logic                       rd_valid,
+    output  logic [519:0]               rddata
 );
 
 // In simulation, we just use a big BRAM to accelerate simulation speed.
 `ifdef USE_BRAM
-localparam DEPTH = (PKT_NUM*32);
-localparam AWIDTH = ($clog2(DEPTH));
 
 logic rden_r;
 assign esram_pll_lock = 1;
@@ -34,9 +32,9 @@ always @(posedge clk_esram) begin
 end
 
 bram_simple2port #(
-    .AWIDTH(AWIDTH),
+    .AWIDTH(PKTBUF_AWIDTH),
     .DWIDTH(520),
-    .DEPTH(DEPTH)
+    .DEPTH(PKTBUF_DEPTH)
 )
 esrm_sim (
     .clock     (clk_esram),
