@@ -1426,6 +1426,70 @@ proc do_create_ip_gen {} {
 	set_instantiation_interface_assignment_value clock ui.blockdiagram.direction {input}
 	add_instantiation_interface_port clock clock clk 1 STD_LOGIC Input
 	save_instantiation
+	add_component sc_fifo ip/ip_gen/sc_fifo.ip fifo sc_fifo 19.1
+	load_component sc_fifo
+	set_component_parameter_value GUI_AlmostEmpty {0}
+	set_component_parameter_value GUI_AlmostEmptyThr {1}
+	set_component_parameter_value GUI_AlmostFull {0}
+	set_component_parameter_value GUI_AlmostFullThr {1}
+	set_component_parameter_value GUI_CLOCKS_ARE_SYNCHRONIZED {0}
+	set_component_parameter_value GUI_Clock {0}
+	set_component_parameter_value GUI_DISABLE_DCFIFO_EMBEDDED_TIMING_CONSTRAINT {1}
+	set_component_parameter_value GUI_Depth {2048}
+	set_component_parameter_value GUI_ENABLE_ECC {0}
+	set_component_parameter_value GUI_Empty {1}
+	set_component_parameter_value GUI_Full {1}
+	set_component_parameter_value GUI_LE_BasedFIFO {0}
+	set_component_parameter_value GUI_LegacyRREQ {1}
+	set_component_parameter_value GUI_MAX_DEPTH {Auto}
+	set_component_parameter_value GUI_MAX_DEPTH_BY_9 {0}
+	set_component_parameter_value GUI_OVERFLOW_CHECKING {0}
+	set_component_parameter_value GUI_Optimize {0}
+	set_component_parameter_value GUI_Optimize_max {0}
+	set_component_parameter_value GUI_RAM_BLOCK_TYPE {Auto}
+	set_component_parameter_value GUI_TESTBENCH {0}
+	set_component_parameter_value GUI_UNDERFLOW_CHECKING {0}
+	set_component_parameter_value GUI_UsedW {1}
+	set_component_parameter_value GUI_Width {8}
+	set_component_parameter_value GUI_dc_aclr {0}
+	set_component_parameter_value GUI_delaypipe {4}
+	set_component_parameter_value GUI_diff_widths {0}
+	set_component_parameter_value GUI_msb_usedw {0}
+	set_component_parameter_value GUI_output_width {8}
+	set_component_parameter_value GUI_read_aclr_synch {0}
+	set_component_parameter_value GUI_rsEmpty {1}
+	set_component_parameter_value GUI_rsFull {0}
+	set_component_parameter_value GUI_rsUsedW {0}
+	set_component_parameter_value GUI_sc_aclr {0}
+	set_component_parameter_value GUI_sc_sclr {0}
+	set_component_parameter_value GUI_synStage {3}
+	set_component_parameter_value GUI_write_aclr_synch {0}
+	set_component_parameter_value GUI_wsEmpty {0}
+	set_component_parameter_value GUI_wsFull {1}
+	set_component_parameter_value GUI_wsUsedW {0}
+	set_component_project_property HIDE_FROM_IP_CATALOG {false}
+	save_component
+	load_instantiation sc_fifo
+	remove_instantiation_interfaces_and_ports
+	add_instantiation_interface fifo_input conduit INPUT
+	set_instantiation_interface_parameter_value fifo_input associatedClock {}
+	set_instantiation_interface_parameter_value fifo_input associatedReset {}
+	set_instantiation_interface_parameter_value fifo_input prSafe {false}
+	set_instantiation_interface_assignment_value fifo_input ui.blockdiagram.direction {input}
+	add_instantiation_interface_port fifo_input data datain 8 STD_LOGIC_VECTOR Input
+	add_instantiation_interface_port fifo_input wrreq wrreq 1 STD_LOGIC Input
+	add_instantiation_interface_port fifo_input rdreq rdreq 1 STD_LOGIC Input
+	add_instantiation_interface_port fifo_input clock clk 1 STD_LOGIC Input
+	add_instantiation_interface fifo_output conduit INPUT
+	set_instantiation_interface_parameter_value fifo_output associatedClock {}
+	set_instantiation_interface_parameter_value fifo_output associatedReset {}
+	set_instantiation_interface_parameter_value fifo_output prSafe {false}
+	set_instantiation_interface_assignment_value fifo_output ui.blockdiagram.direction {output}
+	add_instantiation_interface_port fifo_output q dataout 8 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port fifo_output usedw usedw 11 STD_LOGIC_VECTOR Output
+	add_instantiation_interface_port fifo_output full full 1 STD_LOGIC Output
+	add_instantiation_interface_port fifo_output empty empty 1 STD_LOGIC Output
+	save_instantiation
 	add_component singledsp ip/ip_gen/singledsp.ip altera_s10_native_fixed_point_dsp singledsp 19.1.0
 	load_component singledsp
 	set_component_parameter_value accum_2nd_pipeline_clock {0}
@@ -2426,6 +2490,9 @@ proc do_create_ip_gen {} {
  </element>
  <element __value="rom_2port_noreg">
   <datum __value="_sortIndex" value="10" type="int" />
+ </element>
+ <element __value="sc_fifo">
+  <datum __value="_sortIndex" value="24" type="int" />
  </element>
  <element __value="singledsp">
   <datum __value="_sortIndex" value="21" type="int" />

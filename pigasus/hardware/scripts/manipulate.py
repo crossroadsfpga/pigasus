@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+from math import ceil, log2
 import sys
 import os
 from os import listdir
@@ -190,7 +191,12 @@ def change_ram(fname,new_name,dwidth,awidth,mem_size):
             new_file.append(new_string)
             new_string = "    parameter DEPTH = "+str(mem_size)+";\n"
             new_file.append(new_string)
+            new_string = "    parameter IS_OUTDATA_REG = 1;\n\n"
+            new_file.append(new_string)
 
+            new_string = ("    localparam OUTDATA_REG = (\n" +
+                          "        (IS_OUTDATA_REG == 0) ? \"UNREGISTERED\" : \"CLOCK0\");\n\n")
+            new_file.append(new_string)
 
         if str(dwidth-1) in line and ("q" in line or "data" in line or "sub_wire" in line):
             #print (line)
@@ -211,6 +217,9 @@ def change_ram(fname,new_name,dwidth,awidth,mem_size):
         elif str(mem_size) in line and "numwords" in line:
             #print ("mem_size = "+str(mem_size))
             new_line = line.replace(str(mem_size),"DEPTH")
+            new_file.append(new_line)
+        elif "outdata_reg_a" in line or "outdata_reg_b" in line:
+            new_line = line.replace("\"CLOCK0\"", "OUTDATA_REG")
             new_file.append(new_line)
         else:
             new_file.append(line)
@@ -273,6 +282,71 @@ def change_diff_width_ram(fname,new_name,w_dwidth,w_awidth,w_depth,r_dwidth,r_aw
             new_file.append(new_line)
         elif str(r_depth) in line and "numwords_b" in line:
             new_line = line.replace(str(r_depth),"R_DEPTH")
+            new_file.append(new_line)
+        else:
+            new_file.append(line)
+    f.close()
+
+    with open(fname, 'w') as f:
+        for line in new_file:
+            f.write("%s" % line)
+
+def change_scfifo(fname, dwidth, depth):
+    new_file = []
+    first_input = 1
+    f = open(fname,'r')
+
+    log_depth = ceil(log2(depth))
+    for line in f:
+        #add paramter in the beginning.
+        if "input" in line and first_input:
+            first_input = 0
+            new_string = "    parameter DWIDTH = " + str(dwidth)+";\n"
+            new_file.append(new_string)
+            new_string = "    parameter DEPTH = " + str(depth)+";\n"
+            new_file.append(new_string)
+            new_string = "    parameter IS_SHOWAHEAD = 0;\n"
+            new_file.append(new_string)
+            new_string = "    parameter IS_OUTDATA_REG = 0;\n\n"
+            new_file.append(new_string)
+
+            new_string = "    localparam LOG_DEPTH = $clog2(DEPTH);\n"
+            new_file.append(new_string)
+            new_string = ("    localparam LPM_SHOWAHEAD = (\n" +
+                          "        (IS_SHOWAHEAD == 0) ? \"OFF\" : \"ON\");\n\n")
+            new_file.append(new_string)
+            new_string = ("    localparam ADD_RAM_OUTPUT_REGISTER = (\n" +
+                          "        (IS_OUTDATA_REG == 0) ? \"OFF\" : \"ON\");\n\n")
+            new_file.append(new_string)
+
+        if str(dwidth-1) in line and ("q" in line or "data" in line or "sub_wire" in line):
+            #print (line)
+            new_line = line.replace(str(dwidth-1),"DWIDTH-1")
+            if str(dwidth) in line:
+                new_line = new_line.replace(str(dwidth)+"'h","")
+            new_file.append(new_line)
+        elif str(dwidth) in line and (("data" in line) or ("sub_wire" in line)):
+            #print (line)
+            new_line = line.replace(str(dwidth),"DWIDTH")
+            new_file.append(new_line)
+        elif str(log_depth-1) in line and (("usedw" in line) or ("sub_wire" in line)):
+            #print ("mem_size = "+str(mem_size))
+            new_line = line.replace(str(log_depth-1),"LOG_DEPTH-1")
+            new_file.append(new_line)
+        elif "add_ram_output_register" in line:
+            new_line = line.replace("\"OFF\"", "ADD_RAM_OUTPUT_REGISTER")
+            new_file.append(new_line)
+        elif "lpm_numwords" in line:
+            new_line = line.replace(str(depth), "DEPTH")
+            new_file.append(new_line)
+        elif "lpm_showahead" in line:
+            new_line = line.replace("\"OFF\"", "LPM_SHOWAHEAD")
+            new_file.append(new_line)
+        elif "lpm_width " in line:
+            new_line = line.replace(str(dwidth), "DWIDTH")
+            new_file.append(new_line)
+        elif "lpm_widthu" in line:
+            new_line = line.replace(str(log_depth), "LOG_DEPTH")
             new_file.append(new_line)
         else:
             new_file.append(line)
@@ -367,6 +441,7 @@ ip_list.append("dc_fifo_wrapper_infill_mlab")
 ip_list.append("dc_fifo_core_infill_mlab")
 ip_list.append("dc_fifo_wrapper_mlab")
 ip_list.append("dc_fifo_core_mlab")
+ip_list.append("sc_fifo")
 
 
 #rom
@@ -464,6 +539,23 @@ for ip in ip_list:
                 os.rename(dst_file,new_dst_file)
 
             change_module_name(new_dst_file,ip)
+    elif "sc_fifo" in ip:
+        file_path = ip_path + ip
+        dirs = [f for f in listdir(file_path) if isdir(join(file_path, f))]
+        for gen_dir in dirs:
+            if "fifo" in gen_dir:
+                sub_dir = gen_dir
+
+        file_path = ip_path + ip + "/" + sub_dir + "/synth/"
+        files = [f for f in listdir(file_path) if isfile(join(file_path, f))]
+
+        src_file = file_path + files[0]
+        dst_file = dest_dir + "/" + ip + ".v"
+        shutil.copy(src_file, dst_file)
+
+        change_module_name(dst_file, ip)
+        change_scfifo(dst_file, 8, 2048)
+
     elif ("rom" in ip) or ("ram" in ip):
         if "rom" in ip:
             new_dst_file = copy_file(ip_path,ip,dest_dir,"rom")
