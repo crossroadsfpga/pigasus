@@ -140,21 +140,33 @@ def struct_s():
 `ifndef STRUCT_S
 `define STRUCT_S
 
-//`define SIM
+// `define SIM
 `define USE_BRAM
 `define BRAM_CHECKPKT_BUF
 `define NO_C2F
-//`define DISABLE_NF_BYPASS
+// `define DISABLE_NF_BYPASS
 // `define NO_BP
+// `define ENABLE_SURGEPROTECTOR
+
+// Reassembler scheduling policy
+`ifdef ENABLE_SURGEPROTECTOR""")
+    SCHEDULER_REASSEMBLY_POLICY = Param("WSJF")
+    T("`else")
+    SCHEDULER_REASSEMBLY_POLICY = Param("FCFS")
+    T("""`endif
 
 // Packet buffer
 // STORE 1024 pkts, each pkt takes 32 * 512 bits = 2 KB.
 // 32 * 1024 = 32768 entries.
-`ifdef USE_BRAM""")
+`ifdef USE_BRAM
+`ifdef PKT_NUM
+parameter PKT_NUM = `PKT_NUM;
+`else""")
     PKT_NUM = Param(PKT_NUM_BRAM_V)
-    T("`else")
+    T("""`endif
+`else""")
     PKT_NUM = Param(PKT_NUM_V)
-    T("`endif")
+    T("""`endif""")
     
     IN_BUF_DEPTH = Param(IN_BUF_DEPTH_V)
     DS_THRESH = Param(DS_THRESH_V)
@@ -188,7 +200,7 @@ def struct_s():
     ETH_IP = Param(ETH_IP_V)
     ETH_META = Param(ETH_META_V)
     ETH_USR = Param(ETH_USR_V)
-    
+
     PROT_ETH = Param(PROT_ETH_V)
     IP_V4 = Param(IP_V4_V)
     PROT_TCP = Param(PROT_TCP_V)
@@ -254,7 +266,6 @@ typedef struct packed {
 } flit_meta_t;""")
 
     # Linked list entry
-    LL_DWIDTH = Param(1 + 32 + 16 + 16 + PKT_AWIDTH + 1 + 56)
     T("""
 typedef struct packed {
     logic valid;                    // Valid
@@ -266,18 +277,108 @@ typedef struct packed {
     logic last;                     // Last
     logic [55:0] last_7_bytes;      // Last
 } entry_t;""")
+    LL_DWIDTH = Param(1 + 32 + 16 + LL_AWIDTH + PKT_AWIDTH + 5 + 1 + 56)
 
     # Tuple
-    TUPLE_DWIDTH = Param(32 + 32 + 16 + 16)
     T("""
 typedef struct packed {
     logic [31:0] sIP;
     logic [31:0] dIP;
     logic [15:0] sPort;
     logic [15:0] dPort;
-} tuple_t;
+} tuple_t;""")
+    TUPLE_DWIDTH = Param(32 + 32 + 16 + 16)
 
+    T("""
+/**
+ * Reassembler service.
+ */
+// OOO flow IDs""")
+    MAX_NUM_OOO_FLOWS = Param(1024)
+    OOO_FLOW_ID_AWIDTH = Param(clog2(MAX_NUM_OOO_FLOWS))
+    T("""// Service Queue""")
+    HEAP_BITMAP_WIDTH = Param(32)
+    HEAP_MAX_NUM_ENTRIES = Param(MAX_NUM_OOO_FLOWS)
+    HEAP_NUM_PRIORITIES = Param(HEAP_BITMAP_WIDTH ** 2)
+    HEAP_PRIORITY_AWIDTH = Param(clog2(HEAP_NUM_PRIORITIES))
+    HEAP_LOG_MAX_NUM_ENTRIES = Param(clog2(HEAP_MAX_NUM_ENTRIES))
+    T("""// Scheduler""")
+    OOO_FLOW_LL_MAX_NUM_ENTRIES = Param(PKT_NUM / 2)
+    OOO_FLOW_LL_ENTRY_AWIDTH = Param(clog2(OOO_FLOW_LL_MAX_NUM_ENTRIES))
+    OOO_FLOW_LL_ENTRY_PTR_T_WIDTH = Param(OOO_FLOW_LL_ENTRY_AWIDTH + 1)
 
+    T("""
+typedef logic [OOO_FLOW_ID_AWIDTH-1:0] ooo_flow_id_t;
+typedef logic [HEAP_LOG_MAX_NUM_ENTRIES:0] heap_size_t;
+typedef logic [HEAP_PRIORITY_AWIDTH-1:0] heap_priority_t;
+typedef logic [OOO_FLOW_LL_ENTRY_PTR_T_WIDTH-1:0] ooo_flow_ll_entry_ptr_t;""")
+
+    # Scheduler token
+    T("""
+typedef struct packed {
+    tuple_t tuple;
+    ooo_flow_id_t ooo_flow_id;
+} scheduler_token_t;""")
+    SCHEDULER_TOKEN_T_WIDTH = Param(TUPLE_DWIDTH + OOO_FLOW_ID_AWIDTH)
+
+    T("""
+typedef struct packed {
+    ooo_flow_ll_entry_ptr_t head;
+    ooo_flow_ll_entry_ptr_t tail;
+} ooo_flow_list_t;""")
+    OOO_FLOW_LIST_T_WIDTH = Localparam(2 * OOO_FLOW_LL_ENTRY_PTR_T_WIDTH)
+
+    T("""
+typedef struct packed {
+    logic valid;
+    tuple_t tuple;
+    logic [31:0] seq;
+    logic ll_valid;
+    logic [LL_AWIDTH-1:0] pointer;
+    logic [LL_AWIDTH-1:0] ll_size;
+    logic [55:0] last_7_bytes;
+    logic [FT_AWIDTH-1:0] addr0;
+    logic [FT_AWIDTH-1:0] addr1;
+    logic [FT_AWIDTH-1:0] addr2;
+    logic [FT_AWIDTH-1:0] addr3;
+    ooo_flow_list_t ooo_flow_ll;
+} ooo_flow_fc_entry_t;""")
+    OOO_FLOW_FC_ENTRY_T_WIDTH = Localparam(1 + TUPLE_DWIDTH + 32 + 1 + LL_AWIDTH + LL_AWIDTH +
+                                           56 + (4 * FT_AWIDTH) + OOO_FLOW_LIST_T_WIDTH)
+
+    T("""
+typedef struct packed {
+    tuple_t tuple;
+    logic is_delete;
+    logic [31:0] seq;
+    logic [FT_AWIDTH-1:0] addr0;
+    logic [FT_AWIDTH-1:0] addr1;
+    logic [FT_AWIDTH-1:0] addr2;
+    logic [FT_AWIDTH-1:0] addr3;
+    logic [PKT_AWIDTH-1:0] rel_pkt_cnt;
+} ft_update_t;""")
+    FT_UPDATE_T_WIDTH = Localparam(TUPLE_DWIDTH + 1 + 32 + (4 * FT_AWIDTH) + PKT_AWIDTH)
+
+    T("""
+typedef struct packed {
+    ooo_flow_id_t ooo_flow_id;
+    tuple_t tuple;
+    logic [FT_AWIDTH-1:0] addr0;
+    logic [FT_AWIDTH-1:0] addr1;
+    logic [FT_AWIDTH-1:0] addr2;
+    logic [FT_AWIDTH-1:0] addr3;
+} reassembly_gc_meta_t;""")
+    REASSEMBLY_GC_META_T_WIDTH = Localparam(OOO_FLOW_ID_AWIDTH + TUPLE_DWIDTH + (4 * FT_AWIDTH))
+
+    T("""
+typedef struct packed {
+    logic ll_valid;
+    logic [LL_AWIDTH-1:0] pointer;
+    reassembly_gc_meta_t meta;
+} reassembly_gc_req_t;""")
+    REASSEMBLY_GC_REQ_T_WIDTH = Localparam(1 + LL_AWIDTH + REASSEMBLY_GC_META_T_WIDTH)
+
+    T("""
 typedef struct packed {
     logic [31:0] c2f_kmem_high_1;   // higher 32 bit of kernel memory, FPGA read only
     logic [31:0] c2f_kmem_low_1;    // lower 32 bit of kernel memory, FPGA read only
@@ -300,22 +401,23 @@ typedef struct packed {
     logic [31:0] f2c_tail;          // tail pointer, CPU read only
 } pcie_block_t;""")
 
-    FT_DWIDTH = Param(1 + TUPLE_DWIDTH + 32 + LL_AWIDTH + 1 + PKT_AWIDTH + 56 + (4 * FT_AWIDTH))
     T("""
 typedef struct packed {
     logic valid;
     tuple_t tuple;
     logic [31:0] seq;
-    logic [LL_AWIDTH-1:0] pointer;
-    logic ll_valid;
     logic [PKT_AWIDTH-1:0] slow_cnt;
     logic [55:0] last_7_bytes;
     logic [FT_AWIDTH-1:0] addr0;
     logic [FT_AWIDTH-1:0] addr1;
     logic [FT_AWIDTH-1:0] addr2;
     logic [FT_AWIDTH-1:0] addr3;
-} fce_t; // Flow context entry
+    logic ooo_flow_id_valid;
+    logic [OOO_FLOW_ID_AWIDTH-1:0] ooo_flow_id;
+} fce_t; // Flow context entry""")
+    FT_DWIDTH = Param(1 + TUPLE_DWIDTH + 32 + PKT_AWIDTH + 56 + (4 * FT_AWIDTH) + 1 + OOO_FLOW_ID_AWIDTH)
 
+    T("""
 typedef struct packed {
     tuple_t tuple;
     logic [FT_AWIDTH-1:0] addr0;

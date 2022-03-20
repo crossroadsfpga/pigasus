@@ -6,18 +6,30 @@
 `ifndef STRUCT_S
 `define STRUCT_S
 
-//`define SIM
+// `define SIM
 `define USE_BRAM
 `define BRAM_CHECKPKT_BUF
 `define NO_C2F
-//`define DISABLE_NF_BYPASS
+// `define DISABLE_NF_BYPASS
 // `define NO_BP
+// `define ENABLE_SURGEPROTECTOR
+
+// Reassembler scheduling policy
+`ifdef ENABLE_SURGEPROTECTOR
+parameter SCHEDULER_REASSEMBLY_POLICY = "WSJF";
+`else
+parameter SCHEDULER_REASSEMBLY_POLICY = "FCFS";
+`endif
 
 // Packet buffer
 // STORE 1024 pkts, each pkt takes 32 * 512 bits = 2 KB.
 // 32 * 1024 = 32768 entries.
 `ifdef USE_BRAM
+`ifdef PKT_NUM
+parameter PKT_NUM = `PKT_NUM;
+`else
 parameter PKT_NUM = 1024;
+`endif
 `else
 parameter PKT_NUM = 2688;
 `endif
@@ -93,7 +105,6 @@ typedef struct packed {
     logic eop;
     logic [5:0] empty;
 } flit_meta_t;
-parameter LL_DWIDTH = ((((((1 + 32) + 16) + 16) + PKT_AWIDTH) + 1) + 56);
 
 typedef struct packed {
     logic valid;                    // Valid
@@ -105,7 +116,7 @@ typedef struct packed {
     logic last;                     // Last
     logic [55:0] last_7_bytes;      // Last
 } entry_t;
-parameter TUPLE_DWIDTH = (((32 + 32) + 16) + 16);
+parameter LL_DWIDTH = (((((((1 + 32) + 16) + LL_AWIDTH) + PKT_AWIDTH) + 5) + 1) + 56);
 
 typedef struct packed {
     logic [31:0] sIP;
@@ -113,7 +124,86 @@ typedef struct packed {
     logic [15:0] sPort;
     logic [15:0] dPort;
 } tuple_t;
+parameter TUPLE_DWIDTH = (((32 + 32) + 16) + 16);
 
+/**
+ * Reassembler service.
+ */
+// OOO flow IDs
+parameter MAX_NUM_OOO_FLOWS = 1024;
+parameter OOO_FLOW_ID_AWIDTH = $clog2(MAX_NUM_OOO_FLOWS);
+// Service Queue
+parameter HEAP_BITMAP_WIDTH = 32;
+parameter HEAP_MAX_NUM_ENTRIES = MAX_NUM_OOO_FLOWS;
+parameter HEAP_NUM_PRIORITIES = (HEAP_BITMAP_WIDTH ** 2);
+parameter HEAP_PRIORITY_AWIDTH = $clog2(HEAP_NUM_PRIORITIES);
+parameter HEAP_LOG_MAX_NUM_ENTRIES = $clog2(HEAP_MAX_NUM_ENTRIES);
+// Scheduler
+parameter OOO_FLOW_LL_MAX_NUM_ENTRIES = (PKT_NUM / 2);
+parameter OOO_FLOW_LL_ENTRY_AWIDTH = $clog2(OOO_FLOW_LL_MAX_NUM_ENTRIES);
+parameter OOO_FLOW_LL_ENTRY_PTR_T_WIDTH = (OOO_FLOW_LL_ENTRY_AWIDTH + 1);
+
+typedef logic [OOO_FLOW_ID_AWIDTH-1:0] ooo_flow_id_t;
+typedef logic [HEAP_LOG_MAX_NUM_ENTRIES:0] heap_size_t;
+typedef logic [HEAP_PRIORITY_AWIDTH-1:0] heap_priority_t;
+typedef logic [OOO_FLOW_LL_ENTRY_PTR_T_WIDTH-1:0] ooo_flow_ll_entry_ptr_t;
+
+typedef struct packed {
+    tuple_t tuple;
+    ooo_flow_id_t ooo_flow_id;
+} scheduler_token_t;
+parameter SCHEDULER_TOKEN_T_WIDTH = (TUPLE_DWIDTH + OOO_FLOW_ID_AWIDTH);
+
+typedef struct packed {
+    ooo_flow_ll_entry_ptr_t head;
+    ooo_flow_ll_entry_ptr_t tail;
+} ooo_flow_list_t;
+localparam OOO_FLOW_LIST_T_WIDTH = (2 * OOO_FLOW_LL_ENTRY_PTR_T_WIDTH);
+
+typedef struct packed {
+    logic valid;
+    tuple_t tuple;
+    logic [31:0] seq;
+    logic ll_valid;
+    logic [LL_AWIDTH-1:0] pointer;
+    logic [LL_AWIDTH-1:0] ll_size;
+    logic [55:0] last_7_bytes;
+    logic [FT_AWIDTH-1:0] addr0;
+    logic [FT_AWIDTH-1:0] addr1;
+    logic [FT_AWIDTH-1:0] addr2;
+    logic [FT_AWIDTH-1:0] addr3;
+    ooo_flow_list_t ooo_flow_ll;
+} ooo_flow_fc_entry_t;
+localparam OOO_FLOW_FC_ENTRY_T_WIDTH = ((((((((1 + TUPLE_DWIDTH) + 32) + 1) + LL_AWIDTH) + LL_AWIDTH) + 56) + (4 * FT_AWIDTH)) + OOO_FLOW_LIST_T_WIDTH);
+
+typedef struct packed {
+    tuple_t tuple;
+    logic is_delete;
+    logic [31:0] seq;
+    logic [FT_AWIDTH-1:0] addr0;
+    logic [FT_AWIDTH-1:0] addr1;
+    logic [FT_AWIDTH-1:0] addr2;
+    logic [FT_AWIDTH-1:0] addr3;
+    logic [PKT_AWIDTH-1:0] rel_pkt_cnt;
+} ft_update_t;
+localparam FT_UPDATE_T_WIDTH = ((((TUPLE_DWIDTH + 1) + 32) + (4 * FT_AWIDTH)) + PKT_AWIDTH);
+
+typedef struct packed {
+    ooo_flow_id_t ooo_flow_id;
+    tuple_t tuple;
+    logic [FT_AWIDTH-1:0] addr0;
+    logic [FT_AWIDTH-1:0] addr1;
+    logic [FT_AWIDTH-1:0] addr2;
+    logic [FT_AWIDTH-1:0] addr3;
+} reassembly_gc_meta_t;
+localparam REASSEMBLY_GC_META_T_WIDTH = ((OOO_FLOW_ID_AWIDTH + TUPLE_DWIDTH) + (4 * FT_AWIDTH));
+
+typedef struct packed {
+    logic ll_valid;
+    logic [LL_AWIDTH-1:0] pointer;
+    reassembly_gc_meta_t meta;
+} reassembly_gc_req_t;
+localparam REASSEMBLY_GC_REQ_T_WIDTH = ((1 + LL_AWIDTH) + REASSEMBLY_GC_META_T_WIDTH);
 
 typedef struct packed {
     logic [31:0] c2f_kmem_high_1;   // higher 32 bit of kernel memory, FPGA read only
@@ -136,21 +226,21 @@ typedef struct packed {
     logic [31:0] f2c_head;          // head pointer, FPGA read only
     logic [31:0] f2c_tail;          // tail pointer, CPU read only
 } pcie_block_t;
-parameter FT_DWIDTH = (((((((1 + TUPLE_DWIDTH) + 32) + LL_AWIDTH) + 1) + PKT_AWIDTH) + 56) + (4 * FT_AWIDTH));
 
 typedef struct packed {
     logic valid;
     tuple_t tuple;
     logic [31:0] seq;
-    logic [LL_AWIDTH-1:0] pointer;
-    logic ll_valid;
     logic [PKT_AWIDTH-1:0] slow_cnt;
     logic [55:0] last_7_bytes;
     logic [FT_AWIDTH-1:0] addr0;
     logic [FT_AWIDTH-1:0] addr1;
     logic [FT_AWIDTH-1:0] addr2;
     logic [FT_AWIDTH-1:0] addr3;
+    logic ooo_flow_id_valid;
+    logic [OOO_FLOW_ID_AWIDTH-1:0] ooo_flow_id;
 } fce_t; // Flow context entry
+parameter FT_DWIDTH = (((((((1 + TUPLE_DWIDTH) + 32) + PKT_AWIDTH) + 56) + (4 * FT_AWIDTH)) + 1) + OOO_FLOW_ID_AWIDTH);
 
 typedef struct packed {
     tuple_t tuple;
