@@ -31,7 +31,7 @@ cd ./src/non_fast_pattern_matcher/
 ./update.sh
 cd ../../
 
-vlog +define+SIM +define+PKT_FILE=\"$PKT_FILE\" +define+PKT_FILE_NB_LINES=$PKT_FILE_NB_LINES ./src/*.*v -sv 
+vlog +define+SIM +define+PKT_FILE=\"$PKT_FILE\" +define+PKT_FILE_NB_LINES=$PKT_FILE_NB_LINES ./src/*.*v -sv
 #vlog *.v
 vlog +define+SIM ./src/common/*.sv -sv
 vlog +define+SIM ./src/common/*.v
@@ -45,6 +45,7 @@ vlog +define+SIM ./src/parser/*.sv -sv
 vlog +define+SIM ./src/pcie/*.sv -sv
 vlog +define+SIM ./src/port_group/*.sv -sv
 vlog +define+SIM ./src/reassembly/*.sv -sv
+vlog +define+SIM ./src/reassembly/surge_protector/*.sv -sv
 vlog +define+SIM ./src/services/*.sv -sv
 
 #GUI full debug

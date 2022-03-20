@@ -462,6 +462,10 @@ always @(posedge clk_status) begin
                         REG_MAX_NF2PDU            : $display("REG_MAX_NF2PDU            :\t%d",top_readdata);
                         REG_SM_BYPASS_AF          : $display("REG_SM_BYPASS_AF          :\t%d",top_readdata);
                         REG_SM_CDC_AF             : $display("REG_SM_CDC_AF             :\t%d",top_readdata);
+                        REG_PARSER_OUT_BYTES_L    : $display("REG_PARSER_OUT_BYTES_L    :\t%d",top_readdata);
+                        REG_PARSER_OUT_BYTES_H    : $display("REG_PARSER_OUT_BYTES_H    :\t%d",top_readdata);
+                        REG_DM_OUT_BYTES_L        : $display("REG_DM_OUT_BYTES_L        :\t%d",top_readdata);
+                        REG_DM_OUT_BYTES_H        : $display("REG_DM_OUT_BYTES_H        :\t%d",top_readdata);
                         //REG_PARTITION1_OUT_PKT    : $display("REG_PARTITION1_OUT_PKT    :\t%d",top_readdata);
                         default                   : $display("unsupported reg");
                     endcase
