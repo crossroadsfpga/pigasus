@@ -1,7 +1,7 @@
 `ifndef STATS_REG
 `define STATS_REG
 
-parameter NUM_REG = 54;
+parameter NUM_REG = 58;
 
 parameter REG_IN_PKT                  = 0;
 parameter REG_OUT_PKT                 = 1;
@@ -57,4 +57,8 @@ parameter REG_MAX_BYPASS2NF           = 50;
 parameter REG_MAX_NF2PDU              = 51;
 parameter REG_SM_BYPASS_AF            = 52;
 parameter REG_SM_CDC_AF               = 53;
+parameter REG_PARSER_OUT_BYTES_L      = 54;
+parameter REG_PARSER_OUT_BYTES_H      = 55;
+parameter REG_DM_OUT_BYTES_L          = 56;
+parameter REG_DM_OUT_BYTES_H          = 57;
 `endif

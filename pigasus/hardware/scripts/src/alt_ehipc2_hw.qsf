@@ -429,6 +429,13 @@ set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/hash_func.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/flow_table_wrapper.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/flow_table.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/flow_reassembly.sv
+set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/scheduler_reassembly.sv
+set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/bounded_fcfs_queue.sv
+set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/surge_protector/bounded_wsjf_queue.sv
+set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/surge_protector/ffs.sv
+set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/surge_protector/heap_ops_pkg.sv
+set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/surge_protector/pipelined_heap.sv
+set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/surge_protector/pipelined_heap_wrapper.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/port_group/rule_unit.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/port_group/port_unit.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/port_group/port_group.sv
@@ -549,6 +556,7 @@ set_global_assignment -name VERILOG_FILE src/common/fifo_core_infill_mlab.v
 set_global_assignment -name VERILOG_FILE src/common/fifo_core_infill.v
 set_global_assignment -name VERILOG_FILE src/common/fifo_core.v
 set_global_assignment -name SYSTEMVERILOG_FILE src/common/dsp.sv
+set_global_assignment -name VERILOG_FILE src/common/sc_fifo.v
 set_global_assignment -name VERILOG_FILE src/common/dc_fifo_wrapper_mlab.v
 set_global_assignment -name VERILOG_FILE src/common/dc_fifo_wrapper_infill_mlab.v
 set_global_assignment -name VERILOG_FILE src/common/dc_fifo_wrapper_infill.v

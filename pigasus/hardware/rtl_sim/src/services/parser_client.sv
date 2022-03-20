@@ -6,6 +6,7 @@ module parser_client (
     input   logic                       Clk,
     input   logic                       Rst_n,
     output  logic [31:0]                stats_out_meta,
+    output  logic [63:0]                stats_out_bytes,
  
     server.svr in_meta,
     server.svr in_pkt,
@@ -74,5 +75,20 @@ module parser_client (
         .ready      (port_meta[1].ready),
         .stats_flit (stats_out_meta)
     );
+
+    metadata_t port_out_meta;
+    assign port_out_meta = port_meta[1].data;
+
+    always @ (posedge Clk) begin
+        if (~Rst_n) begin
+            stats_out_bytes <= 0;
+        end else begin
+            if (port_meta[1].ready & port_meta[1].valid) begin
+                stats_out_bytes <= (stats_out_bytes +
+                                    port_out_meta.len +
+                                    port_out_meta.hdr_len);
+            end
+        end
+    end
 
 endmodule

@@ -12,6 +12,7 @@ module data_mover_service (
     output logic [31:0]                 stats_in_check_meta,
     output logic [31:0]                 stats_in_ooo_meta,
     output logic [31:0]                 stats_in_forward_ooo_meta,
+    output logic [63:0]                 stats_out_bytes,
     output logic [31:0]                 stats_nopayload_pkt,
     output logic [31:0]                 stats_check_pkt,
 
@@ -120,8 +121,11 @@ module data_mover_service (
     );
 
     //stats
-    metadata_t tmp_meta;
-    assign tmp_meta = port_meta[0].data;
+    metadata_t port_in_meta;
+    assign port_in_meta = port_meta[0].data;
+
+    metadata_t port_out_meta;
+    assign port_out_meta = port_meta[1].data;
     
     always @ (posedge Clk) begin
         if (~Rst_n) begin
@@ -130,16 +134,23 @@ module data_mover_service (
             stats_in_check_meta <= 0;
             stats_in_ooo_meta <= 0;
             stats_in_forward_ooo_meta <= 0;
+            stats_out_bytes <= 0;
         end else begin
     
             if (port_meta[0].ready & port_meta[0].valid) begin
-                case (tmp_meta.pkt_flags)
+                case (port_in_meta.pkt_flags)
                     PKT_FORWARD:     stats_in_forward_meta     <= stats_in_forward_meta + 1;
                     PKT_DROP:        stats_in_drop_meta        <= stats_in_drop_meta + 1;
                     PKT_CHECK:       stats_in_check_meta       <= stats_in_check_meta + 1;
                     PKT_OOO:         stats_in_ooo_meta         <= stats_in_ooo_meta + 1;
                     PKT_FORWARD_OOO: stats_in_forward_ooo_meta <= stats_in_forward_ooo_meta + 1;
                 endcase
+            end
+
+            if (port_meta[1].ready & port_meta[1].valid) begin
+                stats_out_bytes <= (stats_out_bytes +
+                                    port_out_meta.len +
+                                    port_out_meta.hdr_len);
             end
         end
     end

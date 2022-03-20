@@ -13,22 +13,25 @@ module flow_table_client (
     server.svr in_meta,
     server.clt out_meta,
     server.clt forward_meta,
-    server.clt reorder_meta
+    server.clt reorder_meta,
+    server.clt scheduler_meta
 );
 
-    channel_if#(.WIDTH($bits(metadata_t))) port[4](); 
-    channel_if#(.WIDTH($bits(metadata_t))) blank[4](); 
+    channel_if#(.WIDTH($bits(metadata_t))) port[5]();
+    channel_if#(.WIDTH($bits(metadata_t))) blank[5]();
 
     //Stats
     logic [31:0] out_meta_cnt;
     logic [31:0] forward_meta_cnt;
     logic [31:0] reorder_meta_cnt;
+    logic [31:0] scheduler_meta_cnt;
     
     always @ (posedge Clk) begin
         if (~Rst_n) begin
             stats_out_meta <= 0;
         end else begin
-            stats_out_meta <= out_meta_cnt + forward_meta_cnt + reorder_meta_cnt;
+            stats_out_meta <= (out_meta_cnt + forward_meta_cnt +
+                               reorder_meta_cnt + scheduler_meta_cnt);
         end
     end
 
@@ -57,7 +60,11 @@ module flow_table_client (
         .reorder_meta_data         (port[3].data),
         .reorder_meta_valid        (port[3].valid),
         .reorder_meta_ready        (port[3].ready),
-        .reorder_meta_almost_full  (port[3].almost_full)
+        .reorder_meta_almost_full  (port[3].almost_full),
+        .scheduler_meta_data       (port[4].data),
+        .scheduler_meta_valid      (port[4].valid),
+        .scheduler_meta_ready      (port[4].ready),
+        .scheduler_meta_almost_full(port[4].almost_full)
     );
 
     server_epig_shim#(.DATA_BITS($bits(metadata_t))) out_ss
@@ -85,6 +92,15 @@ module flow_table_client (
         .fl2clt(reorder_meta),
         .tx(blank[3]),
         .rx(port[3])
+    );
+
+    server_epig_shim#(.DATA_BITS($bits(metadata_t))) scheduler_ss
+    (
+        .clk(Clk),
+        .SoftReset(~Rst_n),
+        .fl2clt(scheduler_meta),
+        .tx(blank[4]),
+        .rx(port[4])
     );
 
     //stats
@@ -115,6 +131,13 @@ module flow_table_client (
         .valid      (port[3].valid),
         .ready      (port[3].ready),
         .stats_flit (reorder_meta_cnt)
+    );
+    stats_cnt scheduler_meta_inst(
+        .Clk        (Clk),
+        .Rst_n      (Rst_n),
+        .valid      (port[4].valid),
+        .ready      (port[4].ready),
+        .stats_flit (scheduler_meta_cnt)
     );
 
 endmodule
