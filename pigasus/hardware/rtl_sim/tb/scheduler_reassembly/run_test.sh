@@ -11,6 +11,22 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
+# TODO(natre): This is a hack. Ideally we'd want to colocate
+# artifacts with the source code and keep them under version
+# control, but unfortunately there isn't a good way of doing
+# this today (git LFS doesn't play well with public repos).
+# Fix this whenever that changes.
+if [ ! -d "data" ]; then
+  printf "Data directory missing, downloading now... "
+  wget -O data.tar.gz \
+    https://www.dropbox.com/s/vhbkjv3c2t4u9vs/data.tar.gz?dl=0 \
+    > /dev/null 2>&1
+  printf "Done\n"
+
+  tar -zxf data.tar.gz
+  rm -rf data.tar.gz
+fi
+
 # Common prologue. Arg: CommonDefines
 run_testcase_prologue() {
   cd ../../
