@@ -125,19 +125,14 @@ logic           ddr_rd_resp_valid_int;
 
 
 //eSRAM signals
-logic esram_pll_lock; 
-logic         esram_pkt_buf_wren;
-`ifdef USE_BRAM
-logic [14:0]  pkt_buf_wraddress;
-logic [14:0]  pkt_buf_rdaddress;
-`else
-logic [16:0]  pkt_buf_wraddress;
-logic [16:0]  pkt_buf_rdaddress;
-`endif
-logic [519:0] pkt_buf_wrdata;
-logic         pkt_buf_rden;
-logic         pkt_buf_rd_valid;
-logic [519:0] pkt_buf_rddata;
+logic                       esram_pll_lock;
+logic                       esram_pkt_buf_wren;
+logic [PKTBUF_AWIDTH-1:0]   pkt_buf_wraddress;
+logic [PKTBUF_AWIDTH-1:0]   pkt_buf_rdaddress;
+logic [519:0]               pkt_buf_wrdata;
+logic                       pkt_buf_rden;
+logic                       pkt_buf_rd_valid;
+logic [519:0]               pkt_buf_rddata;
 
 //JTAG
 logic [29:0] s_addr;

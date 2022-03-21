@@ -350,20 +350,15 @@ module alt_ehipc2_hw (
     logic [31:0]     fc_1_readdata;
 
     //eSRAM signals
-    logic            clk_datamover;
-    logic            rst_datamover;
-    logic            pkt_buf_wren;
-`ifdef USE_BRAM
-    logic [14:0]     pkt_buf_rdaddress;
-    logic [14:0]     pkt_buf_wraddress;
-`else
-    logic [16:0]     pkt_buf_rdaddress;
-    logic [16:0]     pkt_buf_wraddress;
-`endif
-    logic [519:0]    pkt_buf_wrdata;
-    logic            pkt_buf_rden;
-    logic            pkt_buf_rd_valid;
-    logic [519:0]    pkt_buf_rddata;
+    logic                       clk_datamover;
+    logic                       rst_datamover;
+    logic                       pkt_buf_wren;
+    logic [PKTBUF_AWIDTH-1:0]   pkt_buf_rdaddress;
+    logic [PKTBUF_AWIDTH-1:0]   pkt_buf_wraddress;
+    logic [519:0]               pkt_buf_wrdata;
+    logic                       pkt_buf_rden;
+    logic                       pkt_buf_rd_valid;
+    logic [519:0]               pkt_buf_rddata;
 
     //PCIe signal
     logic            pcie_clk;
