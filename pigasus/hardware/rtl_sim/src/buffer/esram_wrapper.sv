@@ -47,6 +47,16 @@ esrm_sim (
 );
 
 `else
+
+// Sanity check: When using eSRAM, ensure that the packet buffer depth
+// doesn't exceed the maximum capacity of a single eSRAM block (on the
+// S10 MX, with a 520-bit pktbuf DWIDTH, this corresponds to 2K * 42).
+localparam MAX_ESRAM_DEPTH = (2048 * 42);
+if (PKTBUF_DEPTH > MAX_ESRAM_DEPTH) begin
+    $error("PKTBUF_DEPTH (%0d) exceeds eSRAM block capacity (%0d)",
+           PKTBUF_DEPTH, MAX_ESRAM_DEPTH);
+end
+
 logic [71:0] c0_q;          // ram_output.s2c0_qb_0
 logic [71:0] c1_q;          //           .s2c1_qb_0
 logic [71:0] c2_q;          //           .s2c2_qb_0
