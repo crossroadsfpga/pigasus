@@ -1,7 +1,7 @@
 # Pigasus 2.0
 <img align="right" width="200" src="./pigasus_logo.png">
 
-Pigasus is an Intrusion Detection and Prevention System (IDS/IPS) that achieves 100Gbps using a single FPGA-equipped server. Pigasus' FPGA-first design ensures that most packets are processed entirely using the FPGA, while some packets are sent to the CPU for full evaluation. Refer to the [OSDI '20 paper](https://www.usenix.org/conference/osdi20/presentation/zhao-zhipeng) and [Zhipeng Zhao's PhD Thesis](http://users.ece.cmu.edu/~jhoe/distribution/2021/zhao.pdf) for details about the design.
+Pigasus is an Intrusion Detection and Prevention System (IDS/IPS) that achieves 100Gbps using a single FPGA-equipped server. Pigasus' FPGA-first design ensures that most packets are processed entirely using the FPGA, while some packets are sent to the CPU for full evaluation. Refer to the [OSDI '20 paper](https://www.usenix.org/conference/osdi20/presentation/zhao-zhipeng) and [Zhipeng Zhao's PhD Thesis](http://users.ece.cmu.edu/~jhoe/distribution/2021/zhao.pdf) for details about the design.  You can view a [presentation by Zhipeng](https://www.youtube.com/watch?v=iQcxaiXwMuo) on the [Crossroads YouTube Channel](https://www.youtube.com/channel/UCGXVSHxK6PZKFiP9-XtjxtA).
 
 Compared to Pigasus 1.0, Pigasus 2.0 enables easy customization and more efficient scaling of the Pigasus design. For more details, please refer to the [Pigasus_Release](pigasus_release.md).
 

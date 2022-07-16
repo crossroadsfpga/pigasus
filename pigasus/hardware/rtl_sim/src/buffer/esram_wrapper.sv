@@ -1,28 +1,26 @@
 `include "./src/struct_s.sv"
 
 module esram_wrapper(
-    input   logic           clk_esram_ref, // 100 MHz
-    output  logic           esram_pll_lock,
+    input   logic                       clk_esram_ref, // 100 MHz
+    output  logic                       esram_pll_lock,
 `ifdef USE_BRAM
-    input   logic           clk_esram, // 200 MHz
+    input   logic                       clk_esram, // 200 MHz
 `elsif SIM
-    input   logic           clk_esram, // 200 MHz
+    input   logic                       clk_esram, // 200 MHz
 `else
-    output  logic           clk_esram, // 200 MHz
+    output  logic                       clk_esram, // 200 MHz
 `endif
-    input   logic           wren,
-    input   logic [16:0]    wraddress,
-    input   logic [519:0]   wrdata,
-    input   logic           rden,
-    input   logic [16:0]    rdaddress,
-    output  logic           rd_valid,
-    output  logic [519:0]   rddata
+    input   logic                       wren,
+    input   logic [PKTBUF_AWIDTH-1:0]   wraddress,
+    input   logic [519:0]               wrdata,
+    input   logic                       rden,
+    input   logic [PKTBUF_AWIDTH-1:0]   rdaddress,
+    output  logic                       rd_valid,
+    output  logic [519:0]               rddata
 );
 
 // In simulation, we just use a big BRAM to accelerate simulation speed.
 `ifdef USE_BRAM
-localparam DEPTH = (PKT_NUM*32);
-localparam AWIDTH = ($clog2(DEPTH));
 
 logic rden_r;
 assign esram_pll_lock = 1;
@@ -34,9 +32,9 @@ always @(posedge clk_esram) begin
 end
 
 bram_simple2port #(
-    .AWIDTH(AWIDTH),
+    .AWIDTH(PKTBUF_AWIDTH),
     .DWIDTH(520),
-    .DEPTH(DEPTH)
+    .DEPTH(PKTBUF_DEPTH)
 )
 esrm_sim (
     .clock     (clk_esram),
@@ -49,6 +47,16 @@ esrm_sim (
 );
 
 `else
+
+// Sanity check: When using eSRAM, ensure that the packet buffer depth
+// doesn't exceed the maximum capacity of a single eSRAM block (on the
+// S10 MX, with a 520-bit pktbuf DWIDTH, this corresponds to 2K * 42).
+localparam MAX_ESRAM_DEPTH = (2048 * 42);
+if (PKTBUF_DEPTH > MAX_ESRAM_DEPTH) begin
+    $error("PKTBUF_DEPTH (%0d) exceeds eSRAM block capacity (%0d)",
+           PKTBUF_DEPTH, MAX_ESRAM_DEPTH);
+end
+
 logic [71:0] c0_q;          // ram_output.s2c0_qb_0
 logic [71:0] c1_q;          //           .s2c1_qb_0
 logic [71:0] c2_q;          //           .s2c2_qb_0
