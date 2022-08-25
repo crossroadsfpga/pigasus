@@ -69,6 +69,7 @@ module top (
     logic [31:0] parser_meta_csr_readdata_r;
     logic [31:0] stats_incomp_out_meta_r;
     logic [31:0] stats_parser_out_meta_r;
+    logic [63:0] stats_parser_out_bytes_r;
     logic [31:0] stats_ft_in_meta_r;
     logic [31:0] stats_ft_out_meta_r;
     logic [31:0] stats_emptylist_in_r;
@@ -80,6 +81,7 @@ module top (
     logic [31:0] stats_dm_in_check_meta_r;
     logic [31:0] stats_dm_in_ooo_meta_r;
     logic [31:0] stats_dm_in_forward_ooo_meta_r;
+    logic [63:0] stats_dm_out_bytes_r;
     logic [31:0] stats_nopayload_pkt_r;
     logic [31:0] stats_dm_check_pkt_r;
     logic [31:0] in_pkt_fill_level_dm2sm;
@@ -139,6 +141,7 @@ module top (
 logic [31:0]    out_pkt_status;
 logic [31:0]    incomp_out_meta_status;
 logic [31:0]    parser_out_meta_status;
+logic [63:0]    parser_out_bytes_status;
 logic [31:0]    ft_in_meta_status;
 logic [31:0]    ft_out_meta_status;
 logic [31:0]    emptylist_in_status;
@@ -150,6 +153,7 @@ logic [31:0]    dm_in_drop_meta_status;
 logic [31:0]    dm_in_check_meta_status;
 logic [31:0]    dm_in_ooo_meta_status;
 logic [31:0]    dm_in_forward_ooo_meta_status;
+logic [63:0]    dm_out_bytes_status;
 logic [31:0]    nopayload_pkt_status;
 logic [31:0]    dm_check_pkt_status;
 logic [31:0]    sm_pkt_status;
@@ -226,6 +230,7 @@ logic [31:0]    in_pkt_r1;
 logic [31:0]    out_pkt_r1;
 logic [31:0]    incomp_out_meta_r1;
 logic [31:0]    parser_out_meta_r1;
+logic [63:0]    parser_out_bytes_r1;
 logic [31:0]    ft_in_meta_r1;
 logic [31:0]    ft_out_meta_r1;
 logic [31:0]    emptylist_in_r1;
@@ -237,6 +242,7 @@ logic [31:0]    dm_in_drop_meta_r1;
 logic [31:0]    dm_in_check_meta_r1;
 logic [31:0]    dm_in_ooo_meta_r1;
 logic [31:0]    dm_in_forward_ooo_meta_r1;
+logic [63:0]    dm_out_bytes_r1;
 logic [31:0]    nopayload_pkt_r1;
 logic [31:0]    dm_check_pkt_r1;
 logic [31:0]    sm_pkt_r1;
@@ -289,6 +295,9 @@ assign incomp_out_meta = stats_incomp_out_meta_r;
 logic [31:0]    parser_out_meta;
 assign parser_out_meta = stats_parser_out_meta_r;
 
+logic [63:0]    parser_out_bytes;
+assign parser_out_bytes = stats_parser_out_bytes_r;
+
 logic [31:0]    ft_in_meta;
 assign ft_in_meta = stats_ft_in_meta_r;
 
@@ -321,6 +330,9 @@ assign dm_in_ooo_meta = stats_dm_in_ooo_meta_r;
 
 logic [31:0]    dm_in_forward_ooo_meta;
 assign dm_in_forward_ooo_meta = stats_dm_in_forward_meta_r;
+
+logic [63:0]    dm_out_bytes;
+assign dm_out_bytes = stats_dm_out_bytes_r;
 
 logic [31:0]    nopayload_pkt;
 assign nopayload_pkt = stats_nopayload_pkt_r;
@@ -510,6 +522,8 @@ always @(posedge clk_status) begin
     incomp_out_meta_status        <= incomp_out_meta_r1;
     parser_out_meta_r1            <= parser_out_meta;
     parser_out_meta_status        <= parser_out_meta_r1;
+    parser_out_bytes_r1           <= parser_out_bytes;
+    parser_out_bytes_status       <= parser_out_bytes_r1;
     ft_in_meta_r1                 <= ft_in_meta;
     ft_in_meta_status             <= ft_in_meta_r1;
     ft_out_meta_r1                <= ft_out_meta;
@@ -532,6 +546,8 @@ always @(posedge clk_status) begin
     dm_in_ooo_meta_status         <= dm_in_ooo_meta_r1;
     dm_in_forward_ooo_meta_r1     <= dm_in_forward_ooo_meta;
     dm_in_forward_ooo_meta_status <= dm_in_forward_ooo_meta_r1;
+    dm_out_bytes_r1               <= dm_out_bytes;
+    dm_out_bytes_status           <= dm_out_bytes_r1;
     nopayload_pkt_r1              <= nopayload_pkt;
     nopayload_pkt_status          <= nopayload_pkt_r1;
     dm_check_pkt_r1               <= dm_check_pkt;
@@ -677,6 +693,10 @@ always @(posedge clk_status) begin
                 REG_MAX_NF2PDU            : status_readdata <= max_nf2pdu_status;
                 REG_SM_BYPASS_AF          : status_readdata <= sm_bypass_af_status;
                 REG_SM_CDC_AF             : status_readdata <= sm_cdc_af_status;
+                REG_PARSER_OUT_BYTES_L    : status_readdata <= parser_out_bytes_status[31:0];
+                REG_PARSER_OUT_BYTES_H    : status_readdata <= parser_out_bytes_status[63:32];
+                REG_DM_OUT_BYTES_L        : status_readdata <= dm_out_bytes_status[31:0];
+                REG_DM_OUT_BYTES_H        : status_readdata <= dm_out_bytes_status[63:32];
                 default                   : status_readdata <= 32'hDEADBEEF;
             endcase
         end
@@ -769,6 +789,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .parser_meta_csr_readdata(parser_meta_csr_readdata_r),
         .stats_incomp_out_meta(stats_incomp_out_meta_r),
         .stats_parser_out_meta(stats_parser_out_meta_r),
+        .stats_parser_out_bytes(stats_parser_out_bytes_r),
         .stats_ft_in_meta(stats_ft_in_meta_r),
         .stats_ft_out_meta(stats_ft_out_meta_r),
         .stats_emptylist_in(stats_emptylist_in_r),
@@ -780,6 +801,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .stats_dm_in_check_meta(stats_dm_in_check_meta_r),
         .stats_dm_in_ooo_meta(stats_dm_in_ooo_meta_r),
         .stats_dm_in_forward_ooo_meta(stats_dm_in_forward_ooo_meta_r),
+        .stats_dm_out_bytes(stats_dm_out_bytes_r),
         .stats_nopayload_pkt(stats_nopayload_pkt_r),
         .stats_dm_check_pkt(stats_dm_check_pkt_r),
         .eth(r_eth_direct),

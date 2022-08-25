@@ -1,10 +1,11 @@
 `include "./src/struct_s.sv"
+// `define DEBUG
 
 module flow_table(
     input   logic                   clk,
     input   logic                   rst,
 
-    // Read channel 0
+    // Read channel 0 (from FTW)
     input   fce_meta_t              ch0_meta,
     input   logic                   ch0_rden,
     output  fce_t                   ch0_q,
@@ -12,26 +13,21 @@ module flow_table(
     output  logic [FT_SUBTABLE:0]   ch0_bit_map,
     output  logic                   ch0_rd_stall,
 
-    // Write channel 1
+    // Write channel 1 (from FTW)
     input   logic [2:0]             ch1_opcode,
     input   logic [FT_SUBTABLE:0]   ch1_bit_map,
     input   logic                   ch1_wren,
     input   fce_t                   ch1_data,
     output  logic                   ch1_insert_stall,
 
-    // Read channel 2
-    input   fce_meta_t              ch2_meta,
-    input   logic                   ch2_rden,
+    // Update channel (from Scheduler)
+    input   logic                   ch2_wren,
+    input   ft_update_t             ch2_data,
     output  logic                   ch2_ready,
-    output  fce_t                   ch2_q,
-    output  logic                   ch2_rd_valid,
 
-    // Write channel 3
-    input   logic [2:0]             ch3_opcode,
-    input   logic                   ch3_wren,
-    output  logic                   ch3_ready,
-    input   fce_t                   ch3_data,
-    input   logic [PKT_AWIDTH-1:0]  ch3_rel_pkt_cnt
+    // OOO flow ID release (to FTW)
+    output  ooo_flow_id_t           ooo_flow_id_release_data,
+    output  logic                   ooo_flow_id_release_valid
 );
 
 logic [FT_AWIDTH-1:0]   ft0_addr_a;
@@ -193,15 +189,15 @@ logic        rdwq_b_r2;
 logic        q_empty_r;
 logic        q_rden_a_r1;
 
+fce_t        ch2_q;
+
 typedef enum {
     P_ARB,
     P_LOOKUP,
     P_FILL,
     P_EVIC,
     SLOW_UPDATE,
-    SLOW_UPDATE_WAIT,
-    SLOW_LOOKUP_WAIT,
-    SLOW_LOOKUP
+    SLOW_UPDATE_WAIT
 } place_t;
 place_t p_state;
 
@@ -234,8 +230,8 @@ logic                   ch0_rden_r3;
 fce_t                   ch1_data_r1;
 fce_t                   ch1_data_r2;
 logic [FT_SUBTABLE:0]   ch2_bit_map;
-fce_t                   ch3_data_r;
-logic [PKT_AWIDTH-1:0]  ch3_rel_pkt_cnt_r;
+logic [PKT_AWIDTH-1:0]  rel_pkt_cnt_r;
+ft_update_t             ch2_data_r;
 
 ///////// Lookup operation /////////////////////////
 assign ft0_rden_a = ch0_rden & !ch0_rd_stall;
@@ -436,12 +432,9 @@ assign ft_empty[3] = !ft3_q_b.valid;
 ///////// Arbiration for port_B /////////////////////////
 // Only generate a request during the ARB state.
 assign req[0] = (p_state == P_ARB) & !q_empty_r;
-assign req[1] = (p_state == P_ARB) & (ch3_wren || ch2_rden);
+assign req[1] = (p_state == P_ARB) & ch2_wren;
 assign req[2] = 0;
 assign req[3] = 0;
-
-assign ch3_ready = grant[1];
-assign ch2_ready = grant[1];
 
 assign ft_hit_b[0] = (lookup_tuple_b_r2 == ft0_q_b.tuple) & ft0_q_b.valid;
 assign ft_hit_b[1] = (lookup_tuple_b_r2 == ft1_q_b.tuple) & ft1_q_b.valid;
@@ -470,12 +463,7 @@ always @(*) begin
     ft2_odata_b = ft2_q_b;
     ft3_odata_b = ft3_q_b;
     q_odata_b   = q_q_b;
-    ch2_rd_valid = 0;
     ch2_bit_map = ft_hit_b;
-
-    if (p_state == SLOW_LOOKUP) begin
-        ch2_rd_valid = rd_valid_b;
-    end
 
     if (rdw0_b_r2) begin
         ft0_odata_b = ft0_data_a_r2;
@@ -509,7 +497,8 @@ always @(posedge clk) begin
         ch0_tuple_latch_r <= ch0_meta.tuple;
     end
 end
-assign ch0_tuple_latch = ft0_rden_a ? ch0_meta.tuple : ch0_tuple_latch_r;
+assign ch0_tuple_latch = ft0_rden_a ? lookup_tuple :
+                                      ch0_tuple_latch_r;
 
 // Random number used for eviction
 always @(posedge clk) begin
@@ -527,26 +516,36 @@ assign head_busy = (q_rden_a & (ch0_meta.tuple == q_deque_data.tuple) |
 // Start from the rden, until the update is done
 assign fast_busy = ch0_rden | ch0_rd_stall;
 
-// When slow path is updating the FT assign p_state == SLOW_UPDATE
-assign slow_conflict = slow_busy & ch0_rden & (ch3_data_r.tuple == ch0_meta.tuple);
+// R/W conflict on any of the FT entries
+assign slow_conflict = (slow_busy & ch0_rden & (
+    (ch2_data_r.tuple == ch0_meta.tuple) |
+    (ch2_data_r.addr0 == ch0_meta.addr0) |
+    (ch2_data_r.addr1 == ch0_meta.addr1) |
+    (ch2_data_r.addr2 == ch0_meta.addr2) |
+    (ch2_data_r.addr3 == ch0_meta.addr3)));
 
 // One state machine that arbirates all the read/writes using port_b.
 always @(posedge clk) begin
+    ch2_ready <= 0;
+    ooo_flow_id_release_valid <= 0;
+
     if (rst) begin
-        p_state <= P_ARB;
-        ft0_rden_b <= 0;
-        ft1_rden_b <= 0;
-        ft2_rden_b <= 0;
-        ft3_rden_b <= 0;
-        ft0_wren_b <= 0;
-        ft1_wren_b <= 0;
-        ft2_wren_b <= 0;
-        ft3_wren_b <= 0;
-        q_rden_b   <= 0;
-        q_wren_b   <= 0;
-        q_deque_en <= 0;
-        evict      <= 0;
-        slow_busy  <= 0;
+        p_state                     <= P_ARB;
+        ft0_rden_b                  <= 0;
+        ft1_rden_b                  <= 0;
+        ft2_rden_b                  <= 0;
+        ft3_rden_b                  <= 0;
+        ft0_wren_b                  <= 0;
+        ft1_wren_b                  <= 0;
+        ft2_wren_b                  <= 0;
+        ft3_wren_b                  <= 0;
+        q_rden_b                    <= 0;
+        q_wren_b                    <= 0;
+        q_deque_en                  <= 0;
+        evict                       <= 0;
+        slow_busy                   <= 0;
+        ooo_flow_id_release_data    <= 0;
+        ch2_data_r                  <= 0;
     end
     else begin
         case (p_state)
@@ -580,50 +579,41 @@ always @(posedge clk) begin
                     end
                     // Slow path lookup and update
                     4'b0010: begin
-                        // Read and Write won't happen on the same cycle
-                        if (ch3_wren) begin
-                            // Same entry is busy
-                            if (fast_busy & (ch3_data.tuple == ch0_tuple_latch)) begin
-                                p_state <= SLOW_UPDATE_WAIT;
-                            end
-                            else begin
-                                slow_busy  <= 1;
-                                p_state    <= SLOW_UPDATE;
-                                ft0_rden_b <= 1;
-                                ft1_rden_b <= 1;
-                                ft2_rden_b <= 1;
-                                ft3_rden_b <= 1;
-                                q_rden_b   <= 1;
-                            end
-                            ft0_addr_b <= ch3_data.addr0;
-                            ft1_addr_b <= ch3_data.addr1;
-                            ft2_addr_b <= ch3_data.addr2;
-                            ft3_addr_b <= ch3_data.addr3;
-                            q_addr_b   <= ch3_data.tuple;
-                            ch3_data_r <= ch3_data;
-                            lookup_tuple_b <= ch3_data.tuple;
-                            ch3_rel_pkt_cnt_r <= ch3_rel_pkt_cnt;
+                        // R/W conflict on any of the FT entries
+                        if (ch1_wren & (
+                            (ch1_data.addr0 == ch2_data.addr0) |
+                            (ch1_data.addr1 == ch2_data.addr1) |
+                            (ch1_data.addr2 == ch2_data.addr2) |
+                            (ch1_data.addr3 == ch2_data.addr3))) begin
+                            p_state <= SLOW_UPDATE_WAIT;
+                        end
+                        // The same FT entry is busy
+                        else if (fast_busy & (ch2_data.tuple == ch0_tuple_latch)) begin
+                            p_state <= SLOW_UPDATE_WAIT;
                         end
                         else begin
-                            // Avoid rd/wr conflicts
-                            if (ch0_rd_valid & (ch2_meta.tuple == ch0_tuple_latch)) begin
-                                p_state <= SLOW_LOOKUP_WAIT;
-                            end
-                            else begin
-                                p_state    <= SLOW_LOOKUP;
-                                ft0_rden_b <= 1;
-                                ft1_rden_b <= 1;
-                                ft2_rden_b <= 1;
-                                ft3_rden_b <= 1;
-                                q_rden_b   <= 1;
-                            end
-                            ft0_addr_b <= ch2_meta.addr0;
-                            ft1_addr_b <= ch2_meta.addr1;
-                            ft2_addr_b <= ch2_meta.addr2;
-                            ft3_addr_b <= ch2_meta.addr3;
-                            q_addr_b   <= ch2_meta.tuple;
-                            lookup_tuple_b <= ch2_meta.tuple;
+                            slow_busy  <= 1;
+                            p_state    <= SLOW_UPDATE;
+                            ft0_rden_b <= 1;
+                            ft1_rden_b <= 1;
+                            ft2_rden_b <= 1;
+                            ft3_rden_b <= 1;
+                            q_rden_b   <= 1;
                         end
+                        ch2_data_r <= ch2_data;
+                        ft0_addr_b <= ch2_data.addr0;
+                        ft1_addr_b <= ch2_data.addr1;
+                        ft2_addr_b <= ch2_data.addr2;
+                        ft3_addr_b <= ch2_data.addr3;
+                        q_addr_b   <= ch2_data.tuple;
+                        lookup_tuple_b <= ch2_data.tuple;
+                        rel_pkt_cnt_r <= ch2_data.rel_pkt_cnt;
+
+                        ch2_ready <= 1;
+
+                        `ifdef DEBUG
+                        $display("[FT]: Arbiter granted FC update");
+                        `endif
                     end
                     default: p_state <= P_ARB;
                 endcase
@@ -692,7 +682,7 @@ always @(posedge clk) begin
                 q_deque_en <= 0;
                 if (q_deque_done) begin
                     p_state <= P_ARB;
-                    $display("Evict!");
+                    $display("[FT] Evict!");
                     // The queue cannot be full during eviction,
                     // so don't need to check the full signal.
                     evict <= 1;
@@ -719,7 +709,16 @@ always @(posedge clk) begin
                 end
             end
             SLOW_UPDATE_WAIT: begin
-                if (!(fast_busy & (ch3_data.tuple == ch0_tuple_latch))) begin
+                // R/W conflict on any of the FT entries
+                if (ch1_wren & (
+                    (ch1_data.addr0 == ch2_data_r.addr0) |
+                    (ch1_data.addr1 == ch2_data_r.addr1) |
+                    (ch1_data.addr2 == ch2_data_r.addr2) |
+                    (ch1_data.addr3 == ch2_data_r.addr3))) begin
+                    p_state <= SLOW_UPDATE_WAIT;
+                end
+                // The same FT entry is busy
+                else if (!(fast_busy & (ch2_data_r.tuple == ch0_tuple_latch))) begin
                     p_state    <= SLOW_UPDATE;
                     ft0_rden_b <= 1;
                     ft1_rden_b <= 1;
@@ -741,31 +740,82 @@ always @(posedge clk) begin
                 q_rden_b   <= 0;
                 q_wren_b   <= 0;
 
-                ft0_data_b <= ch3_data_r;
-                ft1_data_b <= ch3_data_r;
-                ft2_data_b <= ch3_data_r;
-                ft3_data_b <= ch3_data_r;
-                q_data_b   <= ch3_data_r;
+                ft0_data_b <= ch2_q;
+                ft1_data_b <= ch2_q;
+                ft2_data_b <= ch2_q;
+                ft3_data_b <= ch2_q;
+                q_data_b   <= ch2_q;
 
-                ft0_data_b.slow_cnt <= ch2_q.slow_cnt - ch3_rel_pkt_cnt_r;
-                ft1_data_b.slow_cnt <= ch2_q.slow_cnt - ch3_rel_pkt_cnt_r;
-                ft2_data_b.slow_cnt <= ch2_q.slow_cnt - ch3_rel_pkt_cnt_r;
-                ft3_data_b.slow_cnt <= ch2_q.slow_cnt - ch3_rel_pkt_cnt_r;
-                q_data_b.slow_cnt   <= ch2_q.slow_cnt - ch3_rel_pkt_cnt_r;
+                ft0_data_b.seq <= ch2_data_r.seq;
+                ft1_data_b.seq <= ch2_data_r.seq;
+                ft2_data_b.seq <= ch2_data_r.seq;
+                ft3_data_b.seq <= ch2_data_r.seq;
+                q_data_b.seq   <= ch2_data_r.seq;
 
-                `ifdef DEBUG
+                ft0_data_b.slow_cnt <= ch2_q.slow_cnt - rel_pkt_cnt_r;
+                ft1_data_b.slow_cnt <= ch2_q.slow_cnt - rel_pkt_cnt_r;
+                ft2_data_b.slow_cnt <= ch2_q.slow_cnt - rel_pkt_cnt_r;
+                ft3_data_b.slow_cnt <= ch2_q.slow_cnt - rel_pkt_cnt_r;
+                q_data_b.slow_cnt   <= ch2_q.slow_cnt - rel_pkt_cnt_r;
+
                 if (rd_valid_b & ch2_bit_map != 0) begin
-                    $display("Slow_cnt current %d, release %d, updated %d",
-                             (ch2_q.slow_cnt, ch3_rel_pkt_cnt_r),
-                             (ch2_q.slow_cnt - ch3_rel_pkt_cnt_r));
+                    `ifdef DEBUG
+                    $display("[FT] Slow_cnt current %0d, release %0d, updated %0d",
+                             ch2_q.slow_cnt, rel_pkt_cnt_r,
+                             (ch2_q.slow_cnt - rel_pkt_cnt_r));
+                    `endif
 
-                    assert(!(ch2_q.slow_cnt < ch3_rel_pkt_cnt_r))
+                    // Sanity checks
+                    assert(!(ch2_q.slow_cnt < rel_pkt_cnt_r))
                     else begin
-                        $error("slow_cnt error");
+                        $error("[FT] Slow_cnt error");
                         $finish;
                     end
+                    assert (ch2_q.ooo_flow_id_valid)
+                    else begin
+                        $error("[FT] OOO flow ID was invalid on SLOW UPDATE path");
+                        $finish;
+                    end
+
+                    // Flow becomes in-order, slow path is now inactive
+                    if ((ch2_q.slow_cnt == rel_pkt_cnt_r) &&
+                        (rel_pkt_cnt_r != 0)) begin
+                        `ifdef DEBUG
+                        $display("[FT] Flow with OOO flow ID %0d becomes in-order",
+                                 ch2_q.ooo_flow_id);
+                        `endif
+
+                        // Release the OOO flow ID
+                        ooo_flow_id_release_valid <= 1;
+                        ooo_flow_id_release_data <= ch2_q.ooo_flow_id;
+
+                        // Update the flow context
+                        q_data_b.ooo_flow_id_valid <= 0;
+                        ft0_data_b.ooo_flow_id_valid <= 0;
+                        ft1_data_b.ooo_flow_id_valid <= 0;
+                        ft2_data_b.ooo_flow_id_valid <= 0;
+                        ft3_data_b.ooo_flow_id_valid <= 0;
+                    end
+
+                    // Flow was GC'd or finished/reset
+                    if (ch2_data_r.is_delete) begin
+                        `ifdef DEBUG
+                        $display("[FT] Flow with OOO flow ID %0d is dropped",
+                                 ch2_q.ooo_flow_id);
+                        `endif
+
+                        // Release the OOO flow ID
+                        ooo_flow_id_release_valid <= 1;
+                        ooo_flow_id_release_data <= ch2_q.ooo_flow_id;
+
+                        // Deallocate the flow context
+                        ft0_data_b.valid <= 0;
+                        ft1_data_b.valid <= 0;
+                        ft2_data_b.valid <= 0;
+                        ft3_data_b.valid <= 0;
+                        q_data_b.valid <= 0;
+                    end
                 end
-                `endif
 
                 // Update data in the flow table. Address is not changed.
                 if (rd_valid_b) begin
@@ -776,27 +826,6 @@ always @(posedge clk) begin
                         5'b0_1000: ft3_wren_b <= 1;
                         5'b1_0000: q_wren_b   <= 1;
                     endcase
-                    p_state <= P_ARB;
-                end
-            end
-            SLOW_LOOKUP_WAIT: begin
-                if (!(ch0_rd_valid & (lookup_tuple_b == ch0_tuple_latch))) begin
-                    p_state    <= SLOW_LOOKUP;
-                    ft0_rden_b <= 1;
-                    ft1_rden_b <= 1;
-                    ft2_rden_b <= 1;
-                    ft3_rden_b <= 1;
-                    q_rden_b   <= 1;
-                end
-            end
-            SLOW_LOOKUP: begin
-                ft0_rden_b <= 0;
-                ft1_rden_b <= 0;
-                ft2_rden_b <= 0;
-                ft3_rden_b <= 0;
-                q_rden_b   <= 0;
-                // Address is not changed
-                if (rd_valid_b) begin
                     p_state <= P_ARB;
                 end
             end

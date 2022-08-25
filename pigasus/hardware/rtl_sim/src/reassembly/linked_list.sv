@@ -1,4 +1,5 @@
 `include "./src/struct_s.sv"
+// `define DEBUG
 
 module linked_list(
     input   logic                   clk,
@@ -6,6 +7,7 @@ module linked_list(
     input   logic                   start,
     output  logic                   done,
     output  logic                   discard,
+    input   logic                   is_newlist,
     input   logic [LL_AWIDTH-1:0]   pointer,
     input   logic [PKT_AWIDTH-1:0]  pktID,
     input   logic [4:0]             flits,
@@ -22,7 +24,14 @@ module linked_list(
     input   logic [LL_AWIDTH-1:0]   head_wr_addr,
     input   logic                   load_empty_pointer,
     output  logic [LL_AWIDTH-1:0]   empty_pointer,
-    output  logic                   empty_pointer_valid
+    output  logic                   empty_pointer_valid,
+    // Garbage collection
+    output  logic                   gc_ready,
+    input   logic                   gc_start,
+    input   logic [LL_AWIDTH-1:0]   gc_pointer,
+    output  entry_t                 gc_entry,
+    output  logic                   gc_done,
+    output  logic [31:0]            gc_fl_fill_level
 );
 
 typedef enum {
@@ -66,8 +75,28 @@ logic [LL_AWIDTH-1:0]   emptylist_in_data;
 logic                   emptylist_out_ready;
 logic                   emptylist_out_valid;
 logic [LL_AWIDTH-1:0]   emptylist_out_data;
+logic                   emptylist_enque_busy;
 
 assign empty_entry = 0;
+
+// Port A
+logic [LL_AWIDTH-1:0] ll_addr;
+assign ll_addr = ll_wr ? ll_wr_addr : ll_rd_addr;
+
+// Port B
+entry_t                 gc_rd_data;
+logic [LL_AWIDTH-1:0]   gc_rd_addr;
+logic                   gc_rd;
+logic                   gc_rd_valid;
+logic                   gc_rd_r1;
+
+// GC logic
+assign emptylist_enque_busy = ((state == INIT) ||
+                               ((state == IDLE) && store_head));
+
+assign gc_ready = (!emptylist_enque_busy && emptylist_in_ready);
+assign gc_entry = gc_rd_data;
+assign gc_done = gc_rd_valid;
 
 // Assume no repeat, no overlapping, no merging
 always @ (posedge clk) begin
@@ -88,6 +117,9 @@ always @ (posedge clk) begin
         ll_rd               <= 0;
         discard             <= 1'b0;
 
+        gc_rd_addr          <= 0;
+        gc_rd               <= 0;
+
         emptylist_in_data   <= 0;
         emptylist_in_valid  <= 0;
         emptylist_out_ready <= 0;
@@ -104,6 +136,18 @@ always @ (posedge clk) begin
             $error("Insert to full LL_emptylsit");
             $finish;
         end
+        assert (!(ll_wr && ll_rd))
+        else begin
+            $error("Cannot perform simultaneous LL read/write");
+            $finish;
+        end
+        assert (!((ll_wr || ll_rd) && gc_rd && (ll_addr == gc_rd_addr)))
+        else begin
+            $error("LL and GC accesses should never collide");
+            $finish;
+        end
+
+        emptylist_in_valid <= 1'b0;
         case (state)
             INIT: begin
                 emptylist_in_valid <= 1'b1;
@@ -112,13 +156,12 @@ always @ (posedge clk) begin
                     if (emptylist_in_data == {LL_AWIDTH{1'b1}}) begin
                         state <= IDLE;
                         emptylist_in_valid <= 1'b0;
-                        $display("Finish LL emptylist init");
+                        $display("[LL] Finish LL emptylist init");
                     end
                 end
             end
             IDLE: begin
                 // Initialize states
-                emptylist_in_valid <= 1'b0;
                 cycle <= 0;
                 done <= 0;
                 entry <= empty_entry;
@@ -144,15 +187,10 @@ always @ (posedge clk) begin
                     ll_rd <= 0;
                 end
 
+                ll_wr <= 0;
                 if (store_head) begin
-                    ll_wr <= 1;
-                    ll_wr_data <= head_in;
-                    ll_wr_addr <= head_wr_addr;
                     emptylist_in_valid <= 1'b1;
                     emptylist_in_data <= head_wr_addr;
-                end
-                else begin
-                    ll_wr <= 0;
                 end
 
                 if (ll_rd_valid) begin
@@ -186,14 +224,27 @@ always @ (posedge clk) begin
                 end
             end
             COMPARE: begin
-                if (entry.valid) begin
+                if (is_newlist) begin
+                    `ifdef DEBUG
+                    $display("[LL] Insert to empty list");
+                    `endif
+
+                    ll_wr <= 1;
+                    ll_wr_addr <= addr;
+                    ll_wr_data <= '{1, seq, len, 0, pktID,
+                                    flits, 1, last_7_bytes};
+
+                    done <= 1;
+                    state <= IDLE;
+                end
+                else if (entry.valid) begin
                     // Check whether the new node should be
                     // inserted in front of the current one.
                     if (end_p < entry.seq) begin
                         // Insert in front of the first node of the list
                         if (first) begin
                             `ifdef DEBUG
-                            $display("Insert in front \n");
+                            $display("[LL] Insert in front \n");
                             `endif
 
                             //list_table[next_empty] <= '{1,seq,len,addr,pktID,0};
@@ -240,7 +291,7 @@ always @ (posedge clk) begin
                                 // Insert new node
                                 8'd3: begin
                                     `ifdef DEBUG
-                                    $display("Insert in between\n");
+                                    $display("[LL] Insert in between\n");
                                     `endif
 
                                     ll_wr <= 1;
@@ -278,7 +329,7 @@ always @ (posedge clk) begin
                                 // Insert new node to the end of the list
                                 8'd1: begin
                                     `ifdef DEBUG
-                                    $display("Insert in the end \n");
+                                    $display("[LL] Insert in the end \n");
                                     `endif
 
                                     ll_wr <= 1;
@@ -297,7 +348,7 @@ always @ (posedge clk) begin
                         // Pass the check of current node, check the next one
                         else begin
                             `ifdef DEBUG
-                            $display("Pass this\n");
+                            $display("[LL] Pass this\n");
                             `endif
 
                             addr <= entry.next;
@@ -308,7 +359,7 @@ always @ (posedge clk) begin
                     end
                     else begin
                         `ifdef DEBUG
-                        $display("Overlap with node in LL");
+                        $display("[LL] Overlap with node in LL");
                         `endif
 
                         done <= 1;
@@ -317,26 +368,28 @@ always @ (posedge clk) begin
                     end
                 end
                 else begin
-                    // Point to an empty location.
-                    if (first) begin
-                        `ifdef DEBUG
-                        $display("Insert to empty list");
-                        `endif
-
-                        ll_wr <= 1;
-                        ll_wr_addr <= addr;
-                        ll_wr_data <= '{1, seq, len, 0, pktID,
-                                        flits, 1, last_7_bytes};
-                    end
-                    done <= 1;
-                    state <= IDLE;
+                    $display("[LL] Error: LL is not empty, but entry is invalid");
+                    $finish;
                 end
             end
             default: begin
-                $display("Error state!");
+                $display("[LL] Error state!");
                 $finish;
             end
         endcase
+
+        /**
+         * Garbage-collection (GC) logic.
+         */
+        gc_rd <= 0;
+        gc_rd_addr <= 0;
+        if (gc_start && gc_ready) begin
+            gc_rd_addr <= gc_pointer;
+            gc_rd <= 1;
+
+            emptylist_in_data <= gc_pointer;
+            emptylist_in_valid <= 1'b1;
+        end
     end
 end
 
@@ -344,21 +397,28 @@ end
 always @(posedge clk) begin
     ll_rd_r1 <= ll_rd;
     ll_rd_valid <= ll_rd_r1;
+
+    gc_rd_r1 <= gc_rd;
+    gc_rd_valid <= gc_rd_r1;
 end
 
-bram_simple2port #(
+bram_true2port #(
     .AWIDTH(LL_AWIDTH),
     .DWIDTH(LL_DWIDTH),
     .DEPTH(LL_DEPTH)
 )
 linked_list_mem (
-    .clock       (clk),
-    .data        (ll_wr_data),
-    .rdaddress   (ll_rd_addr),
-    .rden        (ll_rd),
-    .wraddress   (ll_wr_addr),
-    .wren        (ll_wr),
-    .q           (ll_rd_data)
+    .address_a(ll_addr),
+    .address_b(gc_rd_addr),
+    .clock(clk),
+    .data_a(ll_wr_data),
+    .data_b({LL_DWIDTH{1'b0}}), // GC writes disabled
+    .rden_a(ll_rd),
+    .rden_b(gc_rd),
+    .wren_a(ll_wr),
+    .wren_b(1'b0), // GC writes disabled
+    .q_a(ll_rd_data),
+    .q_b(gc_rd_data)
 );
 
 unified_fifo  #(
@@ -382,7 +442,7 @@ ll_emptylist (
     .out_data          (emptylist_out_data),
     .out_valid         (emptylist_out_valid),
     .out_ready         (emptylist_out_ready),
-    .fill_level        (),
+    .fill_level        (gc_fl_fill_level),
     .almost_full       (),//not used
     .overflow          ()
 );

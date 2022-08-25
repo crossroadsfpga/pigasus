@@ -28,6 +28,7 @@ class Reassembler(Service):
         self.add_control("parser_meta_csr_readdata", 32, Direction.OUTPUT)
         self.add_control("stats_incomp_out_meta", 32, Direction.OUTPUT)
         self.add_control("stats_parser_out_meta", 32, Direction.OUTPUT)
+        self.add_control("stats_parser_out_bytes", 64, Direction.OUTPUT)
         self.add_control("stats_ft_in_meta", 32, Direction.OUTPUT)
         self.add_control("stats_ft_out_meta", 32, Direction.OUTPUT)
         self.add_control("stats_emptylist_in", 32, Direction.OUTPUT)
@@ -39,6 +40,7 @@ class Reassembler(Service):
         self.add_control("stats_dm_in_check_meta", 32, Direction.OUTPUT)
         self.add_control("stats_dm_in_ooo_meta", 32, Direction.OUTPUT)
         self.add_control("stats_dm_in_forward_ooo_meta", 32, Direction.OUTPUT)
+        self.add_control("stats_dm_out_bytes", 64, Direction.OUTPUT)
         self.add_control("stats_nopayload_pkt", 32, Direction.OUTPUT)
         self.add_control("stats_dm_check_pkt", 32, Direction.OUTPUT)
 

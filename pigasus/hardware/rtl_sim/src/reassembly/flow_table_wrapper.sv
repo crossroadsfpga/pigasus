@@ -1,5 +1,5 @@
 `include "./src/struct_s.sv"
-//`define DEBUG
+// `define DEBUG
 module flow_table_wrapper(
     input   logic           clk,
     input   logic           rst,
@@ -16,7 +16,11 @@ module flow_table_wrapper(
     output  metadata_t      reorder_meta_data,
     output  logic           reorder_meta_valid,
     input   logic           reorder_meta_ready,
-    input   logic           reorder_meta_almost_full
+    input   logic           reorder_meta_almost_full,
+    output  metadata_t      scheduler_meta_data,
+    output  logic           scheduler_meta_valid,
+    input   logic           scheduler_meta_ready,
+    input   logic           scheduler_meta_almost_full
 );
 
 tuple_t         h0_tuple_in;
@@ -58,19 +62,10 @@ logic                   ch1_wren;
 fce_t                   ch1_data;
 logic                   ch1_insert_stall;
 
-// Read channel 2
-fce_meta_t              ch2_meta;
-logic                   ch2_rden;
-logic                   ch2_ready;
-fce_t                   ch2_q;
-logic                   ch2_rd_valid;
-
-// Write channel 3
-logic [2:0]             ch3_opcode;
-logic                   ch3_wren;
-logic                   ch3_ready;
-fce_t                   ch3_data;
-logic [PKT_AWIDTH-1:0]  ch3_rel_pkt_cnt;
+// Write channel 2
+logic                   ft_update_fifo_empty;
+logic                   ft_update_fifo_rdreq;
+ft_update_t             ft_update_fifo_q;
 
 fce_meta_t              ch0_meta_r1;
 fce_meta_t              ch0_meta_r2;
@@ -98,21 +93,61 @@ logic udp_pkt; // Not-forward pkt;
 logic stall;
 
 // Slow path
-metadata_t      ooo_meta_data;
-logic           ooo_meta_valid;
-logic           ooo_meta_ready;
-metadata_t      r_meta_data;
-logic           r_meta_valid;
-logic           r_meta_ready;
-fce_t           ooo_fce_data;
-logic           ooo_fce_valid;
-logic           ooo_fce_ready;
-fce_t           r_fce_data;
-logic           r_fce_valid;
-logic           r_fce_ready;
-logic [31:0]    meta_csr_readdata;
-logic [31:0]    ooo_csr_readdata;
-logic           ooo_almost_full;
+metadata_t          ooo_meta_data;
+logic               ooo_meta_valid;
+logic               ooo_meta_ready;
+metadata_t          r_meta_data;
+logic               r_meta_valid;
+logic               r_meta_ready;
+fce_t               ooo_fce_data;
+logic               ooo_fce_valid;
+logic               ooo_fce_ready;
+fce_t               r_fce_data;
+logic               r_fce_valid;
+logic               r_fce_ready;
+logic [31:0]        meta_csr_readdata;
+logic [31:0]        ooo_csr_readdata;
+logic               ooo_almost_full;
+scheduler_token_t   out_sched_token_data;
+logic               out_sched_token_valid;
+logic               out_sched_token_ready;
+scheduler_token_t   r_sched_token_data;
+logic               r_sched_token_valid;
+logic               r_sched_token_ready;
+logic [31:0]        sched_token_csr_readdata;
+logic               sched_token_fifo_almost_full;
+
+// OOO flow ID management
+logic ooo_flow_ids_fl_rdreq;
+logic ooo_flow_ids_fl_wrreq;
+logic ooo_flow_ids_fl_empty;
+ooo_flow_id_t ooo_flow_ids_fl_q;
+ooo_flow_id_t ooo_flow_ids_fl_data;
+
+logic ooo_flow_id_release_valid;
+ooo_flow_id_t ooo_flow_id_release_data;
+ooo_flow_id_t ooo_flow_ids_fl_data_init;
+
+typedef enum {
+    OOO_FLOW_IDS_FL_IDLE,
+    OOO_FLOW_IDS_FL_INIT,
+    OOO_FLOW_IDS_FL_INIT_DONE
+} ooo_flow_ids_fl_state_t;
+ooo_flow_ids_fl_state_t ooo_flow_ids_fl_state;
+
+initial begin
+    ooo_flow_ids_fl_state = OOO_FLOW_IDS_FL_IDLE;
+end
+
+assign ooo_flow_ids_fl_wrreq = (!rst && (
+    (ooo_flow_ids_fl_state == OOO_FLOW_IDS_FL_INIT) ||
+    ooo_flow_id_release_valid
+));
+
+assign ooo_flow_ids_fl_data = (
+    (ooo_flow_ids_fl_state == OOO_FLOW_IDS_FL_INIT) ?
+    ooo_flow_ids_fl_data_init : ooo_flow_id_release_data
+);
 
 ///////// Forward pkts /////////////////////////
 // Packets which are either ACK (0 length) OR
@@ -154,14 +189,34 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk) begin
+    ooo_flow_ids_fl_rdreq <= 0;
+    if (sched_token_fifo_almost_full) begin
+        $error("[FTW] Scheduler token FIFO is almost full");
+        $finish;
+    end
+
     if (rst) begin
-        ch1_opcode      <= 0;
-        ch1_bit_map     <= 0;
-        ch1_wren        <= 0;
-        ch1_data        <= 0;
-        out_meta_valid  <= 0;
-        ooo_meta_valid  <= 0;
-        ooo_fce_valid   <= 0;
+        ch1_opcode                  <= 0;
+        ch1_bit_map                 <= 0;
+        ch1_wren                    <= 0;
+        ch1_data                    <= 0;
+        out_meta_valid              <= 0;
+        ooo_meta_valid              <= 0;
+        ooo_fce_valid               <= 0;
+        ooo_flow_ids_fl_data_init   <= 0;
+        out_sched_token_data        <= 0;
+        out_sched_token_valid       <= 0;
+        ooo_flow_ids_fl_state       <= OOO_FLOW_IDS_FL_INIT;
+    end
+    // Initialize the OOO flow IDs free-list
+    else if (ooo_flow_ids_fl_state == OOO_FLOW_IDS_FL_INIT) begin
+        ooo_flow_ids_fl_data_init <= ooo_flow_ids_fl_data_init + 1;
+
+        if (ooo_flow_ids_fl_data_init ==
+            {OOO_FLOW_ID_AWIDTH{1'b1}}) begin
+            ooo_flow_ids_fl_state <= OOO_FLOW_IDS_FL_INIT_DONE;
+            $display("[FTW] Finish OOO flow ID free-list init");
+        end
     end
     // Stall the pipeline if inserting to full para_q
     else if (!ch1_insert_stall) begin
@@ -183,6 +238,9 @@ always @(posedge clk) begin
         ooo_meta_data <= m10;
         ooo_meta_data.pkt_flags <= PKT_CHECK;
 
+        out_sched_token_data <= 0;
+        out_sched_token_valid <= 0;
+
         ooo_fce_valid <= 0;
         ooo_fce_data <= ch0_q;
         if (ch0_rd_valid) begin
@@ -194,15 +252,17 @@ always @(posedge clk) begin
                 // Inorder and no LL_node, forward the pkt
                 if (m10.seq == ch0_q.seq) begin
                     `ifdef DEBUG
-                    $display("Inorder : pkt %d, seq %x, length %d, expect %x, slow_cnt %d",
-                             m10.pktID, m10.seq, m10.len, ch0_q.seq, ch0_q.slow_cnt);
+                    $display("[FTW] Inorder: pkt %d, seq %x, length %d, expect %x, slow_cnt %d, ",
+                             m10.pktID, m10.seq, m10.len, ch0_q.seq, ch0_q.slow_cnt,
+                             "ooo_flow_id_valid %d, ooo_flow_id %d",
+                             ch0_q.ooo_flow_id_valid, ch0_q.ooo_flow_id);
                     `endif
 
                     ch1_wren <= 1;
                     // Slow Path has packets, update cnt
                     if (ch0_q.slow_cnt > 0) begin
                         `ifdef DEBUG
-                        $display("Check LL");
+                        $display("[FTW] Check LL");
                         `endif
 
                         ch1_data.slow_cnt <= ch0_q.slow_cnt + 1;
@@ -218,7 +278,7 @@ always @(posedge clk) begin
                         // Delete the fce, forward the pkt
                         if (m10.tcp_flags[TCP_FIN] | m10.tcp_flags[TCP_RST]) begin
                             `ifdef DEBUG
-                            $display("FIN/RST : pkt %d, seq %x, length %d, expect %x",
+                            $display("[FTW] FIN/RST : pkt %d, seq %x, length %d, expect %x",
                                      m10.pktID, m10.seq, m10.len, ch0_q.seq);
                             `endif
 
@@ -230,8 +290,10 @@ always @(posedge clk) begin
                 // If incoming seq is bigger than expected, push to slow path
                 else if (m10.seq > ch0_q.seq) begin
                     `ifdef DEBUG
-                    $display("OOO : pkt %d, seq %x, length %d, expect %x, slow_cnt %d",
-                             m10.pktID, m10.seq, m10.len, ch0_q.seq, ch0_q.slow_cnt);
+                    $display("[FTW] OOO: pkt %d, seq %x, length %d, expect %x, slow_cnt %d, ",
+                             m10.pktID, m10.seq, m10.len, ch0_q.seq, ch0_q.slow_cnt,
+                             "ooo_flow_id_valid %d, ooo_flow_id %d",
+                             ch0_q.ooo_flow_id_valid, ch0_q.ooo_flow_id);
                     `endif
 
                     // Update the slow_cnt
@@ -241,6 +303,33 @@ always @(posedge clk) begin
                     ch1_data.seq <= ch0_q.seq;
                     ooo_meta_valid <= 1;
                     ooo_fce_valid <= 1;
+
+                    // If required, allocate a new OOO flow ID
+                    if (!ch0_q.ooo_flow_id_valid) begin
+                        ch1_data.ooo_flow_id_valid <= 1;
+                        ch1_data.ooo_flow_id <= ooo_flow_ids_fl_q;
+                        ooo_fce_data.ooo_flow_id <= ooo_flow_ids_fl_q;
+
+                        ooo_flow_ids_fl_rdreq <= 1;
+                        if (ooo_flow_ids_fl_empty) begin
+                            $error("[FTW] OOO flow IDs free-list is empty");
+                            $finish;
+                        end
+
+                        // Insert op into the scheduler token FIFO
+                        out_sched_token_valid <= 1;
+                        out_sched_token_data.tuple <= ch0_q.tuple;
+                        out_sched_token_data.ooo_flow_id <= ooo_flow_ids_fl_q;
+
+                        if (!out_sched_token_ready) begin
+                            $error("[FTW] Scheduler token FIFO is not ready");
+                            $finish;
+                        end
+
+                        `ifdef DEBUG
+                        $display("[FTW] Allocated OOO flowID %d", ooo_flow_ids_fl_q);
+                        `endif
+                    end
                 end
                 // The incoming seq is smaller than expected (overlapping bytes).
                 // Current policy drops these packet, without changing the FCE.
@@ -249,7 +338,7 @@ always @(posedge clk) begin
                     out_meta_data.pkt_flags <= PKT_DROP;
 
                     `ifdef DEBUG
-                    $display("Overlap : pkt %d, seq %x, length %d, expect %x",
+                    $display("[FTW] Overlap: pkt %d, seq %x, length %d, expect %x",
                              m10.pktID, m10.seq, m10.len, ch0_q.seq);
                     `endif
                 end
@@ -257,17 +346,17 @@ always @(posedge clk) begin
             // Miss, insert
             else begin
                 // Insert to para_q, which is bit[4]
-                ch1_opcode          <= FT_INSERT;
-                ch1_bit_map         <= 5'b1_0000;
-                ch1_data.valid      <= 1;
-                ch1_data.tuple      <= m10.tuple;
-                ch1_data.pointer    <= 0;
-                ch1_data.ll_valid   <= 0;
-                ch1_data.slow_cnt   <= 0;
-                ch1_data.addr0      <= ch0_meta_r3.addr0;
-                ch1_data.addr1      <= ch0_meta_r3.addr1;
-                ch1_data.addr2      <= ch0_meta_r3.addr2;
-                ch1_data.addr3      <= ch0_meta_r3.addr3;
+                ch1_opcode                  <= FT_INSERT;
+                ch1_bit_map                 <= 5'b1_0000;
+                ch1_data.valid              <= 1;
+                ch1_data.tuple              <= m10.tuple;
+                ch1_data.slow_cnt           <= 0;
+                ch1_data.addr0              <= ch0_meta_r3.addr0;
+                ch1_data.addr1              <= ch0_meta_r3.addr1;
+                ch1_data.addr2              <= ch0_meta_r3.addr2;
+                ch1_data.addr3              <= ch0_meta_r3.addr3;
+                ch1_data.ooo_flow_id        <= 0;
+                ch1_data.ooo_flow_id_valid  <= 0;
 
                 // SYN's expected seq is special
                 if (m10.tcp_flags[TCP_SYN]) begin
@@ -287,7 +376,7 @@ always @(posedge clk) begin
                     ch1_wren <= 1;
                 end
                 `ifdef DEBUG
-                $display("Insert : pkt %d, seq %x, length %d, expect %x, slow_cnt %d",
+                $display("[FTW] Insert : pkt %d, seq %x, length %d, expect %x, slow_cnt %d",
                    m10.pktID, m10.seq, m10.len, ch0_q.seq, ch0_q.slow_cnt);
                 `endif
 
@@ -383,29 +472,24 @@ hash_func hash3 (
 );
 
 flow_table flow_table_inst (
-    .clk          (clk),
-    .rst          (rst),
-    .ch0_meta     (ch0_meta),
-    .ch0_rden     (ch0_rden),
-    .ch0_q        (ch0_q),
-    .ch0_rd_valid (ch0_rd_valid),
-    .ch0_bit_map  (ch0_bit_map),
-    .ch0_rd_stall (ch0_rd_stall),
-    .ch1_opcode   (ch1_opcode),
-    .ch1_bit_map  (ch1_bit_map),
-    .ch1_wren     (ch1_wren),
-    .ch1_data     (ch1_data),
-    .ch1_insert_stall (ch1_insert_stall),
-    .ch2_meta     (ch2_meta),
-    .ch2_rden     (ch2_rden),
-    .ch2_ready    (ch2_ready),
-    .ch2_q        (ch2_q),
-    .ch2_rd_valid (ch2_rd_valid),
-    .ch3_opcode   (ch3_opcode),
-    .ch3_wren     (ch3_wren),
-    .ch3_ready    (ch3_ready),
-    .ch3_data     (ch3_data),
-    .ch3_rel_pkt_cnt     (ch3_rel_pkt_cnt)
+    .clk                        (clk),
+    .rst                        (rst),
+    .ch0_meta                   (ch0_meta),
+    .ch0_rden                   (ch0_rden),
+    .ch0_q                      (ch0_q),
+    .ch0_rd_valid               (ch0_rd_valid),
+    .ch0_bit_map                (ch0_bit_map),
+    .ch0_rd_stall               (ch0_rd_stall),
+    .ch1_opcode                 (ch1_opcode),
+    .ch1_bit_map                (ch1_bit_map),
+    .ch1_wren                   (ch1_wren),
+    .ch1_data                   (ch1_data),
+    .ch1_insert_stall           (ch1_insert_stall),
+    .ch2_wren                   (!ft_update_fifo_empty),
+    .ch2_data                   (ft_update_fifo_q),
+    .ch2_ready                  (ft_update_fifo_rdreq),
+    .ooo_flow_id_release_data   (ooo_flow_id_release_data),
+    .ooo_flow_id_release_valid  (ooo_flow_id_release_valid)
 );
 
 unified_fifo  #(
@@ -458,29 +542,72 @@ unified_fifo  #(
     .overflow          ()
 );
 
-flow_reassembly flow_reassembly_inst (
-    .clk               (clk),
-    .rst               (rst),
-    .meta_data         (r_meta_data),
-    .meta_valid        (r_meta_valid),
-    .meta_ready        (r_meta_ready),
-    .fce_data          (r_fce_data),
-    .fce_valid         (r_fce_valid),
-    .fce_ready         (r_fce_ready),
-    .ch2_meta          (ch2_meta),
-    .ch2_rden          (ch2_rden),
-    .ch2_ready         (ch2_ready),
-    .ch2_q             (ch2_q),
-    .ch2_rd_valid      (ch2_rd_valid),
-    .ch3_opcode        (ch3_opcode),
-    .ch3_wren          (ch3_wren),
-    .ch3_ready         (ch3_ready),
-    .ch3_data          (ch3_data),
-    .ch3_rel_pkt_cnt   (ch3_rel_pkt_cnt),
-    .reorder_meta      (reorder_meta_data),
-    .reorder_valid     (reorder_meta_valid),
-    .reorder_ready     (reorder_meta_ready),
-    .reorder_almost_full  (reorder_meta_almost_full)
+scheduler_reassembly scheduler_inst(
+    .clk                            (clk),
+    .rst                            (rst),
+    .in_meta_data                   (r_meta_data),
+    .in_meta_valid                  (r_meta_valid),
+    .in_meta_ready                  (r_meta_ready),
+    .in_fce_data                    (r_fce_data),
+    .in_fce_valid                   (r_fce_valid),
+    .in_fce_ready                   (r_fce_ready),
+    .in_token_data                  (r_sched_token_data),
+    .in_token_valid                 (r_sched_token_valid),
+    .in_token_ready                 (r_sched_token_ready),
+    .ft_update_fifo_empty           (ft_update_fifo_empty),
+    .ft_update_fifo_rdreq           (ft_update_fifo_rdreq),
+    .ft_update_fifo_q               (ft_update_fifo_q),
+    .out_sched_fifo_meta            (scheduler_meta_data),
+    .out_sched_fifo_valid           (scheduler_meta_valid),
+    .out_sched_fifo_ready           (scheduler_meta_ready),
+    .out_sched_fifo_almost_full     (scheduler_meta_almost_full),
+    .out_reassembly_fifo_meta       (reorder_meta_data),
+    .out_reassembly_fifo_valid      (reorder_meta_valid),
+    .out_reassembly_fifo_ready      (reorder_meta_ready),
+    .out_reassembly_fifo_almost_full(reorder_meta_almost_full)
+);
+
+// OOO flow IDs free-list
+sc_fifo #(
+    .IS_SHOWAHEAD(1),
+    .IS_OUTDATA_REG(0),
+    .DEPTH(MAX_NUM_OOO_FLOWS),
+    .DWIDTH(OOO_FLOW_ID_AWIDTH)
+)
+ooo_flow_ids_fl_fifo (
+    .clock(clk),
+    .data(ooo_flow_ids_fl_data),
+    .rdreq(ooo_flow_ids_fl_rdreq),
+    .wrreq(ooo_flow_ids_fl_wrreq),
+    .empty(ooo_flow_ids_fl_empty),
+    .full(), // Unused
+    .q(ooo_flow_ids_fl_q),
+    .usedw() // Unused
+);
+
+unified_fifo  #(
+    .FIFO_NAME        ("[flow_table_wrapper] scheduler_token_fifo"),
+    .MEM_TYPE         ("M20K"),
+    .DUAL_CLOCK       (0),
+    .USE_ALMOST_FULL  (1),
+    .FULL_LEVEL       (112),
+    .SYMBOLS_PER_BEAT (1),
+    .BITS_PER_SYMBOL  (SCHEDULER_TOKEN_T_WIDTH),
+    .FIFO_DEPTH       (128)
+) scheduler_token_fifo (
+    .in_clk            (clk),
+    .in_reset          (rst),
+    .out_clk           (),//not used
+    .out_reset         (),
+    .in_data           (out_sched_token_data),
+    .in_valid          (out_sched_token_valid),
+    .in_ready          (out_sched_token_ready),
+    .out_data          (r_sched_token_data),
+    .out_valid         (r_sched_token_valid),
+    .out_ready         (r_sched_token_ready),
+    .fill_level        (),
+    .almost_full       (sched_token_fifo_almost_full),
+    .overflow          ()
 );
 
 endmodule

@@ -19,6 +19,7 @@ module reassembler_service (
     output logic [31:0]                 parser_meta_csr_readdata,
     output logic [31:0]                 stats_incomp_out_meta,
     output logic [31:0]                 stats_parser_out_meta,
+    output logic [63:0]                 stats_parser_out_bytes,
     output logic [31:0]                 stats_ft_in_meta,
     output logic [31:0]                 stats_ft_out_meta,
     output logic [31:0]                 stats_emptylist_in,
@@ -30,6 +31,7 @@ module reassembler_service (
     output logic [31:0]                 stats_dm_in_check_meta,
     output logic [31:0]                 stats_dm_in_ooo_meta,
     output logic [31:0]                 stats_dm_in_forward_ooo_meta,
+    output logic [63:0]                 stats_dm_out_bytes,
     output logic [31:0]                 stats_nopayload_pkt,
     output logic [31:0]                 stats_dm_check_pkt,
 
@@ -48,6 +50,8 @@ module reassembler_service (
     server#(.DATA_BITS($bits(metadata_t))) parser_meta_fifo();
     server#(.DATA_BITS($bits(metadata_t))) ftw_out_meta();
     server#(.DATA_BITS($bits(metadata_t))) ftw_reorder_meta();
+    server#(.DATA_BITS($bits(metadata_t))) ftw_scheduler_meta();
+    server#(.DATA_BITS($bits(metadata_t))) ftw_reassembly_meta();
     server#(.DATA_BITS($bits(metadata_t))) ftw_nonforward_meta();
     server#(.DATA_BITS($bits(metadata_t))) ftw_forward_meta();
     server#(.DATA_BITS($bits(metadata_t))) dm_meta_in();
@@ -77,6 +81,7 @@ parser_client my_parser (
     .Clk(Clk),
     .Rst_n(Rst_n),
     .stats_out_meta(stats_parser_out_meta),
+    .stats_out_bytes(stats_parser_out_bytes),
     
     .in_meta(incomp_meta),
     .in_pkt(incomp_pkt),
@@ -110,7 +115,21 @@ flow_table_client ftw_inst (
     .in_meta              (parser_meta_fifo),
     .out_meta             (ftw_out_meta),
     .forward_meta         (ftw_forward_meta),
-    .reorder_meta         (ftw_reorder_meta)
+    .reorder_meta         (ftw_reorder_meta),
+    .scheduler_meta       (ftw_scheduler_meta)
+);
+
+arb_2_af_service #(
+    .DWIDTH(META_WIDTH),
+    .DEPTH(512),
+    .FULL_LEVEL(480)
+)
+arb_inorder_reassembly(
+    .Clk              (Clk),
+    .Rst_n            (Rst_n),
+    .in0   (ftw_scheduler_meta),
+    .in1   (ftw_reorder_meta),
+    .out   (ftw_reassembly_meta)
 );
 
 arb_2_af_service #(
@@ -121,8 +140,8 @@ arb_2_af_service #(
 arb_inorder_ooo(
     .Clk              (Clk),
     .Rst_n            (Rst_n),
-    .in0   (ftw_out_meta),
-    .in1   (ftw_reorder_meta),
+    .in0   (ftw_reassembly_meta),
+    .in1   (ftw_out_meta),
     .out   (ftw_nonforward_meta)
 );
 
@@ -148,6 +167,7 @@ data_mover_service dm_inst (
     .stats_in_check_meta       (stats_dm_in_check_meta),
     .stats_in_ooo_meta         (stats_dm_in_ooo_meta),
     .stats_in_forward_ooo_meta (stats_dm_in_forward_ooo_meta),
+    .stats_out_bytes           (stats_dm_out_bytes),
     .stats_nopayload_pkt       (stats_nopayload_pkt),
     .stats_check_pkt           (stats_dm_check_pkt),
 
