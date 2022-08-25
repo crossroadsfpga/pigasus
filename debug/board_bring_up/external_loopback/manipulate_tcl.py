@@ -36,8 +36,8 @@ def change_tcl(fname):
         for line in new_file:
             f.write("%s" % line)
 
-
-fname = sys.argv[1]
-
-change_tcl(fname)
+if __name__ == "__main__":
+    fname = sys.argv[1]
+    
+    change_tcl(fname)
 
