@@ -1,0 +1,150 @@
+
+# Project-Wide Assignments
+# ========================
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 19.3.0
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "17:36:40  AUGUST 26, 2020"
+set_global_assignment -name LAST_QUARTUS_VERSION "19.3.0 Pro Edition"
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+
+# Pin & Location Assignments
+# ==========================
+
+set_location_assignment PIN_AN51 -to o_tx_serial_0[0]
+set_location_assignment PIN_AL51 -to o_tx_serial_0[1]
+set_location_assignment PIN_AJ51 -to o_tx_serial_0[2]
+set_location_assignment PIN_AG51 -to o_tx_serial_0[3]
+set_location_assignment PIN_AM45 -to i_rx_serial_0[0]
+set_location_assignment PIN_AK45 -to i_rx_serial_0[1]
+set_location_assignment PIN_AH45 -to i_rx_serial_0[2]
+set_location_assignment PIN_AF45 -to i_rx_serial_0[3]
+set_location_assignment PIN_AJ43 -to i_clk_ref_0
+
+set_location_assignment PIN_AM3 -to o_tx_serial_1[0]
+set_location_assignment PIN_AL1 -to o_tx_serial_1[1]
+set_location_assignment PIN_AJ1 -to o_tx_serial_1[2]
+set_location_assignment PIN_AH3 -to o_tx_serial_1[3]
+set_location_assignment PIN_AL5 -to i_rx_serial_1[0]
+set_location_assignment PIN_AK7 -to i_rx_serial_1[1]
+set_location_assignment PIN_AH7 -to i_rx_serial_1[2]
+set_location_assignment PIN_AG5 -to i_rx_serial_1[3]
+set_location_assignment PIN_AJ9 -to i_clk_ref_1
+
+
+set_location_assignment PIN_BE17 -to clk50
+set_location_assignment PIN_BL14 -to cpu_resetn
+
+# Classic Timing Assignments
+# ==========================
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 100
+set_global_assignment -name TIMING_ANALYZER_MULTICORNER_ANALYSIS ON
+
+# Analysis & Synthesis Assignments
+# ================================
+set_global_assignment -name TOP_LEVEL_ENTITY alt_ehipc2_hw
+set_global_assignment -name FAMILY "Stratix 10"
+set_global_assignment -name SEARCH_PATH ./common
+
+# Fitter Assignments
+# ==================
+set_global_assignment -name DEVICE 1SM21BHU2F53E1VG
+
+set_global_assignment -name USE_PWRMGT_SCL SDM_IO14
+set_global_assignment -name USE_PWRMGT_SDA SDM_IO11
+set_global_assignment -name USE_CONF_DONE SDM_IO16
+set_global_assignment -name USE_INIT_DONE SDM_IO0
+set_global_assignment -name USE_CVP_CONFDONE SDM_IO15
+set_global_assignment -name PWRMGT_SLAVE_DEVICE_TYPE OTHER
+set_global_assignment -name PWRMGT_SLAVE_DEVICE0_ADDRESS 47
+set_global_assignment -name ACTIVE_SERIAL_CLOCK AS_FREQ_115MHZ_IOSC
+set_global_assignment -name MINIMUM_SEU_INTERVAL 1074947686
+set_global_assignment -name PWRMGT_PAGE_COMMAND_ENABLE ON
+
+
+# ------------------------
+# start ENTITY(alt_ehipc2)
+
+	# Fitter Assignments
+	# ==================
+	set_instance_assignment -name GXB_0PPM_CORECLK ON -to i_rx_serial[*] -entity alt_ehipc2
+	set_instance_assignment -name GXB_0PPM_CORECLK ON -to o_tx_serial[*] -entity alt_ehipc2
+
+# end ENTITY(alt_ehipc2)
+# ----------------------
+
+# ---------------------------
+# start ENTITY(alt_ehipc2_hw)
+
+	# Project-Wide Assignments
+	# ========================
+	set_instance_assignment -name MESSAGE_DISABLE 13410 -to qsfp_lowpwr -entity alt_ehipc2_hw
+	set_instance_assignment -name MESSAGE_DISABLE 13410 -to qsfp_rstn -entity alt_ehipc2_hw
+
+	# Fitter Assignments
+	# ==================
+	set_instance_assignment -name IO_STANDARD "CURRENT MODE LOGIC (CML)" -to i_rx_serial_0[*] -entity alt_ehipc2_hw
+	set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to o_tx_serial_0[*] -entity alt_ehipc2_hw
+	set_instance_assignment -name XCVR_VCCR_VCCT_VOLTAGE 1_1V -to i_rx_serial_0[*] -entity alt_ehipc2_hw
+	set_instance_assignment -name XCVR_VCCR_VCCT_VOLTAGE 1_1V -to o_tx_serial_0[*] -entity alt_ehipc2_hw
+        set_instance_assignment -name IO_STANDARD LVDS -to i_clk_ref_0 -entity alt_ehipc2_hw
+	set_instance_assignment -name IO_STANDARD LVDS -to "i_clk_ref_0(n)" -entity alt_ehipc2_hw
+
+	set_instance_assignment -name IO_STANDARD "CURRENT MODE LOGIC (CML)" -to i_rx_serial_1[*] -entity alt_ehipc2_hw
+	set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to o_tx_serial_1[*] -entity alt_ehipc2_hw
+	set_instance_assignment -name XCVR_VCCR_VCCT_VOLTAGE 1_1V -to i_rx_serial_1[*] -entity alt_ehipc2_hw
+	set_instance_assignment -name XCVR_VCCR_VCCT_VOLTAGE 1_1V -to o_tx_serial_1[*] -entity alt_ehipc2_hw
+        set_instance_assignment -name IO_STANDARD LVDS -to i_clk_ref_1 -entity alt_ehipc2_hw
+	set_instance_assignment -name IO_STANDARD LVDS -to "i_clk_ref_1(n)" -entity alt_ehipc2_hw
+
+	set_instance_assignment -name IO_STANDARD "1.8 V" -to cpu_resetn -entity alt_ehipc2_hw
+	set_instance_assignment -name IO_STANDARD "1.8 V" -to eQSFP_resetL -entity alt_ehipc2_hw
+	set_instance_assignment -name IO_STANDARD "1.8 V" -to eQSFP_LPmode -entity alt_ehipc2_hw
+
+# end ENTITY(alt_ehipc2_hw)
+# -------------------------
+
+# ----------------------------------------
+# start ENTITY(alt_ehipc2_wide_word_ram_8)
+
+	# Project-Wide Assignments
+	# ========================
+	set_global_assignment -name MESSAGE_DISABLE 14320 -entity alt_ehipc2_wide_word_ram_8
+
+# end ENTITY(alt_ehipc2_wide_word_ram_8)
+# --------------------------------------
+
+# Ordering Sensitive Assignments
+# ==============================
+set_global_assignment -name ENABLE_INTERMEDIATE_SNAPSHOTS ON
+set_global_assignment -name FAST_PRESERVE OFF -entity alt_ehipc2_hw
+set_global_assignment -name ENABLE_SIGNALTAP ON
+set_global_assignment -name SYSTEMVERILOG_FILE alt_ehipc2_hw.sv
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_user_mode_det.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_optics_control_i2c_workaround.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_mdio_control.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_i2c_wrapper.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_i2c_control.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_packet_client.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_ack_skid.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_mac_loopback.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_traffic_break.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_sync_arst.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_status_sync.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_packet_gen.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_packet_gen_sanity_check.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_stat_cntr_5port.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_six_three_comp.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_status_cntr_sync.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_a10_temp_sense.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_times_1pt8.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_sticky_flag.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_avalon_mm_read_combine.v
+set_global_assignment -name VERILOG_FILE ./common/alt_aeuex_wide_stat_cntr_4port.v
+set_global_assignment -name QIP_FILE ../ex_100G/ex_100G.qip
+set_global_assignment -name QSYS_FILE common/alt_ehipc2_jtag_avalon.ip
+set_global_assignment -name QSYS_FILE common/alt_ehipc2_sys_pll.ip
+set_global_assignment -name QSYS_FILE common/probe8.ip
+set_global_assignment -name QSYS_FILE common/reset_ip.ip
+set_global_assignment -name SDC_ENTITY_FILE ./alt_ehipc2_hw.sdc -entity alt_ehipc2_hw
+set_global_assignment -name OPTIMIZATION_MODE "SUPERIOR PERFORMANCE"
+set_global_assignment -name SEED 1
