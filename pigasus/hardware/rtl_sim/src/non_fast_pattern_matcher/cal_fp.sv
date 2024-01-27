@@ -2544,42 +2544,42 @@ always@(posedge clk)begin
         sub_fp_7 <= 0;
     end else begin
         if(last_r)begin
-            sub_fp_0 <= 0;
+            sub_fp_0 <= l4_valid_0_0 ? l4_sub_fp_0_0 : 0; 
         end else if (l4_valid_0_0)begin
             sub_fp_0 <= sub_fp_0 | l4_sub_fp_0_0;
         end
         if(last_r)begin
-            sub_fp_1 <= 0;
+            sub_fp_1 <= l4_valid_1_0 ? l4_sub_fp_1_0 : 0;
         end else if (l4_valid_1_0)begin
             sub_fp_1 <= sub_fp_1 | l4_sub_fp_1_0;
         end
         if(last_r)begin
-            sub_fp_2 <= 0;
+            sub_fp_2 <= l4_valid_2_0 ? l4_sub_fp_2_0 : 0;
         end else if (l4_valid_2_0)begin
             sub_fp_2 <= sub_fp_2 | l4_sub_fp_2_0;
         end
         if(last_r)begin
-            sub_fp_3 <= 0;
+            sub_fp_3 <= l4_valid_3_0 ? l4_sub_fp_3_0 : 0;
         end else if (l4_valid_3_0)begin
             sub_fp_3 <= sub_fp_3 | l4_sub_fp_3_0;
         end
         if(last_r)begin
-            sub_fp_4 <= 0;
+            sub_fp_4 <= l4_valid_4_0 ? l4_sub_fp_4_0 : 0;
         end else if (l4_valid_4_0)begin
             sub_fp_4 <= sub_fp_4 | l4_sub_fp_4_0;
         end
         if(last_r)begin
-            sub_fp_5 <= 0;
+            sub_fp_5 <= l4_valid_5_0 ? l4_sub_fp_5_0 : 0;
         end else if (l4_valid_5_0)begin
             sub_fp_5 <= sub_fp_5 | l4_sub_fp_5_0;
         end
         if(last_r)begin
-            sub_fp_6 <= 0;
+            sub_fp_6 <= l4_valid_6_0 ? l4_sub_fp_6_0 : 0;
         end else if (l4_valid_6_0)begin
             sub_fp_6 <= sub_fp_6 | l4_sub_fp_6_0;
         end
         if(last_r)begin
-            sub_fp_7 <= 0;
+            sub_fp_7 <= l4_valid_7_0 ? l4_sub_fp_7_0 : 0;
         end else if (l4_valid_7_0)begin
             sub_fp_7 <= sub_fp_7 | l4_sub_fp_7_0;
         end
