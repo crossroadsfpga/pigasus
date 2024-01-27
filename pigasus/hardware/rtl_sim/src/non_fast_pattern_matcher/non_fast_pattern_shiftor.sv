@@ -155,7 +155,8 @@ always @ (posedge clk) begin
     // state update
     if (out_valid) begin
         if (last_r1) begin
-            state <= 64'h0003070f1f3f7fff;
+	    //state <= 64'h0003070f1f3f7fff; // jhoe thinks this is wrong;
+	    state <= 64'h000103070f1f3f7f; // this is correct
         end else begin
             state <= next_state;
         end
@@ -166,7 +167,8 @@ always @ (posedge clk) begin
     end
 
     if (rst) begin
-        state <= 64'h0003070f1f3f7fff;
+	//state <= 64'h0003070f1f3f7fff; // jhoe thinks this is wrong
+	state <= 64'h000103070f1f3f7f; // this is correct
     end
 end
 
