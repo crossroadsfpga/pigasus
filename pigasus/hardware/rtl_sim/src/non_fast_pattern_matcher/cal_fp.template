@@ -85,7 +85,7 @@ always@(posedge clk)begin
     end else begin
 {% for i in range(0,context['bucket_size']) %}
         if(last_r)begin
-            sub_fp_{{i}} <= 0;
+            sub_fp_{{i}} <= l{{context['cal_layer']-1}}_valid_{{i}}_0 ? l{{context['cal_layer']-1}}_sub_fp_{{i}}_0 : 0;
         end else if (l{{context['cal_layer']-1}}_valid_{{i}}_0)begin
             sub_fp_{{i}} <= sub_fp_{{i}} | l{{context['cal_layer']-1}}_sub_fp_{{i}}_0;
         end
